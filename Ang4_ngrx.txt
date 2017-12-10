@@ -1,0 +1,446 @@
+refer ngrxproj03/itr2_poc-ngrx/ folder.
+Working example for 
+typescript: v2.3.4
+@ngrx/store: v4.x
+@ngrx/core: v1.2
+
+uses ActionReducerMap:<T> + StoreModule.forRoot(reducersVar) where reducersVar is of type ActionReducerMap
+these should be in your app.module.ts //This is where the change is
+in prev. versions of @ngrx/Store it was StoreModule.provideStore({year: MathReducer}) 
+
+
+===================================================
+app/reducers/ 
+	- lead.reducer.ts / MathReducer.ts 
+		import {Action} from '@ngrx/store' ;
+		export function leadReducer(state:, action:){
+			switch(action.type){
+				case ADD_LEAD:
+				case REMOVE_LEAD: 
+					state.filter (lead => lead.id !== action.payload.id)  
+				default:	
+			}
+			wtf is .payload?? .filter??
+		}	
+	- lead.reducer.spec.ts 
+	- app.module.ts
+		imports:[StoreModule.provideStore(_reducer, _initialState)] 
+				 StoreModule.provideStore(lead, leadReducer)	
+	- lead-control.component.ts 
+		lead: Observable<Lead[]> ;
+		constructor(private store:Store<AppState>) {}
+		
+		this.leads = this.store.select(state => state.lead); 
+		
+=========================================
+Medium: https://medium.com/@aravindfz/setting-up-storemodule-in-ngrx-4-0-b7c60732aa64 
+
+Setting up StoreModule in ngrx 4.0
+
+    Create a interface for AppStore, a collection of all the states.
+
+	
+app.store.ts	// This is our AppState.ts 
+
+export interface AppStore {
+     loaderSlice: LoaderSlice;
+}
+
+2. Create actions separately which will be of class and type(instead of enums)
+
+actions.ts	//Actions are defined in our MathReducer.ts. action.ts + reducer.ts = MathReducer.ts ?
+
+import { Action } from “@ngrx/store”;
+export const ShowLoader = ‘Showing Loader’
+export const HideLoader = ‘Hiding Loader’
+
+export class SHOW_LOADER implements Action {
+     readonly type = ShowLoader
+ }
+
+export class HIDE_LOADER implements Action {
+ readonly type = HideLoader
+ }
+export type Actions = SHOW_LOADER | HIDE_LOADER;
+ 
+
+Note: Each action will have a type so you should be implementing Action interface from ngrx/store
+
+3. Create a reducer and a state interface for strict typing(LoaderSlice in our example)
+reducer.ts	//Actions are defined in our MathReducer.ts. action.ts + reducer.ts = MathReducer.ts ?
+
+export interface LoaderSlice {
+   showOverlayLoader: boolean;
+}
+let initialState: LoaderSlice = {
+   showOverlayLoader: false
+};
+export function reducer
+               (state = initialState, 
+                action: LOADER_ACTIONS.Actions): LoaderSlice {
+
+switch (action.type) {
+    case LOADER_ACTIONS.ShowLoader: {
+         initialState.showOverlayLoader = true;
+         return Object.assign({},initialState);
+    }
+     case LOADER_ACTIONS.HideLoader:
+         return Object.assign({},initialState);
+      default:
+         return initialState;
+ }
+}
+
+4. This is the additional step you need to do in order to register your reducer.
+reducer.factory.ts
+
+import * as loaderReducer from “app/store/reducers/loader.reducer”;	//THis will be MathReducer.ts 
+import { AppStore } from “app/store/app.store”;		//THis will be AppState from AppState.ts 
+
+export const reducers: ActionReducerMap<AppStore> = {	//export const reducers: ActionReducerMap<AppState> = { ... }
+     loaderSlice: loaderReducer.reducer
+};
+
+Note: Registering reducers to a generic object of type ActionReducer<T>
+
+5.Import statement in your module by supplying the reducer factory
+StoreModule.forRoot(reducers)	//earlier it was StoreModule.provideStore({ year : MathReducer }) //step2: register the reducer
+
+================================================
+
+https://github.com/ngrx/platform/issues/171 (for any type errors)
+
+https://stackoverflow.com/questions/45268550/ngrx-4-store-without-a-model-using-any
+
+ngrx live app
+https://github.com/ngrx/platform/tree/master/example-app
+
+
+===========================================
+https://www.youtube.com/watch?v=cyaAhXHhxgk  ngrx-conf talks
+
+1 outside world interactions: like api calls etc.
+npm install --save @ngrx/effects
+
+    >> EffectsModule.run(BookEffects); 
+
+Component 
+  -> dispatch action 
+    -> Reducer (state, action)
+                           ====> > if this action has to do outside world interactions, we use
+                                  @ngrx/effects to isolate those outside world api calls, etc.
+                                 > @ngrx/effects will also return an action back to the original 
+                                  reducer to continue further.
+                           <====        
+        reducer returns new state   
+
+2.
+import changeDetectionStrategy from '@angular/core';
+@Component
+  changeDetection: ChangeDetectionStrategy.onPush
+
+This is called onPushNotification. This tell Angular2 CD, to skip the deep-dirty checks of objects
+and only do it when the reference to objects changes. 
+THis is because the store is now managing the state for us
+
+3. time travel 
+State1  -> state 2 -> state 3
+So, we can go back to any of the previous states of the state machine. This is called time travel.
+For this, we use.
+
+npm install --save @ngrx/store-devtools
+
+it gives us a time-travel debugger. 
+
+ >> Chrome / FF extension: Redux devtools extension 
+ >> app.module.ts
+ import { StoreDevToolsModule } from  @ngrx/store-devtools' ;
+ imports: [ ... , StoreDevTools.instrumentStore();
+
+when we instrument the store, we are keeping several states and that is a performance hit during development.
+And also when u push to production
+
+Another scenario would be you may want to take store-snapshots only when u r working on the chrome extension
+  for that use StoreDevTools.instrumentOnlyWithExtension() instead of StoreDevTools.instrumentStore() 
+Now, u dont have to pay performance penalty during dev or when u push to prod. 
+this is significant way to do dev work,
+
+===
+Wrapping up 
+
+1. State is readonly, observable n immutable. 
+  > observable: observable because components can register to changes in our state.  
+  > immutable: so that we can turn on the onpush change detection strategy to get big performance wins on our application.
+
+2. Our app now has a shared state service.
+3. Our side effects are isolated using @ngrx/effects
+
+See their @ngrx/example-app 
+> @ngrx/db for persisting data across multiple sessions . (is it really requuired???)
+> @ngrx/router=store to connect the angular-router to the store. and use the same time-travel debugger for the router.
+
+-------------------------------
+https://www.youtube.com/watch?v=pjwVq8B-ZAw&t=394s 
+Evolving State and Data Management with @ngrx/store and @ngrx/effects
+
+WHats an observable: is a handle to a stream of values which will change over time. 
+Its similar to a future in java. its similar to a promise (except u CANT cancel a promise, but u can cancel 
+an observable)
+
+https://www.youtube.com/watch?v=XY9VPrKuJaA 
+AngularJS Promise vs RxJs
+
+  You keep saying "switchMap presevers the order", which I find a bit vague. 
+  What it actually does is unsubscribe the previous observable that it returned and returns a new one.
+  So this means that the result from the previous observable is just lost, and 
+    the next one is now the one producing values. 
+    In the case of this being a employee selection, as in your example, 
+    it just means that when you quickly click employees in the list, the previous requests the thrown away, 
+    and only the last one you click on will be let through. Had you used mergeMap or flatMap, 
+    then the behavior would be the same as in the promise based solution, 
+    because mergeMap and flatMap don't unsubscribe the last observable that they produced.﻿
+
+  | async
+  Rx.Observable.fromPromise 
+  Rx.Observable.combineLatest
+    https://www.youtube.com/watch?v=ei7FsoXKPl0
+    https://www.youtube.com/watch?v=Tux1nhBPl_w
+  .next ?
+  cancelling an observable.
+  
+  Subject
+  BehaviorSubject
+  AsyncSubject ???
+
+================================================================
+
+
+Subjects:
+RxJS
+1. When the persons typing something, it will go and speak to a service. 
+
+<md-input-container>
+	<input #keywords type="text" mdInput autofocus="true" placeholder="Enter keyword" 
+	(input) = "keywordsInputChanges.next(keywords.value)" />
+</md-input-container>
+
+- Here the Subject would be the eventHandler. 
+- template reference variable will be used to get the text-value i.e. #keywords 
+- Since its a subject, it is also an observer and observers have .next() methods. 
+	the next() method, will push the values thru the Subject into an Observable of values 
+
+			import { Component, Inject } from '@angular/core' ;	
+			import Subject from 'rxjs/Subject'; 
+			import Observable from 'rxjs/Observable';	
+
+			- Subjects are observables;
+			- they r also observers with next, error and complete
+			- allow us to push values by calling subject$.next(value)
+			- have all operators on them, that any observable would 
+
+			Do NOT do these:- 
+			import * as Rx from 'rxjs'; //NO!!!
+			import {Observable, BehaviorSubject} from 'rxjs'; //Wrong 
+			import {Subject} from 'rxjs/Rx' ; //Bad 
+			These will bring 60+ operators everytime u type that line, making ur application bulky.
+
+			Right way to do things:- include just what you need. (only the barebones)
+			// Pull in types you need individually 
+			import {Observable} from 'rxjs/Observable'; 
+			import {Subject} from 'rxjs/Subject' ;
+			import {async} from 'rxjs/scheduler/async'; 
+			//add operators in your app.module.ts 
+			import 'rxjs/add/operator/map';
+			import 'rxjs/add/operator/filter';
+			//of, from, etc. 
+
+Coming back to what we were doing earlier:=
+
+@Component({
+	...
+	providers: [PunService]
+})
+
+export class PunLookUpComponent{
+	constructor(private puns: PunService){}
+}
+
+---
+
+PunService looks like this:- 
+
+@Injectable
+export class PunService {
+	constructor(private http:Http){}
+	
+	suggestKeywords(partial:string) : Observable<string[]> {
+		return this.http.get('https://..../?q=${partial}') //see how string interpolation is being done.
+		.map (res => res.json() )		//we can do switchMap and mergeMap as well. 
+		.catch (err=> {
+			console.error(err);
+			return Observable.empty(); //This is cool !!!	
+		});
+	}
+} //Punservice ends
+
+---
+
+extending our PunLookUpComponent{ class 
+
+
+@Component({
+	...
+	providers: [PunService]
+})
+
+export class PunLookUpComponent{
+	constructor(private puns: PunService){}
+	keywordsInputChange$ = new Subject<string>();
+	keyword$ = this.keywordsInputChange$.switchMap(text => this.puns.suggestKeywords(text));
+}
+
+The reason we r using switchMap here is :-
+It is going to take that observable of text input changes and change it into an observable of suggestKeywords
+- it converts the values into a new observable
+- it switches to that observable
+- it unsubscribes from any previous ones they might have made.
+
+<ul>
+	<li *ngFor="let keyword of (keyword$ | async)">{{keyword}}</li>
+</ul>
+
+| async === when the component initializes, it will subscribe to the the observable and when it is removed from the view, it will unsubscribe from the observable
+
+	<li *ngFor="let keyword of (keyword$ | async)">{{keyword}}</li>
+	<li *ngFor="let keyword of (keyword$ | async)">{{keyword}}</li>
+	
+	if u r reusing, then u need to use the share-operator for multicasting.
+	keyword$ = this.keywordsInputChange$.switchMap(text => this.puns.suggestKeywords(text))
+				.share(); 
+				one subscription, multiple subscribers. 
+	
+--- 
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+1) ngrx 
+= setting a value
+= getting a value 
+https://medium.com/@flashMasterJim/setting-up-ngrx-store-in-an-angular-2-project-e5232a7b082e
+
+2) ngrx-effects
+= api call
+https://medium.com/@flashMasterJim/the-basics-of-ngrx-effects-effect-and-async-middleware-for-ngrx-store-in-angular-2-f25587493329
+
+3) angular-material design
+- introduction 
+
+4) | async 
+
+-----------------------------------------
+
+ngrx 
+- Reading data from a Store https://medium.com/@flashMasterJim/setting-up-ngrx-store-in-an-angular-2-project-e5232a7b082e
+  constructor (private store:Store<State>) {
+
+    store.select('mainStoreReducer')
+      .subscribe( (data:State )=> {
+        this.data = 'data is' + data.counter;
+      });
+
+  }
+  
+= setting values (same link as above )
+  constructor (private store:Store<State>) {
+
+    store.select('mainStoreReducer')
+      .subscribe( (data:State )=> {
+        this.data = 'data is' + data.counter;
+      });
+
+    this.store.dispatch({ type: INCREMENT });
+
+  }
+
+Note that we can also send a payload along with our actions like this:
+  this.store.dispatch({ type: INCREMENT, payload: {innerObj: {text: "derp!"}} });
+  
+And then you can access this payload in your reducer from the actions object like so:
+  console.log('the payload string is: ' + action.payload.innerObj.text);
+  
+----------------------------------------
+2) ngrx-effects	https://medium.com/@flashMasterJim/the-basics-of-ngrx-effects-effect-and-async-middleware-for-ngrx-store-in-angular-2-f25587493329
+npm install @ngrx/effects --save
+
+Next, you need to tell your application that you wan to use effects. In the imports array in your NgModule add a line where you call EffectsModule.run. 
+Pass in the class (or classes) that you are using as the “Effects Class” (or classes). 
+Of course your NgModule file will probably have lots more code in in thie file, but I’ve distilled it down to just the ngrx things here:
+
+import { EffectsModule } from '@ngrx/effects';
+...
+@NgModule({
+  imports: [
+    StoreModule.provideStore({mainStoreReducer}),	//this is outdated in angular 4
+    EffectsModule.run(MainEffects),	//MainEffects is an Effects Class we need to create.
+  ]
+  ]
+})
+
+> Create An Effects Class named "MainEffects"
+At it’s core, the Effects Class in simply just an Angular 2 Service:
+What you want to return from an ngrx/effect is an observable to an action
+
+import {Effect, Actions, toPayload} from "@ngrx/effects";
+import {Injectable} from "@angular/core";
+import {Observable} from "rxjs";
+
+@Injectable()
+export class MainEffects {
+  
+  constructor(private action$: Actions) { }
+
+}
+
+> Hello World @Effect (where to write this ??) In the store code ?? i think so
+@Effect() update$ = this.action$
+    .ofType('SUPER_SIMPLE_EFFECT')
+    .switchMap( () =>
+      Observable.of({type: "SUPER_SIMPLE_EFFECT_HAS_FINISHED"})
+    );
+	
+> Payload example 
+@Effect() effectWithPayloadExample$ = this.action$
+    .ofType('SEND_PAYLOAD_TO_EFFECT')
+    .map(toPayload)
+    .switchMap(payload => {
+      console.log('the payload was: ' + payload.message);
+      return Observable.of({type: "PAYLOAD_EFFECT_RESPONDS", payload: {message: "The effect says hi!"}})
+    });
+
+	
+
+NOTE: state/action both seem to be Subjects !
+research on this more !!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
