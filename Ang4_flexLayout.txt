@@ -1,0 +1,77 @@
+3) 
+https://material.angular.io/guide/getting-started 
+https://material.angular.io/components/categories
+
+npm install --save @angular/material @angular/cdk
+npm install --save angular/material2-builds angular/cdk-builds (???)
+npm install --save @angular/animations
+Note: @angular/animations uses the WebAnimation API that isn't supported by all browsers yet. 
+If you want to support Material component animations in these browsers, you'll have to include a polyfill.
+https://github.com/web-animations/web-animations-js
+
+https://www.youtube.com/watch?v=ngXXFn3G1r8
+
+npm install --save @angular/flex-layout
+https://tburleson-layouts-demos.firebaseapp.com/#/docs
+https://slides.com/thomasburleson/flex-layout		https://slides.com/thomasburleson
+https://github.com/angular/flex-layout/wiki/Responsive-API
+http://bit.ly/demo-flex-layout-responsive 
+http://cssreference.io/flexbox/ 
+import {FlexLayoutModule} from ''; 
+
+https://alligator.io/angular/flex-layout/	
+http://www.dzurico.com/angular-flex-layout/ 
+
+Breakpoint ranges. 
+0-599px xs
+600 - 959 sm 
+960-1279 md 
+1280-1919 lg
+1920-5000px xl 
+
+----
+
+https://www.spreadshirt.com/angular+t-shirts
+https://www.spreadshirt.com/angular+hoodies+&+sweatshirts 
+
+----
+div table responsive bootstrap
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link href="main.css" rel="stylesheet" />
+    </head>
+
+    <body>
+
+    <div class="row">
+      <div class="col-md-3 col-xs-6 divTableCell"><img src="https://cdn.shopify.com/s/files/1/1606/7271/files/iPhone4Parts.png?11283548812375177185" alt="" width="200" height="200" /> <br />iPhone 4 Parts
+      </div>
+      <div class="col-md-3 col-xs-6 divTableCell"><img src="https://cdn.shopify.com/s/files/1/1606/7271/files/iPhone4sParts.jpg?3165596616796717679" alt="" width="200" height="200" /> <br />iPhone 4s Parts
+      </div>
+      <div class="col-md-3 col-xs-6 divTableCell"><img src="https://cdn.shopify.com/s/files/1/1606/7271/files/iPhone5Parts.jpg?8873682526308780626" alt="" width="200" height="200" /> <br />iPhone 5 Parts
+      </div>
+      <div class="col-md-3 col-xs-6 divTableCell"><img src="https://cdn.shopify.com/s/files/1/1606/7271/files/iPhone5cwhite.jpg?647508470520316270" alt="" width="200" height="200" /> <br />iPhone 5c Parts
+      </div>
+    </div>
+
+    </body>
+</html>
+
+.divTableCell, .divTableHead {
+    border: 1px solid #ffffff;
+    /*display: table-cell;
+    padding: 3px 10px;*/
+    text-align: center;
+}
+
+@media (max-width: 320px) { 
+    .divTableCell {
+        width: 100%;
+    }
+}
+
+---
+  
