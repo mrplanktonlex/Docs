@@ -1,0 +1,162 @@
+Migration plan:-
+
+MILESTONE 1.
+https://blog.thoughtram.io/angular/2015/10/24/upgrading-apps-to-angular-2-using-ngupgrade.html
+> structuring:- ng1 folder structure should be feature based. like ng2. (like moda in ng1)
+    >> make ng1 app work using this new structure.
+> use .service() instead of .factory()
+    >> >> https://blog.thoughtram.io/angular/2015/07/07/service-vs-factory-once-and-for-all.html
+> writing new components in ES6 n TS.    
+> identifying dumb components n move to .components(), so that ng2 equivalent code can be written.
+
+MILESTONE 2.        
+ngUpgrade. The module basically acts as an adapter facade, so we don’t really feel that there are two frameworks running side-by-side.
+
+The typical upgrade process
+Here’s what a typical upgrade process would look like:-
+    Include Angular and upgrade module
+    Pick component to upgrade and change its controller and template Angular 2.x syntax (this is now an Angular 2.x component)
+    Downgrade Angular 2.x component to make it run in Angular 1.x app
+    Pick a service to upgrade, this usually requires little amount of change (especially if we’re on ES2015)
+    Repeat step 2 and 3 (and 4)
+    Replace Angular 1 bootstrap with Angular 2.x bootstrap
+
+Sample demo:-
+    1. https://github.com/thoughtram/angular-upgrade-demo
+    2. https://angular.io/guide/upgrade
+    3. https://gist.github.com/bcherny/8f35f5e5ff62b09ce7b3ef9cbf637ee9 (ang.1. using ts)
+            http://www.developerhandbook.com/typescript/writing-angularjs-1-x-with-typescript/ 
+
+Communicating between components in ng2
+http://jasonwatmore.com/post/2016/12/01/angular-2-communicating-between-components-with-observable-subject
+
+
+upgrade cheatsheet:-
+https://angular.io/guide/ajs-quick-reference  VIMP!!!
+webpack2 for angular2:-
+    https://github.com/AngularClass/angular-starter (Detailed ng2 starter kit for dev n prod, using webpack2)
+    https://github.com/wkwiatek/angular2-webpack2 (mini starter kit)
+    https://semaphoreci.com/community/tutorials/setting-up-angular-2-with-webpack
+    http://www.dotnetcurry.com/angularjs/1320/using-webpack-bundling-with-angular-2
+    https://damienbod.com/2017/01/14/angular-2-lazy-loading-with-webpack-2/
+    https://webpack.github.io/
+        http://webpack.github.io/docs/
+        http://webpack.github.io/docs/what-is-webpack.html
+        http://webpack.github.io/docs/tutorials/getting-started/
+---
+
+yarn with angular2:-  https://yakovfain.com/2016/11/06/angular-cli-speed-up-installing-dependencies-with-yarn/
+    ng new sampleProj
+    The above command will generate the boilerplate code of the project in the directory sampleProj with package.json and will immediately run npm install there.
+    
+Deterministic installation using yarn:-
+    ng set --global packageManager=yarn
+    npm install -g yarn
+    ng new --skip-install sampleProj
+    cd sampleProj
+    yarn
+    npm set strict-ssl false
+    yarn
+
+---
+
+Q. Is yarn really deterministic? How about a test?
+A. We will check if same versions of packages were installed or not (before and after deleting node_modules/ folder)
+1) yarn list > yarn_list_1.txt
+    D:\js\ng2\test02\sampleProj>yarn list > yarn_list_1.txt   
+2) Delete node_modules/ folder
+3) yarn (same as "yarn install") .
+    Parallely also install Ultraedit to compare both yarn_list_1.txt and yarn_list_2.txt (which we will create soon)
+4) yarn list > yarn_list_2.txt
+5) Open both files in ultraedit compare and only 1 line is different i.e. Done in x.xxs.
+
+> Delete node_modules/ folder
+    npm install
+> npm list > npm_list_2.txt.
+    Now lets compare yarn_list_1.txt and npm_list_2.txt and we can already see many diff:-
+        eg.1.
+        package.json: No entry. this is a dependency
+        yarn: autoprefixer@^6.5.3. Both time same version. in yarn_list_1.txt , yarn_list_2.txt
+        npm: autoprefixer@6.7.7
+        package.json: No entry. this is a dependency
+        yarn: lodash@^4.11.1       Both time same version. in yarn_list_1.txt , yarn_list_2.txt
+        npm: lodash@4.17.4
+        
+        eg.2. https://stackoverflow.com/questions/22343224/whats-the-difference-between-tilde-and-caret-in-package-json
+        package.json: ^5.1.0
+        yarn: rxjs@^5.0.1
+        npm: rxjs@5.4.2
+
+        package.json: "zone.js": "^0.8.4"
+        yarn: zone.js@0.8.12
+        zone.js@0.8.12
+        Looks like both yarn and npm r not picking any version. Looks that way. But isnt.
+
+        0.8.12 ===> major(breakingchange).minor(refactoring,backward compatibility, etc.).patch(bugfixes)
+
+        minor is denoted by ^
+        patch is denoted by ~
+
+        https://stackoverflow.com/questions/22343224/whats-the-difference-between-tilde-and-caret-in-package-json
+        ^version     "Compatible with version"
+        ~version     "Approximately equivalent to version"
+         version     Must match version exactly
+
+         eg. 3. How does yarn & npm behave when we use exact versions ??
+         package.json
+             "rxjs": "5.1.0",
+             "zone.js": "0.8.4"
+
+            > Delete node_modules/
+            > yarn
+            > yarn list > yarn_list_3_1.txt
+            > Delete node_modules/
+            > npm install
+            > npm list > npm_list_3_1.txt
+            Compare:   
+                yarn n npm both got exact versions. However, rxjs uses a symbol-observable sub-package and :-
+                    for it, yarn: 1.0.1 , npm : 1.0.4
+
+Continue to use yarn.
+Running npm install on two different machines can result in different dependencies being installed on each machine. These two machines could be two developer machines.
+Or, much more problematic, they could be a development machine and a production machine.
+If the same dependency list goes in, the same node_modules folder should come out.
+    npm claims to do what yarn does using "npm shrinkwrap" but pundits rebuff this. See this:- http://jonnyreeves.co.uk/2016/npm-shrinkwrap-sucks/
+---
+    https://scotch.io/tutorials/yarn-package-manager-an-improvement-over-npm
+    Adding Babel, sass and webpack to yarn:-
+    https://medium.com/front-end-hacking/what-are-npm-yarn-babel-and-webpack-and-how-to-properly-use-them-d835a758f987
+    Did not add:- (as these are already there in the ng-cli-skeleton ) webpack  babel-preset-react  css-loader  node-sass  sass-loader  style-loader
+    yarn add --dev  babel-core babel-loader  babel-preset-es2015
+
+---   
+Lets start with webpack:-
+
+webpack.config.js:-
+    var config = {
+      entry: 'src/app/index.js',
+      output:{
+        path: 'src/dist',
+        filename: 'build.js',
+      }
+    };
+    module.exports = config;
+edit package.json
+scripts->build: ng run build / ng build ??
+Also, cli has src/dist defined so use another ABSOLUTE path.
+---
+toaster-service in angular1.
+
+app.factory("Data", ['$http', 'toaster',
+    function ($http, toaster) { // This service connects to our REST API
+        var serviceBase = 'api/v1/';
+        var obj = {};
+        obj.toast = function (data) {
+            toaster.pop(data.status, "", data.message, 10000, 'trustedHtml');
+        }
+
+       
+
+       
+
+-        
