@@ -1,0 +1,277 @@
+https://www.youtube.com/watch?v=L8TAn9OcdqU
+
+1.
+<base href="/src/"> in index.html 
+tells angular how to compose navigation urls 
+
+2. 
+import RouterModule and define routes.
+	Routes is just an array of routes 
+	{path: '', redirectTo: '/home', pathMatch:'full'} 		//if user enters root path, move it to /home route, which can also be defined. 
+	{path: '**', component: PageNotFoundComponent, redirectTo: '/home', pathMatch:'full'}		//wildcard route 
+	
+	order is important:
+	specific routes should be @ top 
+	general path should be at the bottom
+
+3. 	
+<div style="padding:5px">
+	nav nav-tabs 
+
+<router-outlet>
+the routerLinkActive="active" can be assigned to all <li> elements (note <li> not <a>)
+	
+4. 
+re-write rules 	maybe required for the contextroot in place of /src/
+
+5. 
+html5 style routes require rewrite rules (in webserver config)
+hash style routes then rewrite rules is not required 
+
+lets use hash style routes :-
+> RouterModule.forRoot(appRoutes, {useHash: true} )
+
+- back n forward buttons of browser should work
+- reload of page should work 
+- /src/#/asfdsdf should load PageNotFoundComponent 
+- typing the path manually should work 
+
+---
+
+https://www.youtube.com/watch?v=WWQZCDegWHg&list=PL6n9fhu94yhWqGD8BuKuX-VTKqlNBj-m6 
+- Also see attribute binding, style binding, class binding 
+- lifecycle hooks  https://www.youtube.com/watch?v=RCLwwWQ8-V0&index=24&list=PL6n9fhu94yhWqGD8BuKuX-VTKqlNBj-m6 
+ngOnChanges, ngOnInit, ngDoCheck, (very common)
+	ngAfterContentInit, ngAfterContentChecked, ngAfterViewInit, ngAfterViewChecked (less commonly used)
+ngOnDestroy (very common)
+
+--- 
+
+ngOnChanges
+- called before ngOnInit
+- executes everytime the value of an input property changes
+- the hook methods receives a SimpleChanges object containing current and previous property values. 
+
+ngOnInit
+- executes after the constructor and after ngOnChange hook for the first time. 
+- it is commonly used for compoent initialisation and retrieving data from a database. 
+
+--- 
+
+import {OnChanges, SimpleChanges} from '@angular/core';
+ngOnChanges(changes: SimpleChanges){
+	for (let propertyName in changes ) {
+		let change = changes[propertyName]; 
+		let current = JSON.stringify (change.currentValue);
+		let previous = JSON.stringify(change.previousValue);
+		console.log
+	}
+}
+
+---
+routerLink = "/servers" -OR- [routerLink] = "'/users'"
+routerLink = "servers" -OR- [routerLink] = "'users'" 	
+
+---
+
+Q.1. How to get current route ?
+Do this: 
+import from @angular/router
+constructor(route: ActivatedRoute)
+
+ActivatedRoute will give you the route for the currently loaded route !
+
+Q.2. how to do relative path routing?
+	this.router.navigate(['servers'], {relativeTo: })
+Note:-
+/servers makes it absolute path 
+servers makes it relative to current route (if there is no 2nd param)
+servers + { relativeTo: } makes it relative to specific path 
+
+this.router.navigate(['servers'], {relativeTo: this.route}) where route is ActivatedRoute from Q.1.
+
+Q.3. L120
+Passing route params to routes 
+
+(there is users-obj in the usersComponent class )
+Same route, different components
+{path: 'users', component: UsersComponent}
+{path: 'users', component: UserComponent} //<< note this is a singular component. But path is same for now. 
+
+we want to do something like this:
+{path: 'users/1', component: UserComponent} 
+{path: 'users/2', component: UserComponent} 
+
+{path: 'users/:id', component: UserComponent} 
+
+
+To get this :id in our class, 
+- constructor(private route:ActivatedRoute)
+- 
+Beginning of class:
+	user {id:number, name:string}
+ngOnInit()
+	this.user = {
+		id: this.route.snapshot.params['id'],
+		name: this.route.snapshot.params['name'],
+	};
+	
+{path: 'users/:id/:name', component: UserComponent}	
+
+{{user.id}} {{user.name}}
+
+---
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+
+Directives
+	Q. What r directives??
+	A. Instructions in the DOM.
+	3 types of directives.
+		- components : directives with templates. instructions in the dom. 
+		- directives : directives without templates 
+		- inbuilt directives (ships with angular)
+			- ngIf 
+			- ngFor 
+	
+eg. for #2	There are also directives without any template. eg. 
+	<div appTurnThisGreen></div>
+	...
+	@Directive({
+		selector: '[appTurnThisGreen]'
+	})
+	export class TurnGreenDirective {
+	}
+	
+eg. for #3 	
+*ngIf : * means its a structural directive: it either add or it doesnt add it. 
+	<p *ngIf="userCreated">Welcome user: {{userName}} </p>
+		condition : any expression returning return true/false, any function returning true or false, or a hardcoded true/false 
+	
+*ngIf-else:
+		<p *ngIf="userCreated">Welcome user: {{userName}} </p>
+
+		<p>User not created </p>	//this is the else section that we want to make
+		step1:
+			<ng-template #somevar >
+				<p>User not created</p> 
+			</ng-template>	//wrap  <p> with <ng-template>
+																//the reason we replace is because we want to mark it in the template.
+																//we r also assigning a reference variable (will dive deeper into it later) eg. #somevar 
+
+		step2: 															
+		<p *ngIf="userCreated; else somevar" >Welcome user: {{userName}} </p>
+
+ngStyle: allows us to add barebone css 
+	ngStyle + property binding = [ngStyle] . not mandatory to use property binding 
+	<p [ngStyle] = "{'background-color': 'red'}">Welcome user: {{userName}} </p>
+	<p [ngStyle] = "{backgroundColor: 'red'}">Welcome user: {{userName}} </p> //if u dont use '' for keynames like background-color, 
+		//the casing becomes camelcased i.e. backgroundColor 
+	
+	<p [ngStyle] = "{backgroundColor: getColor()">Welcome user: {{userName}} </p>	
+	
+ngClass: allows us to add css classes. 
+	keys are css-classnames
+	values are conditions 
+	
+	<p [ngClass] = "{online: ServerStatus==='online'">Server is online !!! </p>	
+	
+*ngFor 	
+	works???
+	<ul *ngFor="let item of items">
+		<li>{{item}}</li>
+	</ul>
+	
+		<ul *ngFor="let item of items; let myIndex = index">
+			myIndex is available here.
+		</ul>	
+		
+--------------
+
+Basics of Angular
+... 4 ways of communication (called Data binding in angular) ...
+TS COde 	===>output data  ===========>   	HTML
+			<===react to user event <====
+
+Output Data:-
+	1. String Interpolation {{data}}, 	 
+	render the bound value from component's template and it converts this expression into a string.
+			
+	2. Property Binding [someProperty]="data",
+	does the same thing by rendering value from component to template, but if you want to bind the expression that is other than string (for example - boolean), then property Binding is the best option.
+				LHS is a TS variable in a class. usually marked a public . 
+					NOTE: by default all properties are not accessible outside the component. 
+						  So, u have to be specific as to which properties you want to expose. 
+						  In order to do that, we need to use the @Input() decorator
+									import {Input} from '@angular/core'; 
+									...
+									@input() element: {name:string, place:string, animal:string}	//@input is required to make a property bindable from outside
+									@input() element: {} //just to showcase how to write variables of type objects in TS. 
+									...
+									HTML in ngFor
+									<[element] = "ServerElement">
+									
+							Sometimes, u may want to hide the name on the html side like 		
+									<[srvElement] = "ServerElement"> 
+									But this wont work now. 
+									To make it work, write this in ur class 
+									@input('srvElement') element: {name:string, place:string, animal:string}
+										srvElement now acts as an alias to element .
+									
+				RHS is some data which is coming from n ngFor loop, lets say
+					trueValue="{{true}}"
+					[trueValue]="'Y'"
+					[trueValue]="Y"
+
+		Attribute Binding
+			attr.trueValue="{{'Y'}}"
+			[attr.trueValue]="'Y'"
+			Attribute binding is helpful if you want to use the trueValue attribute to address the element with CSS selectors.
+				
+React to(User) events
+	3. Event Binding	
+		(event) = "expression"
+		L63. how to create custom event from child1 component to the parent (app-component)		
+		IMP: this is for Component communication. 
+		NOTE: this does not become optimum for sibling communication i.e. when 2 comps sit next to each other, dont use this method.
+		
+			eg. <child (serverCreated) = "onServerAdded($event)></child>
+				where serverCreated is a custom event 
+					  onServerAdded() is a class method 
+				
+				> in child component
+					serverCreated will be a public property in the child class 
+					export class childComponent
+						serverCreated; //but this wont work . we have to make it an event. 
+						
+						import {EventEmitter} from '@angular/core' ;
+						serverCreated = new EventEmitter; // WIP 
+						serverCreated = new EventEmitter<{key1:value1, ...}>; // WIP. 
+						serverCreated = new EventEmitter<{key1:value1, ...}>(); // add () to call the constructor of eventEmitter. WIP
+																				now it becomes an event 
+		
+						//within the child class itself 
+						somefunc(){
+							this.serverCreated.emit({some object with keys n values });
+						}
+
+							=OR=													
+							//import Output from angular/core
+							@Output() serverCreated = new EventEmitter<{key1:value1, ...}>();  //Add @Output()
+									//so that it becomes listenable.
+							
+							=OR=
+							@Output('srvCreated') serverCreated = new EventEmitter<{key1:value1, ...}>();  //Add @Output()
+							...
+							<child (srvCreated) = "onServerAdded($event)></child>
+							
+					----
+						
+					  
+	4. Two-way data binding
+		property + event binding 
+				
+				
+				
