@@ -1,0 +1,7902 @@
+CORS = Cross origin resource sharing
+Browser may not allow outside access.
+
+Sometimes, u r not getting the response back from the server. its because of CORS.
+//access-control-allow-origin : browser needs to set it. 
+Sol1. add a chrome extension. The name of the extension is: access-control-allow-origin
+You dont have to do anything. it will take care of it.  
+Sol2. interceptor. ( InterceptorModule by the TechSith guy)
+HttpInterceptor. It will insert the property access-control-allow-origin in the header.
+Access-Control-Allow-Origin
+This is viewable in the Network tab.
+
+https://www.youtube.com/watch?v=MN2WkxPnGTo HttpClient
+
+- app.module.ts
+import {HttpClientModule} from '@angular/common/http';
++ 
+in @NgModule
+imports:[ ... , HttpClientModule]
++
+app.component.ts
+import {HttpClient} from '@angular/common/http'; //Note: here it is HttpClient
++
+inside class
+constructor(private hc:HttpClient){
+}
+//use json-server && db.json 
+somefunc(){
+this.hc.get('<url>')
+    .subscribe(
+        (data:any[]) => {
+            if (data.length){
+              //...
+            }
+        }
+}
+
+---
+
+Goals:
+Create a new comp: intro1
+1. execute simple tests using plain jasmine
+2. execute simple tests using TS
+> Unit Tests.
+Component+fakeservice/fakerouter + NOtemplate.
+> Integration Tests.
+Component+template+fakeservice/fakerouter
+> End-to-end Tests. 
+When we test the entire application as a whole
+protractor. Very slow. Very fragile.
+Write more unit+integration tests
+n do End to end only for really important functionality.
+
+- Arrange. Assimilate. Act.
+
+--- 
+
+Consolidated : As in ysne email
+
+>>> app.module.ts
+
+
+@NgModule is a module-based decorator
+
+- declarations: All new components are within the declarations array.
+
+- imports:
+
+    -- FormsModule provides ngModel
+
+    -- HttpModule is module that includes http to make ajax calls
+
+    -- BrowserModule provides ng-module for the browser
+
+- providers: to make the service globally available
+
+- bootstrap: [AppComponent] //the root component is mentioned here
+
+
+>>> Manually creating a component:-
+
+
+-> radicaltest/radical-test.component.ts :-
+
+
+        //Component needs to be imported from the @angular/core package
+
+        import {Component} from '@angular/core';
+
+
+        //Component defines the metadata.
+
+        @Component({
+
+          selector: 'radical-test', //selector implies the html-tag. eg. <radical-test></radical-test>
+
+          template: `M a radical component`
+
+        })
+
+
+        //class is lowercase.
+
+        //RadicalTestComponent would mean 2 things.
+
+          //its defined in radical-test.component.ts
+
+          //its selector should be hyphenated .i.e. radical-test
+
+
+        export class RadicalTestComponent{
+
+
+        }
+
+
+-> app.component.html:-    
+
+        <radical-test></radical-test>
+
+
+-> app.module.ts:-
+
+    import { RadicalTestComponent } from './radicaltest/radical-test.component' ;
+
+    ...
+
+    @NgModule
+
+        declarations: [ ...,
+
+                        RadicalTestComponent
+
+                        ]
+
+
+Assignment: Create 2 fresh components of ur own.                        
+
+                       
+
+>>> string interpolation
+
+
+->radicaltest/radical-test.component.ts
+
+
+    @Component({
+
+      selector: 'radical-test', //selector implies the html-tag. eg. <radical-test></radical-test>
+
+      template: `M a radical component
+
+        + {{string_interpolate1}} + {{func_interpolate1()}}
+
+        + {{obj_interpolate1['hero1']}}
+
+        + {{obj_interpolate1['hero2'] | uppercase}}
+
+        + {{obj_interpolate1['hero2'] | uppercase | lowercase}}
+
+        + {{(10 + 10) / 10}}
+
+        + {{ (string_interpolate1)? 'string_interpolate1 found' : 'string_interpolate1 NOT found' }}
+
+        + {{ obj_interpolate1 | json }}
+
+        + {{ 'Concatenation example: ' + '1string' + '2string' + arr_interpolate1[0] + obj_interpolate1['hero1']}}
+
+        + {{arr_interpolate1.length }}
+
+        + {{arr_interpolate1}}
+
+
+        }}
+
+        `
+
+        //+ {{arr_interpolate1.push(10) }} //WONT WORK.
+
+    })
+
+
+    ...
+
+    export class RadicalTestComponent{
+
+      string_interpolate1:string = 'string1';
+
+      func_interpolate1 = ():string => {return 'func_interpolate1'};
+
+      obj_interpolate1:any = {
+
+        hero1: 'batman', hero2: 'superman'
+
+      }
+
+      arr_interpolate1:number[] = [1, 2, 3, 4];
+
+
+    }
+
+                       
+
+NOTE:
+
+> try to keep data expressions as lean as possible.
+
+> | uppercase, | lowercase, | json are some inbuilt pipes
+
+
+O/p:
+
+M a radical component + string1 + func_interpolate1 + batman + SUPERMAN + superman + 2 + string_interpolate1 found + { "hero1": "batman", "hero2": "superman" } + Concatenation example: 1string2string1batman + 4 + 1,2,3,4 }}                       
+
+                       
+
+                       
+
+>>> property binding
+
+remove the template: property and create a templateUrl instead
+
+
+>>>
+
+  templateUrl: './radical-test.component.html'
+
+ 
+
+radical-test.component.html
+
+    <div>Radical Component in html</div>
+
+ 
+
+
+>>> property binding
+
+
+-> radical-test.component.ts
+
+export class RadicalTestComponent{
+
+  disabledflag:boolean = true;
+
+
+  constructor(){
+
+    setTimeout(()=>{
+
+      this.disabledflag = !this.disabledflag;
+
+      return this.disabledflag
+
+    }, 5000); //setTimeout ends
+
+
+  } //constructor ends
+
+} //RadicalTestComponent ends
+
+
+
+-> radical-test.component.html
+
+<div>Radical Component in html</div>
+
+<button class="btn btn-primary" [disabled]=disabledflag>Click me</button>
+
+
+Copy and paste radical-test.component.ts to 4radical-test.component.property_binding
+
+
+---
+
+
+Task: make an textbox using property binding on the placeholder-property
+
+A.
+
+<input type="text" [placeholder]="inputplaceholder">
+
++
+
+export class RadicalTestComponent{
+
+  disabledflag:boolean = true;
+
+  inputplaceholder:string = 'Enter username';
+
+  ...
+
+ }
+
+
+>>>
+
+event binding :- onClick in Native JS is click-here,
+
+radical-test.component.html
+
+    <button class="btn btn-primary" (click) = "onMyClick()"></button>
+
+
+radical-test.component.ts   
+
+    export class RadicalTestComponent{
+
+
+      constructor(){
+
+      } //constructor ends
+
+
+      onMyClick(){
+
+        console.log('button clicked');
+
+      }
+
+
+    } //RadicalTestComponent ends
+
+
+
+Note: in the html, () is required as we are executing that function i.e. onMyClick()
+
+
+>>> two-way data binding
+
+
+DONT USE ex.
+
+-> radical-test.component.html   
+
+    <input type="text" [(ngModel)] = "inputValue">
+
+    {{inputValue}}
+
+
+    +
+
+   
+
+-> radical-test.component.ts
+
+   
+
+    export class RadicalTestComponent{
+
+      inputValue:string = 'some default value';
+
+     
+
+      constructor(){
+
+      } //constructor ends
+
+    } //RadicalTestComponent ends
+
+
+---
+
+Only html needs to be modified.
+
+- tmp variable is created @ runtime.
+
+- tmp var captures edited changes
+
+- same can be put back on the view using data expressions
+
+
+<!-- method3: using angular 2-way binding. Concise than method2 -->
+
+<!-- <input type="text" [(ngModel)] = "y"> {{y}} -->
+
+<!-- y gets created @ runtime and is assigned the value of textbox.
+
+  y is used to update the view back
+
+ -->
+
+
+<!-- method2: using angular 2-way binding. Concise than method1 -->
+
+<!-- <input type="text" [ngModel] = "z"
+
+(ngModelChange) = "z=$event"
+
+> {{z}} -->
+
+
+
+<!-- method1: without two-way data-binding -->
+
+<!-- <input type="text" [value] = " x?x:''  "
+
+(input) = "x=$event.target.value"
+
+> {{x}} -->
+
+<!--
+
+> if u just put x instead of x?x:'' then u get 'undefined' when page loads
+
+> we have to use $event.target.value here.
+
+> input can be used here; if u use keydown/keypress, then u will have 1 char less
+
+-->
+
+       
+
+>>> local references
+
+-> Revert code to the event-binding code
+
+
+eg.1.
+
+    <button class="btn btn-primary" (click) = "onMyClick()" #x></button>
+
+    {{x}}
+
+    {{x | json}}
+
+
+    +
+
+    onMyClick(){
+
+            console.log('button clicked');
+
+    }
+
+                       
+
+eg.2.
+
+    <button class="btn btn-primary" (click) = "onMyClick(x)" #x></button>
+
+    +
+
+   
+
+    onMyClick(val1){
+
+        console.log('button clicked', val1, typeof(val1));
+
+    }
+
+    + click the button on View
+
+   
+
+    //in console.log u should get the entire element, object
+
+
+eg.3.
+
+    - Added a "name" and Button1
+
+    <button name = "btn1" class="btn btn-primary" (click) = "onMyClick(x)" #x>Button1</button>
+
+    {{x}}
+
+    {{x | json }}
+
+   
+
+    export class RadicalTestComponent{
+
+      constructor(){
+
+      } //constructor ends
+
+      onMyClick(val1){
+
+            console.log('button clicked', val1, typeof(val1));
+
+        console.log(val1.innerHTML, val1.name); //Button1, btn1
+
+          }
+
+    } //RadicalTestComponent ends
+
+
+eg. 4.
+
+    -- getting buttons feature into an input. references act like variables and its properties can be used in the entire view
+
+   
+
+    <button name = "btn1" class="btn btn-primary" (click) = "onMyClick(x)" #x>Button1</button>
+
+    {{x}}
+
+    {{x | json }}
+
+    <input type="text" [placeholder] = x.name >
+
+   
+
+    NOTE: see how x.name is used in another element( a textbox)
+
+
+>>> capturing ngModel changes in Model using local references:-
+
+
+in the above examples, the changes remain in the view.
+
+to make them perculate onto the model side i.e. within the RadicalTestComponent class, we need to use (change) which is onChange basically.
+
+
+This can be achieved by adding this line:=
+
+(change) = "onMyChange(inp)" #inp
+
+to any of the methods above in ngModel.   
+
+   
+
+Method3:
+
+    <input type="text" [(ngModel)] = "y"
+
+    (change) = "onMyChange(inp)" #inp
+
+    > {{y}}
+
+
+    onMyChange(x){
+
+        console.log(x.value);
+
+    }   
+
+   
+
+Method2:-
+
+    <input type="text" [ngModel] = "z"
+
+    (ngModelChange) = "z=$event"
+
+    (change) = "onMyChange(inp)" #inp
+
+    > {{z}}   
+
+   
+
+    onMyChange(x){} is same
+
+
+Method1:-
+
+    <input type="text" [value] = " x?x:''  "
+
+    (input) = "x=$event.target.value"
+
+    (change) = "onMyChange(inp)" #inp
+
+    > {{x}}
+
+    onMyChange(x){} is same   
+
+   
+
+   
+
+>>> Checking input is dirty, etc.
+
+>>> Checking form is dirty, etc.
+
+
+> This is done by using local-reference to create a circular reference
+
+eg. #myform = "ngForm" -OR- #inp = "ngModel"
+
+> circular reference requires "name" property on the element
+
+
+<form name = "mainform" #myform = "ngForm">
+
+<input type="text" [(ngModel)] = "username" name = "username"
+
+  #inp = "ngModel"
+
+>
+
+{{'inp.dirty is: ' + inp.dirty + inp.pristine + inp.valid}} <br>
+
+{{'mainform.dirty is: ' + myform.dirty + myform.pristine + myform.invalid + myform.valid}}<br>
+
+{{myform.value | json}}
+
+{{myform.errors}}
+
+
+</form>
+
+   
+
+>>> adding back-ground color change if element is dirty
+
+    pre-requisite: add a radical-test.component.css file
+
+
+-> radical-test.component.css
+
+.xdirty{
+
+  background-color: red;
+
+}
+
+
+-> radical-test.component.ts
+
+    @Component({
+
+      selector: 'radical-test',
+
+      templateUrl: './radical-test.component.html',
+
+      styleUrls: ['./radical-test.component.css']
+
+    })
+
+   
+
+-> radical-test.component.html
+
+
+<form name = "mainform" #myform = "ngForm">
+
+<input type="text" [(ngModel)] = "username" name = "username" id="username"
+
+  #inp = "ngModel"
+
+  [ngClass]="{'xdirty': inp.dirty}"
+
+>
+
+{{'inp.dirty is: ' + inp.dirty + inp.pristine + inp.valid}} <br>
+
+{{'mainform.dirty is: ' + myform.dirty + myform.pristine + myform.invalid + myform.valid}}<br>
+
+{{myform.value | json}}
+
+{{myform.errors}}
+
+
+</form>
+
+   
+
+Notice this line:   [ngClass]="{'xdirty': inp.dirty}"
+
+
+RHS is an obj. of the format:
+
+    key = style/css class
+
+    value = expression which returns true.
+
+   
+
+LHS is ngClass, but that alone will NOT work. You have to property bind it as it is dependent on a dynamic value i.e. inp.dirty
+
+
+O/p: now when u type the background-color would change to red, because inp.dirty became true.    
+
+   
+
+   
+
+>>> eg. for ngStyle. pending
+
+
+>>> Communicating from parent to child using @Input    
+
+
+eg.1.
+
+app.component --> radical-test.component.ts
+
+app.component.ts
+
+    export class AppComponent {
+
+      title = 'app works!';
+
+      serverNames = ['bastion', 'falcon', 'xanadu'];
+
+    }   
+
+
+app.component.html
+
+    <div *ngFor = "let item of serverNames">
+
+      <radical-test [prop1] = "item"></radical-test>
+
+      <!--
+
+      (sending data to child component using prop1)
+
+      -->
+
+    </div>
+
+   
+
+radical-test.component.ts
+
+    import {Component, Input, OnInit} from '@angular/core';   
+
+   
+
+    export class RadicalTestComponent implements OnInit{
+
+      @Input() prop1;
+
+      constructor(){ //this.prop1 will not be accessible here.
+
+      }
+
+      ngOnInit(){
+
+        console.log(this.prop1); //prints the 3 server-names passed.
+
+      }
+
+    }
+
+NOTE:- console.log(this.prop1); is accessible only in ngOnInit. it will NOT work in the constructor.
+
+Question is why ?? Maybe we will get the answer when we c hooks.
+
+   
+
+eg.2.
+
+app.component --> radical-test.component.ts
+
+- child can "enforce" what prop1 should look like. 
+
+    @Input() prop1 ; //DOESNT look like we can do enforcement here using @Input() prop1:number ;
+
+    Skipped
+
+   
+
+eg.3. use an alias: when u use an alias, the alias name (servername) has to be used by the parent and NOT the actual name (prop1)    
+
+depends on eg.1.
+
+   
+
+app.component.html   
+
+    <radical-test [servername] = "item"></radical-test> //works <<<=======
+
+    <radical-test [prop1] = "item"></radical-test> //will give errors
+
+
+radical-test.component.ts   
+
+    export class RadicalTestComponent implements OnInit{
+
+      @Input('servername') prop1 ;    <<<=======
+
+
+      constructor(){
+
+      }
+
+      ngOnInit(){
+
+        console.log(this.prop1);
+
+      }
+
+    }
+
+   
+
+>>>
+
+@Output: child -> parent communication (think like event bubbling)
+
+
+Child:-
+
+    -> radical-test.component.ts
+
+        import {Component, Input, Output, OnInit, EventEmitter} from '@angular/core';
+
+        ...
+
+        @Output() childEvent = new EventEmitter(); //step1. create the custom-event which needs to be bubbled.
+
+        clickHandler(){
+
+            this.childEvent.emit("secret data"); //step2. created event must be emitted.
+
+        }
+
+   
+
+    -> radical-test.component.html    //step3. bind clickHandler() to child-view
+
+        <div style="border: 1px solid red">Radical Component in html
+
+          <button (click) = "clickHandler()"> child button </button>
+
+        </div>
+
+
+Parent:-    
+
+    --> app.component.html
+
+        <radical-test (childEvent) = "parentDoSomething($event)"></radical-test> //step4. using the custom event in parent. Note how $event is passed.
+
+   
+
+    --> app.component.ts
+
+        parentDoSomething(e){
+
+            console.log(e); //e has "secret data"
+
+        }
+
+
+>>> Simple Service
+
+1. create a new file radical.service.ts
+
+    export class RadicalService{
+
+        greeting = 'radical service calling';
+
+    }
+
+2. needs to be registered with app.module.ts. services are shared across components.
+
+    import {RadicalService} from './radicaltest/radical.service';
+
+    ...
+
+    providers: [RadicalService],
+
+
+Common mistake:
+
+    instead of using app.module.ts's providers:[], sometimes people try to define providers:[] in *component.ts
+
+    Thats wont work
+
+   
+
+3. component using the service now.
+
+    import {RadicalService} from './radical.service';
+
+    ...
+
+    constructor(private myServ: RadicalService){
+
+        console.log(myServ.greeting);
+
+    }
+
+
+>>> service using a service
+
+previous example we had created a new service radical.service.ts
+
+lets create one more service: radical.service2.ts   
+
+    step1: radical.service2.ts
+
+            export class RadicalService2{
+
+              defaultGreeting = 'hello world'; 
+
+            }
+
+    step2: register on app.module.ts, so that angular knows it.
+
+   
+
+        import {RadicalService2} from './radicaltest/radical.service2';
+
+        ...
+
+        providers: [RadicalService, RadicalService2],
+
+
+    step3: radical.service2.ts
+
+
+        import {Injectable} from '@angular/core';
+
+        import {RadicalService} from './radical.service';    //step1: get the other service
+
+
+        @Injectable()    //vimp. doesnt work without it. step2: make it injectable
+
+
+        export class RadicalService2{
+
+          defaultGreeting = 'hello world';
+
+
+          constructor(private myServ: RadicalService){    //step3: make an instance of it
+
+            console.log(myServ.greeting);
+
+            console.log(this.defaultGreeting);
+
+          }
+
+
+        }       
+
+       
+
+    step 4: using the radical.service2.ts in a component
+
+-> radical-test.component.ts
+
+    import {RadicalService2} from './radical.service2';   
+
+    ...
+
+    export class RadicalTestComponent implements OnInit{
+
+      constructor(private myServ: RadicalService2){
+
+        //console.log(myServ.greeting);
+
+      }
+
+
+      ngOnInit(){
+
+      }
+
+    }
+
+   
+
+O/p:- both the calls are made.
+
+
+>>> Custom-Pipes
+
+- create a new pipe: multiply-by-two.pipe.ts
+
+
+    //step 1
+
+    import {Pipe, PipeTransform} from '@angular/core';
+
+
+    //step 2: declare the metadata using @Pipe
+
+    @Pipe({
+
+      name: 'multiplyByTwo' //multiplyByTwo & MultiplyByTwoPipe is the class
+
+    })
+
+
+    //step 3: needs to implement the PipeTransform
+
+    export class MultiplyByTwoPipe implements PipeTransform {
+
+      //step4: implement the transform function
+
+      transform(){}
+
+    }
+
+
+
+---
+
+eg.1
+
+D:\js\Ang2\proj2\p3>ng g p somepipe
+
+installing pipe
+
+  create src\app\somepipe.pipe.spec.ts
+
+  create src\app\somepipe.pipe.ts
+
+  update src\app\app.module.ts
+
+
+ Adds to app.module.ts
+
+    import { SomepipePipe } from './somepipe.pipe';
+
+    @NgModule({declaration:[..., SomepipePipe] })
+
+   
+
+somepipe.pipe.ts
+
+    import { Pipe, PipeTransform } from '@angular/core';
+
+
+    @Pipe({
+
+      name: 'somepipe'
+
+    })
+
+    export class SomepipePipe implements PipeTransform {
+
+
+      transform(value: any, args?: any): any {
+
+        return null;
+
+      }
+
+    }
+
+
+    NOTE:- args in tranforms() can be named anything else too like x?
+
+
+---
+
+eg. 2
+
+{{ 'batman' | somepipe : [10, 20, 30] }}
+
+then
+
+    value: batman
+
+    x? is: [10,20,30] and within transform() the same can be accessed as normal array elements
+
+
+---
+
+   
+
+{{ 'batman' | somepipe : {'10' : '20'} }}
+
+    here x is object{} of 10,20
+
+
+---
+
+    {{ 'batman' | somepipe }}
+
+   
+
+    import { Pipe, PipeTransform } from '@angular/core';
+
+
+    @Pipe({
+
+      name: 'somepipe'
+
+    })
+
+    export class SomepipePipe implements PipeTransform {
+
+
+    //  transform(value: any, args?: any): any {
+
+      transform(value: any, x?: any): any {
+
+          value = 'Mr. ' + value ;
+
+          console.log (value);
+
+        return null;
+
+      }
+
+
+    }
+
+   
+
+---    
+
+
+
+
+
+
+
+
+   
+
+=================================
+
+My RND :-
+
+
+Understanding two-way data-binding:
+
+https://blog.thoughtram.io/angular/2016/10/13/two-way-data-binding-in-angular-2.html
+
+
+Using System.js  VIMP.
+
+https://plnkr.co/edit/nqS9YJwnWAFF02qAyihc?p=preview
+
+    https://plnkr.co/edit/YVcOvr8HLWJ6dvchPAp2?p=preview (forked n frozen)
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                        
+
+SYNE TRAINING : CHILD TO PARENT COMMUNICATION
+
+Example 1:- eg. 1.
+
+
+Sending data from child to parent:-
+
+1. CHILD STEPS
+
+1a) needs an custom-event to send event up (to the parent)using event bubbling.
+
+we are calling it "compevent" .
+
+
+outputs: ['compevent']    //we let angular know, there is a custom-event we are going to define.
+
+...
+
+method 1a.1
+
+
+    compevent;                //declare the event
+
+    constructor(){
+
+        this.compevent = new EventEmitter(); //setting the event type to EventEmitter. This is to make it inline with angular context.
+
+    }
+
+    Reading the custom-event is DONE.
+
+  
+
+method 1a.2
+
+    Remove 1a) code and add this:-
+
+  
+
+    @Output() compevent = new EventEmitter();  
+
+
+
+1b)
+
+Q. when should this event be emitted?
+
+A. lets say a button click . so we need to tie the click-event to action-function.
+
+
+template:`
+
+  <div style="border: 1px solid red">
+
+    <button (click) = "clickHandler()" >send msg to parent </button>    <!-- clickHandler will be responsible for emitting -->
+
+  </div>
+
+  `,
+
+READING the template is DONE.
+
+
+1c)
+
+clickHandler(){
+
+  this.compevent.emit("secret data");
+
+}
+
+Emitting the event is DONE
+
+
+2. PARENT STEPS
+
+2a) Link the child-component to the child-event
+
+
+<app-comp1 (compevent) = "childEventHandler($event)">
+
+  <div>hey where r u guys ??? </div>
+
+</app-comp1> 
+
+Linking to child-event is DONE.
+
+
+2b)
+
+childmessage;
+
+childEventHandler(evt){
+
+  this.childMessage = evt;
+
+  console.log(this.childMessage);
+
+}
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+>>>
+
+@Output: child -> parent communication (think like event bubbling)
+
+
+Child:-
+
+    import {Component, Input, Output, OnInit, EventEmitter} from '@angular/core';
+
+    ...
+
+    @Output() childEvent = new EventEmitter(); //step1. create the custom-event which needs to be bubbled.
+
+    clickHandler(){
+
+        this.childEvent.emit("secret data"); //step2. created event must be emitted.
+
+    }
+
+   
+
+-> radical-test.component.html    //step3. bind clickHandler() to child-view
+
+    <div style="border: 1px solid red">Radical Component in html
+
+      <button (click) = "clickHandler()"> child button </button>
+
+    </div>
+
+
+Parent:-    
+
+    app.component.html
+
+    <radical-test (childEvent) = "parentDoSomething($event)"></radical-test> //step4. using the custom event. Note $event usage.
+
+   
+
+    app.component.ts
+
+    parentDoSomething(e){
+
+        console.log(e); //e has "secret data
+
+    }
+
+     
+xxxxxxxxxxx
+
+SYNE TRAINING : ng2
+
+nodejs, gitbash, webstorm, atom
+
+
+https://github.com/coreybutler/nvm-windows/releases
+
+Download nvm-setup.zip
+
+
+C:\js\ts>nvm install 8.0.0
+
+nvm list
+
+nvm use 8.0.0
+
+
+C:\js\ts>nvm list
+
+
+  * 8.0.0 (Currently using 64-bit executable)
+
+    6.10.3
+
+
+C:\js\ts>
+
+---
+
+
+For scoop
+
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+
+
+scoop update
+
+scoop install wget
+
+scoop install curl
+
+
+---
+
+
+creating a project in ES5 > creating a project in ES6 > creating a project in TS2.3 > 
+
+
+//IIFE can be invoked using +function(){}
+
+//u can use + ~
+
+//* is for generators so dont use it. @ and $ may not work. so some things work, other dont.
+
+
+ ---
+
+
+ES6:-
+
+
+1) Destructuring  objects
+
+
+<script type="module">
+
+ let comp = {name: 'synechron', site: 'hinjewadi'};
+
+ let {name, site} = comp;
+
+ console.log (name,site);
+
+
+</script>
+
+
+//compName and compSite are two new objects
+
+<script type="module">
+
+ let comp = {name: 'synechron', site: 'hinjewadi'};
+
+ let {name : compName, site : compSite} = comp;
+
+ console.log (compName, compSite);
+
+
+</script>
+
+
+<script type="module">
+
+ let comp = {name: 'synechron',
+
+             site: 'hinjewadi',
+
+             projects:
+
+                 {
+
+                     project01: 'DMT',
+
+                     project02: 'xyz'
+
+                 }
+
+            };
+
+
+ //read from right to left.
+
+ //RHS to LHS: From comp, i want the key "projects", from which i want project01, and assign project01 to a new variable "p1"
+
+ let {projects: {project01: p1}, projects: {project02: p2}} = comp;
+
+ console.log(p1, p2);
+
+</script>
+
+
+ REFER ES6 CONSOLIDATED FOR MORE ON SYNE TRAINING
+
+
+----
+
+
+
+core-js/client/shim.js
+
+zone.js/dist/zone.js
+
+rxjs/bundles/Rx.js
+
+@angular/core/bundles/core.umd.js
+
+common/bundles/common.umd.js
+
+compiler/bundles/compiler
+
+platform-browser/bundles/
+
+platform-browser-dynamic/bundles/
+
+
+
+var Mycomp = ng.core.Component({
+
+selector: "",
+
+remplateUrl:""
+
+}).Class({
+
+ constructor: function(){
+
+}
+
+
+}) ;
+
+
+
+var MyMod = ng.core.NgModel({
+
+  declaration:[],
+
+  imports:[ng.platformBrowser.BrowserModule],
+
+  bootstrap:[]
+
+}).Class({
+
+  consutrcutor: function(){
+
+  //empty
+
+ }
+
+
+})
+
+
+FULL CODE:-
+
+
+<!DOCTYPE html>
+	
+
+<html lang="en">
+	
+
+<head>
+	
+
+<meta charset="UTF-8">
+	
+
+<title>Hello World with Angular4</title>
+	
+
+<script src="node_modules/core-js/client/shim.js"></script>
+	
+
+<script src="node_modules/zone.js/dist/zone.js"></script>
+	
+
+<script src="node_modules/rxjs/bundles/Rx.js"></script>
+		
+
+<script src="node_modules/@angular/core/bundles/core.umd.js"></script>
+	
+
+<script src="node_modules/@angular/common/bundles/common.umd.js"></script>
+	
+
+<script src="node_modules/@angular/compiler/bundles/compiler.umd.js"></script>
+	
+
+<script src="node_modules/@angular/platform-browser/bundles/platform-browser.umd.js"></script>
+	
+
+<script src="node_modules/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js"></script>
+	
+
+<script>
+	
+
+// component
+	
+
+// dom element which is used by our component
+	
+
+// module
+	
+
+// module is bootstraped to your app
+	
+
+
+	
+
+var MyComp = ng.core.Component({
+	
+
+selector : "my-app",
+	
+
+template : "<h1> Welcome to your life </h1>"
+	
+
+}).Class({
+	
+
+constructor : function(){
+	
+
+// empty
+	
+
+}
+	
+
+});
+	
+
+var MyMod = ng.core.NgModule({
+	
+
+imports : [ng.platformBrowser.BrowserModule],
+	
+
+declarations : [MyComp],
+	
+
+bootstrap : [MyComp]
+	
+
+}).Class({
+	
+
+constructor : function(){
+	
+
+// empty
+	
+
+}
+	
+
+});
+	
+
+
+	
+
+window.onload = function(){
+	
+
+ng.platformBrowserDynamic
+	
+
+.platformBrowserDynamic()
+	
+
+.bootstrapModule(MyMod);
+	
+
+}
+	
+
+</script>
+	
+
+</head>
+	
+
+<body>
+	
+
+<my-app></my-app>
+	
+
+</body>
+	
+
+</html>
+
+
+
+xxxxxxxxxxxxxxxxxxxxxx
+
+
+interfaces and typescript
+
+
+interface IcanRun {
+
+    run(speed:string): string;
+
+};
+
+
+interface IcanFly {
+
+    fly(): string;
+
+};
+
+
+class Hero implements IcanRun, IcanFly{
+
+
+    public name:string;
+
+    private secret:string;
+
+
+    constructor(){
+
+        this.name = 'batman';
+
+        this.secret = 'i am bruce wayne' ;
+
+    }
+
+    toString(num1: number){
+
+        return num1.toString();
+
+    }
+
+
+    run(p1: string):string{
+
+        return 'I can rrun @ 110km/hr';
+
+    }
+
+
+    fly():string{
+
+        return 'i cann fcking fly';
+
+    }
+
+
+};
+
+
+let h = new Hero();
+
+console.log(h.name);
+
+console.log(h.run('xxx'));
+
+console.log(h.run('xxx'));
+
+console.log(h.fly());
+
+
+xxxxxxxxxxxxxxxxxxx
+
+
+
+
+pipes
+
+
+ng g p somepipe
+
+
+somepipe.ts
+
+
+    import { Pipe, PipeTransform } from '@angular/core';
+
+
+    @Pipe({
+
+      name: 'somepipe'
+
+    })
+
+
+
+    export class SomepipePipe implements PipeTransform {
+
+      // transform(value: any, args?: any): any {
+
+      transform(value: any, ...x): any { //2ns param doesnt have to be args, it can be anything like x
+
+        //do Mr. and Mrs. ka logic here.
+
+        return x[0] + " hi  " + value;
+
+      }
+
+
+    }
+
+   
+
+app.component.ts
+
+
+    import { Component} from '@angular/core';
+
+
+    @Component({
+
+      selector: 'app-root',
+
+      //templateUrl: './app.component.html',
+
+      template:`
+
+         <h1 *ngFor = "let item of usersList; let i = index">{{item.title | somepipe :item.gender}}</h1>    <!-- see how params r passes to pipes using : -->
+
+      `,
+
+
+          // <h1>{{userslist[0].title}}</h1>
+
+      styleUrls: ['./app.component.css']
+
+    })
+
+
+
+    export class AppComponent {
+
+      title = 'app';
+
+      usersList = [
+
+        {title: "Superman", gender: "male", city:"Metropolis"},
+
+        {title: "Superman2", gender: "male", city:"Metropolis"}
+
+      ];
+
+
+    }
+
+   
+
+---
+
+u can send in more params using one more :
+
+eg.  <h1 *ngFor = "let item of usersList; let i = index">{{item.title | somepipe :item.gender: item.city }}</h1>
+
+
+Solution: (use x[1] to get the additional param )
+
+    ...
+
+    return x[0] + " hi  " + value + " " + x[1];
+
+  
+
+---
+
+u can also add one more custome pipe and lets say currencypipe.    
+
+    item.title | somepipe :item.gender: item.city | currencypipe
+
+u may have to import them
+
+---
+
+pipes may have restriction when converting string to int. try to RND on that.
+
+---
+
+
+import { SomepipePipe } from './somepipe.pipe';
+
+
+describe('SomepipePipe', () => {
+
+  it('create an instance', () => {
+
+    const pipe = new SomepipePipe();
+
+    expect(pipe).toBeTruthy();
+
+  });
+
+});
+
+
+---
+
+input [(ngModel)] = "uname" #ctrl = "ngModel"
+
+https://github.com/angular/angular/issues/15890
+
+formElement, formBuilder  
+
+
+xxxxxxxxx
+
+ng2 complete guide
+
+sec 9 v 96
+
+
+1. services:-
+
+- never create instances of a service like this
+
+let x = new LoggingService(); //DONT DO.
+
+
+- instead use
+
+constructor (private x : LogginService){}
+
+
+- we need to add the
+
+providers: [LoggingService];  in the @Component () section.
+
+
+All components which are using the LoggingService will need the providers-section
+
+the service can now be called as this.x.function1(), etc.
+
+
+---
+
+v 99 Hierarchial Injector
+
+
+The Dependency injector is a hierarchial injector.
+
+ - So, if a service is created for a component, then it is ALSO AVAILABLE to its child components.
+
+- the child components will receive the same instance of the service
+
+
+AppModule: same instance of service is available APPLICATION WISE
+
+- if u provide a module there, it is available throughout the application
+
+
+AppComponent: same instance of Service is avail. for all child components. (but not for other services)
+
+
+NOTE: child component can override the same instance of service . that is what the providers : [] array is for !!!
+
+- so if u want to use the same instance of Service from parent component, DO NOT populate providers:[] array
+
+- so if u want to override the instance from parent component, then populate the providers[] array.
+
+
+---
+
+
+v101 Injecting Services in Services
+
+
+- AppModule: add both services here AccountsService and LogginService.
+
+-  Open AccountService and add a constructor(private x : LoggingService){}
+
+
+u may think this should do it, but u will run into errors.
+
+the problem is if u inject LServ. into AServ. , Aserv. should have some metadata attached to it .
+
+Component has some metadata in @Component, directive has some metadata with @Directive, but a  service does NOT have any metadata by default.
+
+
+@Injectable() is the metadata to be used and it needs to be put into the AServ. as it is receiving the LServ.
+
+- no @Injectable in Lserv()
+
+- @injectable in AServ, as we r injecting LServ into it.
+
+
+---
+
+
+v102 Cross-component communication (using Services)
+
+- Services have made our code a lot leaner, else we would have to do a lot with property/event binding, etc.
+
+
+GOAL: trigger an event in one comp and LISTEN in another
+
+A. we will use new EventEmitter(), .emit() and .subscribe()
+
+
+Pre-requisite: Comp1 and Comp2 are using a common service  Aserv
+
+
+AServ: accounts.service.ts
+
+- statusUpdated: new EventEmitter<string>();
+
+
+Comp1:- (already uses AServ)
+
+this.AServ.statusUpdated.emit(status);
+
+
+Comp2:- (already uses Aserv)
+
+this.Aserv.statusUpdated.subscribe();
+
+
+This is also called push-notifications being sent across components
+
+---
+
+Skipped Course project
+
+---
+
+
+Sec11, v114 Routes
+
+
+AppModule : here is where we inform angular where we r going to add routes.
+
+eg.
+
+import {Routes, RouterModule} from '@angular/router'
+
+
+const appRoutes: Routes = [
+
+ {path:'server' (no slash plz!!!), component: ServerComponent},
+
+ {path:'servers', component: },
+
+];
+
+
+...
+
+imports: [
+
+...,
+
+RouterModule.forRoot(appRoutes) //this is how we register our routes. angular now knows our routes.
+
+]
+
+
+<router-outlet></router-outlet> is the placeholder for injecting the component.
+
+
+<a href="/server"></a>            dont use this . this will reload the page
+
+<a routerLink="/server"></a>  USE this. this will PREVENT page reload.
+
+
+---
+
+
+v117 styling router links
+
+
+we can add css class to the <li> tabs. (bootstrap classes: ul: nav nav-tabs & li: role="presentation")
+
+we use BStrap class "active" (?) to keep Home as active by default.
+
+
+Q. But how do we make the other tabs "active" when they r clicked? currently there is NO visual indication (even though the components are visible correctly. This is a styling problem of non-home tabs.
+
+A. use routerLinkActive and routerLinkActiveOptions together.
+
+
+routerLinkActive="active" (is active a bootstrap class? i think so)
+
+[routerLinkActiveOptions] = "{exact:true}"
+
+
+we r using property binding here, because we are passing an object and NOT a string.
+
+
+---
+
+
+v118 routes: navigating programmitically
+
+
+- import {Router} from '@angular/router';
+
+- constructor(private x: Router){ ... }
+
+- somefunc(){
+
+//complex calculation
+
+this.router.navigate(['/servers']);
+
+}
+
+
+on some button-click execute somefunc()
+
+
+NOTE: no page reload happens while doing this
+
+
+---
+
+
+v119: using relative paths in route navigation
+
+- if u are already on /servers page, above code in v118 will not work as that is an absolute path.
+
+ this.router.navigate(['/servers']);
+
+
+Note:-
+
+- / is removed to make it relative.
+
+- Router does not know on which component u r correctly on
+
+- routerLink (in prev videos) CANNOT use relative paths but Router, here , can.
+
+that is bcoz routerLink KNOWS which route it is currently on and will give errors.
+
+
+eg.2
+
+To make Router know which route it is on, do below:-
+
+
+- import {Router, ActivateRoute} from '@angular/router';
+
+- constructor ( private x: ActivatedRoute) { ... } 
+
+this.router.navigate(['servers'], {relativeTo: this.x });
+
+
+Now, we are relative to this.x
+
+
+---
+
+
+v 120 Passing parameters to Routes
+
+
+AppModule:
+
+
+const appRoutes: Routes = [
+
+   {path: 'server/:id', component: ServerComponent }
+
+];
+
+
+here :id is a param and can be retrieved later
+
+
+v121
+
+
+- use ActivatedRoute
+
+constructor(private x: ActivatedRoute){ ... }
+
+ngOnInit(){
+
+   //this.x.snapshot.params['id']  will give us the:id param we passed in AppModule.
+
+}
+
+
+
+if route was server/:id/:name will be accessible via //this.x.snapshot.params['name']
+
+---
+
+
+v 122 fetching route params reactively
+
+
+there r few cases in which above style of getting params may NOT work
+
+
+// this.route.params (is an observable)
+
+this.route.params.subscribe();
+
+xxxxxxxxxxxxxx
+
+ng_testing rough1
+
+app.component.spec.ts
+
+
+
+describe('xxx', ()=>{
+
+  it('testsuite', ()=>{
+
+    expect(true).toBe(true);
+
+  });
+
+
+  it('testsuite', ()=>{
+
+    expect(true).toBe(true);
+
+  });
+
+
+  it('testsuite', ()=>{
+
+    expect(true).toBe(true);
+
+  });
+
+ 
+
+})
+
+
+
+
+// /* tslint:disable:no-unused-variable */
+
+//
+
+// import { TestBed, async } from '@angular/core/testing';
+
+// import { AppComponent } from './app.component';
+
+//
+
+// describe('AppComponent', () => {
+
+//   beforeEach(() => {
+
+//     TestBed.configureTestingModule({
+
+//       declarations: [
+
+//         AppComponent
+
+//       ],
+
+//     });
+
+//     TestBed.compileComponents();
+
+//   });
+
+//
+
+//   it('should create the app', async(() => {
+
+//     const fixture = TestBed.createComponent(AppComponent);
+
+//     const app = fixture.debugElement.componentInstance;
+
+//     expect(app).toBeTruthy();
+
+//     expect(true).toBe(true);
+
+//   }));
+
+//
+
+//   it(`should have as title 'app works!'`, async(() => {
+
+//     const fixture = TestBed.createComponent(AppComponent);
+
+//     const app = fixture.debugElement.componentInstance;
+
+//     expect(app.title).toEqual('app works!');
+
+//   }));
+
+//
+
+//   it('should render title in a h1 tag', async(() => {
+
+//     const fixture = TestBed.createComponent(AppComponent);
+
+//     fixture.detectChanges();
+
+//     const compiled = fixture.debugElement.nativeElement;
+
+//     expect(compiled.querySelector('h1').textContent).toContain('app works!');
+
+//   }));
+
+// });
+
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+karma.conf.js
+
+
+// Karma configuration
+
+// Generated on Fri Oct 30 2015 22:10:10 GMT+0900 (JST)
+
+
+module.exports = function(config) {
+
+  config.set({
+
+
+    // base path that will be used to resolve all patterns (eg. files, exclude)
+
+    basePath: '',
+
+
+
+    // frameworks to use
+
+    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+
+    frameworks: ['jasmine'],
+
+
+
+    // list of files / patterns to load in the browser
+
+    files: [
+
+      'node_modules/babel-polyfill/dist/polyfill.js',
+
+      'src/app/*.spec.ts'
+
+    ],
+
+
+
+    // list of files to exclude
+
+    exclude: [
+
+    ],
+
+
+
+    plugins: [
+
+      'karma-jasmine',
+
+      'karma-phantomjs-launcher',
+
+      'angular-cli/plugins/karma',
+
+      'karma-babel-preprocessor',
+
+      //require('./lib')
+
+    ],
+
+
+
+    // preprocess matching files before serving them to the browser
+
+    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+
+    preprocessors: {
+
+      'src/app/*.ts': 'babel'
+
+    },
+
+
+
+    babelPreprocessor: {
+
+              options: {
+
+                presets: ['es2015'],
+
+                sourceMap: 'inline'
+
+              },
+
+              filename: function (file) {
+
+                return file.originalPath.replace(/\.js$/, '.es5.js');
+
+              },
+
+              sourceFileName: function (file) {
+
+                return file.originalPath;
+
+              }
+
+            },
+
+
+    // test results reporter to use
+
+    // possible values: 'dots', 'progress'
+
+    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+
+    reporters: ['progress'],
+
+
+
+    // web server port
+
+    port: 9876,
+
+
+
+    // enable / disable colors in the output (reporters and logs)
+
+    colors: true,
+
+
+
+    // level of logging
+
+    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+
+    logLevel: config.LOG_INFO,
+
+
+
+    // enable / disable watching file and executing tests whenever any file changes
+
+    autoWatch: true,
+
+
+
+    // start these browsers
+
+    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+
+    browsers: ['PhantomJS'],
+
+
+
+    // Continuous Integration mode
+
+    // if true, Karma captures browsers, runs the tests and exits
+
+    singleRun: true,
+
+
+    // Concurrency level
+
+    // how many browser should be started simultanous
+
+    concurrency: Infinity
+
+  })
+
+}
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+package.json
+
+
+{
+
+  "name": "project1",
+
+  "version": "0.0.0",
+
+  "license": "MIT",
+
+  "angular-cli": {},
+
+  "scripts": {
+
+    "ng": "ng",
+
+    "start": "ng serve",
+
+    "test": "ng test",
+
+    "pree2e": "webdriver-manager update --standalone false --gecko false",
+
+    "e2e": "protractor"
+
+  },
+
+  "private": true,
+
+  "dependencies": {
+
+    "@angular/common": "^2.3.1",
+
+    "@angular/compiler": "^2.3.1",
+
+    "@angular/core": "^2.3.1",
+
+    "@angular/forms": "^2.3.1",
+
+    "@angular/http": "^2.3.1",
+
+    "@angular/platform-browser": "^2.3.1",
+
+    "@angular/platform-browser-dynamic": "^2.3.1",
+
+    "@angular/router": "^3.3.1",
+
+    "core-js": "^2.4.1",
+
+    "rxjs": "^5.0.1",
+
+    "ts-helpers": "^1.1.1",
+
+    "zone.js": "^0.7.2"
+
+  },
+
+  "devDependencies": {
+
+    "@angular/compiler-cli": "^2.3.1",
+
+    "@types/jasmine": "2.5.38",
+
+    "@types/node": "^6.0.42",
+
+    "angular-cli": "1.0.0-beta.28.3",
+
+    "babel-core": "^6.24.1",
+
+    "babel-loader": "^7.0.0",
+
+    "babel-polyfill": "^6.23.0",
+
+    "babel-preset-es2015": "^6.24.1",
+
+    "codelyzer": "~2.0.0-beta.1",
+
+    "jasmine": "^2.6.0",
+
+    "jasmine-core": "2.5.2",
+
+    "jasmine-spec-reporter": "2.5.0",
+
+    "karma": "^1.7.0",
+
+    "karma-babel-preprocessor": "^6.0.1",
+
+    "karma-chrome-launcher": "^2.0.0",
+
+    "karma-cli": "^1.0.1",
+
+    "karma-jasmine": "^1.1.0",
+
+    "karma-phantomjs-launcher": "^1.0.4",
+
+    "karma-remap-istanbul": "^0.2.1",
+
+    "protractor": "~4.0.13",
+
+    "ts-node": "1.2.1",
+
+    "tslint": "^4.3.0",
+
+    "typescript": "~2.0.3"
+
+  }
+
+}
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+i copied the karma.conf.js from the node_modules/karma-babel-preprocessor/ ... /karma.conf.js
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+original karma.conf.js wrongly modified but kept for reference
+
+
+ROUGH 1
+
+
+// Karma configuration file, see link for more information
+
+// https://karma-runner.github.io/0.13/config/configuration-file.html
+
+
+
+module.exports = function (config) {
+
+  config.set({
+
+    basePath: '',
+
+    frameworks: ['jasmine', 'angular-cli'],
+
+    plugins: [
+
+      //require("babel-core"), require("jasmine-core"),
+
+      require('karma-jasmine'),
+
+      require('karma-chrome-launcher'),
+
+      require('karma-remap-istanbul'),
+
+      require('angular-cli/plugins/karma'),
+
+      require('karma-babel-preprocessor')
+
+    ],
+
+    files: [
+
+//      { pattern: './src/test.ts', watched: false }
+
+        'node_modules/babel-polyfill/dist/polyfill.js'
+
+   ],
+
+    preprocessors: {
+
+      //'./src/test.ts': ['angular-cli']
+
+      './src/app/*.spec.ts': ['babel']
+
+    },
+
+    babelPreprocessor: {
+
+          options: {
+
+            presets: ['es2015'],
+
+            sourceMap: 'inline'
+
+          },
+
+          filename: function (file) {
+
+            return file.originalPath.replace(/\.js$/, '.es5.js');
+
+          },
+
+          sourceFileName: function (file) {
+
+            return file.originalPath;
+
+          }
+
+        },
+
+
+    // mime: {
+
+    //   'text/x-typescript': ['ts','tsx']
+
+    // },
+
+    // remapIstanbulReporter: {
+
+    //   reports: {
+
+    //     html: 'coverage',
+
+    //     lcovonly: './coverage/coverage.lcov'
+
+    //   }
+
+    // },
+
+    angularCli: {
+
+      config: './angular-cli.json',
+
+      environment: 'dev'
+
+    },
+
+    // reporters: config.angularCli && config.angularCli.codeCoverage
+
+    //           ? ['progress', 'karma-remap-istanbul']
+
+    //           : ['progress'],
+
+    reporters: ['progress'],
+
+    port: 9876,
+
+    colors: true,
+
+    logLevel: config.LOG_INFO,
+
+    autoWatch: true,
+
+    browsers: ['Chrome'],
+
+    singleRun: false
+
+  });
+
+};
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+ngTesting01
+
+ng new ngtesting01/
+
+
+npm test
+
+    D:\js\Ang2\proj2\ngtesting01>npm test
+
+
+npm install systemjs --save-dev    (required?)
+
+
+karma start karma.conf.js
+
+    D:\js\Ang2\proj2\ngtesting01>karma start karma.conf.js
+
+    1st.spec.ts is the only one running.
+
+
+npm install karma-phantomjs-launcher --save-dev
+
+karma start karma.conf.js
+
+    npm install babel-polyfill --save-dev
+
+    karma start karma.conf.js
+
+    https://stackoverflow.com/questions/42640317/phantomjs-error-while-running-tests-in-angular-cli
+
+        Uncomment these lines in polyfill.js
+
+       
+
+        import 'core-js/es6/object';
+
+        import 'core-js/es6/array';
+
+        import 'intl';  // Run `npm install --save intl`.
+
+   
+
+        https://github.com/angular/angular-cli/issues/1675
+
+        npm install --save intl
+
+       
+
+       
+
+D:\js\Ang2\proj2\ngtesting01>karma start karma.conf.js
+
+
+WORKED!!! with phantomjs !!!
+
+
+----------------------
+
+
+ng new ngtesting02/
+
+cd ngtesting02/
+
+karma start karma.conf.js    //works
+
+    singlerun:true
+
+    files: [
+
+      { pattern: './src/**/*.spec.ts', watched: false }
+
+    ],
+
+   
+
+renamed app.component.spec.ts to .xxx
+
+and added
+
+01.spec.ts
+
+    describe('1st tests', () => {
+
+      it('true is true', () => expect(true).toBe(true));
+
+      // it('true is true', () => expect(true).toBe(true));
+
+    });
+
+   
+
+karma start karma.conf.js //worked
+
+
+---
+
+
+karma-phantomjs-launcher
+
+
+npm install karma-phantomjs-launcher --save-dev
+
+
+add to karma.conf.js
+
+    require('karma-phantomjs-launcher'),
+
+    ...
+
+    ...
+
+    browsers: ['PhantomJS', 'PhantomJS_custom'],
+
+
+        customLaunchers: {
+
+             'PhantomJS_custom': {
+
+               base: 'PhantomJS',
+
+               options: {
+
+                 windowName: 'my-window',
+
+                 settings: {
+
+                   webSecurityEnabled: false
+
+                 },
+
+               },
+
+               flags: ['--load-images=true'],
+
+               debug: true
+
+             }
+
+           },
+
+
+           phantomjsLauncher: {
+
+             // Have phantomjs exit if a ResourceError is encountered (useful if karma exits without killing phantom)
+
+             exitOnResourceError: true
+
+           },
+
+
+karma start karma.conf.js //error (pending)
+
+        Uncomment these lines in polyfill.js
+
+       
+
+        import 'core-js/es6/object';
+
+        import 'core-js/es6/array';
+
+        import 'intl';  // Run `npm install --save intl`.
+
+
+================================
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+
+D:\js\test\tsc>
+
+npm install -g jasmine jasmine-ts
+
+npm install -g jasmine-core
+
+D:\js\test\tsc>
+
+npm install jasmine-core jasmine @types/jasmine jasmine-ts --save-dev
+
+npm uninstall jasmine-core jasmine @types/jasmine jasmine-ts --save-dev
+
+
+---------------
+
+
+http://twofuckingdevelopers.com/2016/01/testing-angular-2-with-karma-and-jasmine/
+
+
+---------------
+
+stack: ang2 + ang2material + jasmine + karma
+
+---------------
+
+
+xxxx
+
+
+ng2 explanations:
+
+ng2 start:-    (for installation see Maximilians guide ng new ... )
+
+D:\js\test\js1>ng serve
+
+(keep this cmd terminal running, open another terminal if u want bootstrap, etc. installed)
+
+
+---
+
+
+- index.html = our SPA.
+
+    @ run time, webpack will add polyfills/bundles etc and insert it into the html .
+
+- main.ts
+
+uses platformBrowserDynamic().bootstrapModule(AppModule);
+
+// AppModule implies app.module(.ts)
+
+// PlanktonLex would imply plankton.lex(.ts)  .ts is understood.
+
+// when we create components, (we will c components soon ), we will use the same naming convention i.e.
+
+    //server.component(.ts) would be referred as ServerComponent in code in TS.
+
+   
+
+    => as u can see AppModule is bootstrapped, i.e. app.module.ts is bootstrapped 
+
+        and if u see app.module.ts, in @NgModule, we can see it is bootstrapping AppComponent, i.e. it is bootstrapping app.component.ts
+
+    => app.component.ts is called the ROOT component.
+
+        - any other web component we create will be a child of this ROOT Component.
+
+       
+
+---
+
+
+creating a module manually :-
+
+- create app/server/ folder       
+
+    -- create server.component.ts. It will be called by ServerComponent, when u code.
+
+    -- create a templateUrl for it, and a selector using @Component({ ... }).
+
+        -> selector means
+
+            -- what html-tag will be used to reference it? eg. <app-server></app-server>
+
+            -- if u put it in [] square braces, it becomes attribute. in that case use it as eg. <div app-server></div>
+
+           
+
+        -> @Component is a decorator which helps us in creating this component, using the selector & templateUrl.
+
+            Without it, it is just a class named ServerComponent; when we use @Component, angular understands, we want to
+
+            it to consider as a component
+
+            -- it comes from a package called @angular/core.
+
+       
+
+    app/server/server.component.ts
+
+            import { Component } from '@angular/core';
+
+            @Component({
+
+              selector: 'app-server',
+
+              templateUrl: './server.component.html'
+
+            })
+
+            export class ServerComponent{
+
+            }
+
+
+    app/server/server.component.html
+
+        <h3>I am a server component; take stock of me.</h3>
+
+
+       
+
+    Remember, all components are child to the ROOT app-component.
+
+    So, inorder for the root component to pick our server component up we need to edit app.module.ts
+
+   
+
+    - import { ServerComponent } from './app/server.component.ts';
+
+    - add ServerComponent to the "declarations" array.
+
+   
+
+    Our app-server is still not visible on UI, this is because we have not used the selector <app-server></app-server> anywhere.
+
+    So, lets add it into app.component.html
+
+        <app-server></app-server>
+
+   
+
+- Data binding:- is a mode of communication between the view and the model, and there r 4 ways to do it (in angular):-
+
+1. String interpolation (use it when u want to display something on the view)
+
+    -- {{ }} is the syntax.
+
+        NOTE: it cannot be multiline and it cannot have multiline logic of if/else, etc.
+
+2. Property binding (use it when logic is property-based and nothing is to be presently directly on the view)
+
+    -- [] square braces is the syntax
+
+3. Event binding (use it to bind events)
+
+    gotcha: vanilla events like onclick, onmouseover, etc. become click, mouseover, etc. (so the "on is omitted")
+
+    -- () round braces is the syntax
+
+4. Two-way data binding (uses property binding + event binding)   
+
+
+---
+
+styling ServerComponent:-
+
+create app/server/server.component.css
+
+h3{
+
+    color: dodgerblue
+
+}
+
+
+server.component.ts (add this line):
+
+  ,
+
+  styleUrls: ['./server.component.css']  
+
+
+ 
+
+server.component.html
+
+<h3>I am a server component; take stock of me.</h3>
+
+      {{serverId}}
+
+<button class="btn btn-default">Add Server</button>
+
+   
+
+---
+
+styling app component (installing bootstrap )
+
+
+installing bootstrap:- (we r going to add more components, so to make it beautiful, lets use bootstrap for now)
+
+D:\js\test\js1>npm install --save-dev bootstrap
+
+
+VIMP!!!
+
+.angular-cli.json
+
+    "styles": [
+
+            "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+
+            "styles.css"
+
+          ],
+
+         
+
+---
+
+creating a new component automagically
+
+
+cd D:\js\test\js1\src\app>
+
+ng g c servers (this folder/component should NOT be existing before)
+
+(u can run this from platformio-ide-terminal too).
+
+app.component.ts is automatically updated.
+
+
+next steps:-
+
+app.component.html --> <app-servers></app-servers>
+
+    servers.component.ts
+
+        - import {ServerComponent} from '../server/server.component';
+
+    servers.component.html
+
+        - <app-server></app-server>
+
+       
+
+
+---
+
+
+1. String interpolation:-
+
+Some data from the model needs to be displayed on the view.
+
+Add a variable like serverId in the ServerComponent class and u can get that variable in the view using {{10}}
+
+
+2. property binding:-
+
+lets say we now wanted to disable the button.
+
+app.component.html
+
+          <button class="btn btn-primary" disabled>Add Server</button><br>
+
+
+lets say we now wanted to disable the button, but after 3 secs, it should become enabled.          
+
+- declare any variable with boolean value in servers.component.ts
+
+app.component.html
+
+- <button class="btn btn-primary" [disabled] = !setEnableFlag>Add Server</button><br>
+
+
+3. event binding:-
+
+servers.component.html
+
+    <button class="btn btn-primary"
+
+      [disabled] = !setEnableFlag
+
+      (click) = onClickCreateServer()  >Add Server</button><br>
+
+
+      <div><strong>{{onClickCreated}}</strong></div>
+
+     
+
+4. two-way data binding:-
+
+<div class="form-group">
+
+  <input type="text" class="form-control serverInputClass"
+
+  [(ngModel)]="serverInput" value="serverInput"
+
+  >
+
+  {{serverInput}}
+
+</div>     
+
+
+For 3 n 4,
+
+servers.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+
+import {ServerComponent} from '../server/server.component';
+
+
+@Component({
+
+  selector: 'app-servers',
+
+  templateUrl: './servers.component.html',
+
+  styleUrls: ['./servers.component.css']
+
+})
+
+
+export class ServersComponent implements OnInit {
+
+  setEnableFlag = false;
+
+  onClickCreated = '';
+
+  serverInput = 'DummyServer';
+
+
+  constructor() {
+
+    setTimeout(() => {this.setEnableFlag = true
+
+      console.log('xxxxxxxxxx');
+
+    }, 3000);
+
+
+  }//constrcutor ends
+
+
+  onClickCreateServer(){
+
+    console.log('created served');
+
+    this.onClickCreated = 'Server created, Mr.Anderson';
+
+  }
+
+
+  ngOnInit() {
+
+  }
+
+
+} //exporting ends
+
+
+=========================================================
+
+
+Directives = instructions placed on the DOM
+
+Components are directives-with-template.
+
+There are also directives-without-template.
+
+    2 types:-
+
+    structural & attribute directives.
+
+   
+
+Built-in directives:- ngIf, etc.
+
+
+*ngIf
+
+    * is for structural directive. Without it, it would NOT work.
+
+    - creates the control @ runtime
+
+    - can assign it a function too
+
+   
+
+    servers.component.ts    
+
+    <p *ngIf = "!setEnableFlag"> joker is back </p>
+
+
+ngIf-else
+
+    - use local reference #
+
+    - the else part has to be in double quotes.
+
+   
+
+    <p *ngIf = "!setEnableFlag; else noServer"> joker is back </p>
+
+    <ng-template #noServer>
+
+        <p>joker is NOT back</p>
+
+    </ng-template>
+
+
+---
+
+
+ngStyle
+
+    <p[ngStyle] = "{ 'background-color': 'red' }"
+
+    -OR-
+
+    <p[ngStyle] = "{ backgroundColor: 'red' }"
+
+    -OR-
+
+    <p[ngStyle] = "{ backgroundColor: getColor() }"
+
+
+    both syntaxes are valid.
+
+   
+
+---
+
+
+ngFor : structural directive.
+
+*ngFor
+
+
+<app-server *ngFor="let server of servers"></app-server> where servers is an array.
+
+
+==================================
+
+
+D:\js\Ang2\proj2>npm init -y
+
+D:\js\Ang2\proj2>ng new p2    
+
+D:\js\Ang2\proj2>cd p2
+
+
+
+v 61...
+
+1)
+
+1.1)
+
+(Property) Binding to custom properties:- (In Angular 1 terms, we can think of it like broadcasting, but not using events)
+
+- Top down communication .
+
+- using custom properties.
+
+- Root comp (app-comp) sends data.
+
+    - child captures it using @Input() decorator.
+
+       
+
+Suppose we have app-comp --> server-component.
+
+                                + any property (lets say serverName) in ServerComponent class
+
+                                - such a property will NOT be available in app-component.
+
+                                - this is a security feature, so that public properties are public within the SAME component class
+
+                               
+
+                                to make serverName available to app-component, do this:-
+
+                               
+
+                                server.component.ts
+
+                                    import { ... , Input} from '@angular/core';
+
+                                    ...
+
+                                    @Input() serverName
+
+                               
+
+                                app.component.html
+
+                                <app-server [serverName] = "..."></app-server>
+
+
+Live eg.
+
+                               
+
+app.component.ts wants to send this data:-
+
+    serverElements = [
+
+    {type:'server1', name:'Testserver1', content:'Just server1'},
+
+    {type:'server2', name:'Testserver2', content:'Just server2'},
+
+    {type:'server3', name:'Testserver3', content:'Just server3'},
+
+    {type:'server4', name:'Testserver4', content:'Just server4'}
+
+                   ];
+
+
+app.component.html is the "Port of Origin":-                               
+
+    <app-server  *ngFor="let serverElement of serverElements"
+
+      [element] = "serverElement">
+
+      </app-server>
+
+   
+
+    - this requires an "element" type to be defined in the child component, so that the child can have access to it .
+
+   
+
+server.component.ts
+
+    - complies and makes ready "element"
+
+        import { Component, Input } from '@angular/core';
+
+        ....
+
+        @Input() element: {type:string, name:string, content:string};
+
+       
+
+        !!!VIMP!!!
+
+            NOTE: that the signature of the "element" has to be same as that of the incoming data;
+
+                    so if we change content: number, then the SPA will crash.
+
+   
+
+server.component.html
+
+    - is the Port of Destination.
+
+    - display root-component-data using "element"
+
+   
+
+    <p>123 {{element.type}}, {{element.name}}, {{element.content}} </p>
+
+
+NOTE:- @Input() can be intercepted using:-
+
+1. a setter (basically u define a set() and get() function)
+
+2. ngOnChanges
+
+    Refer https://angular.io/docs/ts/latest/cookbook/component-communication.html
+
+   
+
+---
+
+eg. 1.2
+
+(Property) Binding using alias to custom-properties:-
+
+- ask outside / parent component to use alias ('srvrName') instead of the internal 'serverName'
+
+
+                                server.component.ts                               
+
+                                    import { ... , Input} from '@angular/core';
+
+                                    ...
+
+                                    @Input('srvrName') serverName
+
+                               
+
+                                app.component.html
+
+                                    <app-server [srvrName] = "..."></app-server>
+
+                                   
+
+(see 1.1 before reading this:)
+
+- we can encapsulate/hide "element" ; as it is an internal property of the child component.
+
+
+server.component.ts
+
+    @Input('xxx') element: {type:string, name:string, content:string};                                   
+
+
+app.component.html will now have to send data (from parent to child) using the alias "xxx" instead of "element"
+
+    <app-server  *ngFor="let serverElement of serverElements"
+
+      [xxx] = "serverElement">
+
+    </app-server>
+
+   
+
+---
+
+DO ng serve in js1 folder:= PENDING
+
+Binding to custom events:-
+
+- we want to inform our parent comp. i.e. app-component that server was created.
+
+- inside to outside. (child to parent commmunication).
+
+
+app.component.html
+
+    <app-server (serverCreated) = "onServerCreated($event)"> </app-server>
+
+    - serverCreated is a custom-event,
+
+    - $event will catch the data. its inbuilt
+
+   
+
+app.component.ts
+
+    onServerCreated(serverData: {serverName: string, serverContent: string}) {
+
+    ...
+
+    }
+
+   
+
+server.component.html
+
+    - create property i.e. serverCreated;
+
+    serverCreated = new EventEmitter<{serverName: string, serverContent: string}>();
+
+        - allows u to emit ur own events
+
+   
+
+    this.serverCreated.emit({serverName: string, serverContent: string});
+
+
+---
+
+
+@Output: parent listening for child event
+
+- The child component exposes an EventEmitter property with which it emits events when something happens
+
+
+    @Output() onVoted = new EventEmitter<boolean>();
+
+   
+
+https://angular.io/docs/ts/latest/cookbook/component-communication.html#!#parent-to-view-child
+
+
+Parent and children communicate via a service
+
+    import { Injectable } from '@angular/core';
+
+    import { Subject }    from 'rxjs/Subject';   
+
+        x = new Subject<string>();
+
+        dstream$ = this.x.asObservable();
+
+    import { Subscription }   from 'rxjs/Subscription';
+
+   
+
+---
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+creating a attribute directive:-
+
+
+- create a new proj. and install bootstrap
+
+- create a new folder in app/ and name it basic-highlight
+
+    - basic-highlight.directive.ts
+
+   
+
+import {Directive} from '@angular/core';
+
+
+@Directive({
+
+  selector: '[appBasicHighlight]', //we absolutely need this.  this is a unique name.
+
+            //we have put [] to make it known that this will be used as an ATTRIBUTE.
+
+})
+
+
+export class BasicHighlightDirective{ 
+
+}
+
+
+Goal: to change background of the element in which this attribute will be used.
+
+Sol.:- so, we need access to the element where this attribute will be used, right?
+
+
+Angular gives us that access in the "ElementRef" class
+
+
+- import {Directive, ElementRef} from '@angular/core';
+
+-
+
+export class BasicHighlightDirective{
+
+  constructor(private elementRef: ElementRef){}
+
+}
+
+
+//private elementRef: ElementRef . What does this line do?
+
+- creates a property called elementRef.
+
+- assigns an instance of the ElementRef class to this property.
+
+- note: we are writing this line in the constructor's param.
+
+
+//its better to put all initialization in OnInit/ngOnInit //import {OnInit} ...
+
+
+export class BasicHighlightDirective implements OnInit{
+
+  constructor(private elementRef: ElementRef){}
+
+  ngOnInit(){
+
+    this.elementRef.nativeElement.style.backgroundColor = 'green';
+
+  }
+
+} //export class
+
+
+---
+
+we have created it. now we have to use it.
+
+but angular doesnt scan for it. so we have to tell angular, it exists.
+
+
+app.module.ts
+
+
+import { BasicHighlightDirective } from './basic-highlight/basic-highlight.directive';
+
+...
+
+@ngModule({
+
+    declarations:[ ..., BasicHighlightDirective]
+
+})
+
+
+Now angular knows, a new directive has been added.
+
+
+---
+
+app.component.html
+
+<div appBasicHighlight>wassup Neo Anderson??? </div>
+
+
+if u have a server (child component), u can use the same in that too.
+
+the directive becomes available.
+
+
+----
+
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+DOING better: Using Renderer to build a better ATTRIBUTE DIRECTIVE
+
+- using renderer is a better approach; but y?
+
+
+    its not a good practive to directly access ur elements.
+
+        this.elementRef.nativeElement.style.backgroundColor = 'green';
+
+    so how should be access our elements.
+
+
+create better-highlight/ folder manually
+
+
+D:\js\Ang2\proj2\p2\src\app\better-highlight>ng g d better-highlight
+
+installing directive
+
+  create src\app\better-highlight\better-highlight.directive.spec.ts
+
+  create src\app\better-highlight\better-highlight.directive.ts
+
+  update src\app\app.module.ts
+
+   
+
+Make sure to change the paths in app.module.ts  to include the better-highlight/ folder
+
+
+better-highlight.directive.ts
+
+    import { Directive, ElementRef, OnInit, Renderer2 } from '@angular/core';
+
+
+    @Directive({
+
+      selector: '[appBetterHighlight]'
+
+    })
+
+
+    export class BetterHighlightDirective implements OnInit{
+
+      constructor(private elRef: ElementRef,
+
+                  private renderer: Renderer2) { }
+
+
+      ngOnInit(){
+
+        this.renderer.setStyle(this.elRef.nativeElement, 'backgroundColor', 'blue');
+
+      }
+
+    }
+
+
+- checkout what are the other methods Renderer    
+
+   
+
+++++++++++++++++++++++++++++++++++++++++
+
+
+v87. using HostListener to Listen to Host Events
+
+
+- its not very interactive. Lets Give a blue background on mouse hover, else a transparent background
+
+
+same example as above.
+
+- Additionally we require HostListener
+
+
+better-highlight.directive.ts
+
+   import { Directive, ElementRef, OnInit, Renderer2, HostListener } from '@angular/core';
+
+...
+
+  @HostListener('mouseenter') mouseover(eventData: Event){
+
+        this.renderer.setStyle(this.elRef.nativeElement, 'backgroundColor', 'blue');
+
+  }
+
+
+  @HostListener('mouseleave') mouseleave(eventData: Event){
+
+        this.renderer.setStyle(this.elRef.nativeElement, 'backgroundColor', 'transparent');
+
+  }
+
+
+---
+
+
+using HostBinding to bind to host properties
+
+
+- even easier way (other than using the renderer).
+
+- using the renderer is NOT wrong
+
+- use HostBinding decorator.
+
+- this way u can bind to any property ur element is sitting on.
+
+
+better-highlight.directive.ts
+
+
+    import { Directive, ElementRef, OnInit, Renderer2, HostListener, HostBinding } from '@angular/core';
+
+    @Directive({
+
+      selector: '[appBetterHighlight]'
+
+    })
+
+    export class BetterHighlightDirective implements OnInit{
+
+    //  @HostBinding('style.backgroundColor') backgroundColor: string;
+
+     @HostBinding('style.backgroundColor') backgroundColor: string = 'transparent';
+
+
+      constructor(private elRef: ElementRef,
+
+                  private renderer: Renderer2) { }
+
+      ngOnInit(){
+
+        //this.renderer.setStyle(this.elRef.nativeElement, 'backgroundColor', 'blue');
+
+      }
+
+      @HostListener('mouseenter') mouseover(eventData: Event){
+
+            //this.renderer.setStyle(this.elRef.nativeElement, 'backgroundColor', 'blue');
+
+            this.backgroundColor = 'blue';
+
+      }
+
+      @HostListener('mouseleave') mouseleave(eventData: Event){
+
+            //this.renderer.setStyle(this.elRef.nativeElement, 'backgroundColor', 'transparent');
+
+            this.backgroundColor = 'transparent';
+
+      }
+
+    }
+
+
+---
+
+
+this attribute-directive should be further customizable, using
+
+- custom property binding (this is what we will use mostly!)
+
+-OR-
+
+- custom event binding (how to do this ???)
+
+
+a) custom property binding on a custom-attribute-directive.
+
+- we make use of @Input () decorator to declare variables.
+
+
+better-highlight.directive.ts
+
+
+    import { Input, Directive, ElementRef, OnInit, Renderer2, HostListener, HostBinding } from '@angular/core';
+
+
+    @Directive({
+
+      selector: '[appBetterHighlight]'
+
+    })
+
+
+    export class BetterHighlightDirective implements OnInit{
+
+    @Input () defaultColor:string = 'transparent';
+
+    @Input () highlightColor:string = 'blue';
+
+
+    //  @HostBinding('style.backgroundColor') backgroundColor: string;
+
+    // @HostBinding('style.backgroundColor') backgroundColor: string = 'transparent';
+
+    @HostBinding('style.backgroundColor') backgroundColor: string = this.defaultColor;
+
+
+      constructor(private elRef: ElementRef,
+
+                  private renderer: Renderer2) { }
+
+
+      ngOnInit(){
+
+        //this.renderer.setStyle(this.elRef.nativeElement, 'backgroundColor', 'blue');
+
+      }
+
+
+      @HostListener('mouseenter') mouseover(eventData: Event){
+
+            //this.renderer.setStyle(this.elRef.nativeElement, 'backgroundColor', 'blue');
+
+            //this.backgroundColor = 'blue';
+
+            this.backgroundColor = this.highlightColor;
+
+      }
+
+
+      @HostListener('mouseleave') mouseleave(eventData: Event){
+
+            //this.renderer.setStyle(this.elRef.nativeElement, 'backgroundColor', 'transparent');
+
+            //this.backgroundColor = 'transparent';
+
+            this.backgroundColor = this.defaultColor;
+
+      }
+
+
+    }
+
+
+app.component.html
+
+    <div appBetterHighlight [defaultColor] = "'yellow'" [highlightColor] = "'red'">I am the one ! </div>
+
+   
+
+    Note:- values of defaultColor and highlightColor have to be string and hence within " '...' "
+
+            Without the '' single quotes, this wont work
+
+           
+
+---
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+why does angular require * for structural directive:-
+
+- behind the scenes, ng will transform them into something else.
+
+    --
+
+v 90
+
+
+* basically means
+
+
+<ng-template [ngIf] = "">
+
+</ng-template>
+
+
+---
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+Building a structural directive :
+
+
+D:\js\Ang2\proj2\p2\src\app>mkdir unless
+
+
+D:\js\Ang2\proj2\p2\src\app>cd unless
+
+
+D:\js\Ang2\proj2\p2\src\app\unless>ng g d unless
+
+installing directive
+
+  create src\app\unless\unless.directive.spec.ts
+
+  create src\app\unless\unless.directive.ts
+
+  update src\app\app.module.ts
+
+
+- we need to create a directive which is opposite of ngIf, i.e. unless
+
+
+(skipped)
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+ngSwitch = structural Directive (instead of using several ngIfs)
+
+
+<div [ngSwitch] = "value">
+
+    <p *ngSwitchCase="5">Value is 5</p>
+
+    <p *ngSwitchCase="15">Value is 15</p>
+
+    <p *ngSwitchCase="25">Value is 25</p>
+
+    <p *ngSwitchDefault>Value is Default</p>
+
+</div>
+
+ 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+10. Services
+
+10.1 Creating a Logging Service + 10.2 Injecting a Logging Service
+
+10.3 Creating a Data Service
+
+10.4. Hierarchial Injection
+
+- All child components (of a parent component) will receive the SAME instance of the service automatically , if the service is defined with the component.
+
+- All child components get the services tied to app.component.ts
+
+- To introduce application-wide services, tie a service to app.module.ts
+
+- child-components can override the service imported from the parent.
+
+10.5
+
+10.6 Injecting Services into Service
+
+10.7
+
+
+10.1
+
+
+- Unlike a component/directive, we do NOT require a decorator to create a logging service
+
+- creating a class itself means creating a service
+
+- a service is created to implement the BL, so that the model can store data and supply it while rendering happens.
+
+
+
+logging.service.ts
+
+
+    export class LoggingService{
+
+      logStatusChange(status:string){
+
+        console.log('Status is : ' + status);
+
+      }
+
+    }
+
+
+app.component.ts
+
+
+    import { Component } from '@angular/core';
+
+    import {LoggingService} from './logging.service';
+
+
+    @Component({
+
+      selector: 'app-root',
+
+      templateUrl: './app.component.html',
+
+      styleUrls: ['./app.component.css'],
+
+      providers: [LoggingService]
+
+    })
+
+    export class AppComponent {
+
+      title = 'app works!';
+
+
+      constructor(private logger: LoggingService){
+
+        this.logger.logStatusChange('offline');
+
+      }
+
+
+    } //AppComponent ends
+
+
+---
+
+10.3
+
+
+accounts.service.ts
+
+
+    export class AccountsService{
+
+      userData = [
+
+        {name: 'user1', age:20},
+
+        {name: 'user2', age:30},
+
+        {name: 'user3', age:40}
+
+      ];
+
+    } //AccountsService ends
+
+
+app.component.ts
+
+    - add AccountsService to the 'providers' array
+
+   
+
+constructor(private logger: LoggingService, private accountsData: AccountsService){
+
+    this.logger.logStatusChange('offline');
+
+    console.log(this.accountsData);
+
+  }
+
+   
+
+---
+
+
+10.6 injecting services into services
+
+
+@Injectable
+
+- ???
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+11) Routes:
+
+
+
+app.module.ts
+
+
+    import {Routes, RouterModule} from '@angular/router';
+
+
+    const appRoutes: Routes = [
+
+      {    path:'server',    //note: this should not have /
+
+          component: ServerComponent
+
+      },
+
+      {    path:'',    //note: this should not have /
+
+          component: HomeComponent
+
+      },
+
+      ...
+
+    ];
+
+
+    ...
+
+    ...
+
+    imports:[
+
+    ...
+
+      RouterModule.forRoot(appRoutes)
+
+    ],
+
+   
+
+app.component.html
+
+    <router-outlet></router-outlet> and use routerLink instread of href in <a ... >
+
+
+...   
+
+<div class="container">
+
+  <div class="row">
+
+    <div class="col-xs-12">
+
+      <ul class="nav nav-tabs">
+
+
+        <!-- <li role="presentation"><a href="/serv"> Server Comp </a> </li> -->
+
+        <li role="presentation"><a routerLink="/server"> Server Comp </a> </li>
+
+        <li role="presentation"><a routerLink="/">  Home Comp</a></li>
+
+
+      </ul>
+
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-xs-12">
+
+      <router-outlet></router-outlet>
+
+
+      <div appBetterHighlight [defaultColor] = "'yellow'" [highlightColor] = "'red'">I am the one ! </div>
+
+
+    </div>
+
+  </div>
+
+</div>
+
+...
+
+
+---
+
+
+- routerLink catches the click on <a-tag
+
+- prevents the default behavior of (href/a-tag) to send a request to the server
+
+
+---
+
+
+<li role="presentation"><a [routerLink]="['/server']"> Server Comp </a> </li>
+
+- we r using property binding on non-string data i.e. routes.
+
+
+Also see:- https://www.barbarianmeetscoding.com/blog/2016/07/07/updating-your-angular-2-app-to-use-the-new-router/
+
+
+---
+
+v 116
+
+Understanding Navigation Paths:-
+
+- /server is preferred as it mentions relative paths in app.component
+
+- if u miss / in child components, then clicking it means, getting absolute paths and ur app may break
+
+- as a best practice, it is better to use / or ./ or ../server
+
+
+---
+
+
+routerLinkActive="active"
+
+
+- use it when the /server tab does not look like its active.
+
+- in bootstrap it is class="active", but in ng2 it becomes
+
+routerLinkActive="active"
+
+
+<li role="presentation" routerLinkActive="active" routeLinkActiveOptions="{exact: true}"><a routerLink="server"> Server Comp </a> </li>
+
+<li role="presentation"><a routerLink="/" >  Home Comp</a></li>
+
+
+---
+
+
+Trigerring routes programmatically:- (using absolute paths eg. /server)
+
+server.component.html
+
+    <button class = "btn btn-primary" (click) = "onLoadServers()"> Goto Home Comp </button>
+
+
+server.component.ts
+
+    import {Router} from '@angular/router';
+
+    ...
+
+    constructor(private rtr: Router) { }
+
+   
+
+    ...
+
+    onLoadServers(){
+
+    //complex calculation
+
+    //then navigate to another route
+
+    this.rtr.navigate(['/']);
+
+    }
+
+
+Now when the server component is loaded, there will be a button to goto home.
+
+
+---
+
+Triggering routes programmatically (using relative path)
+
+
+(skipped)
+
+
+---
+
+
+D:\js\Ang2\proj2\p3 
+
+ng serve
+
+Passing parameters to Routes
+
+
+D:\js\Ang2\proj2\p3>ng g c server
+
+installing component
+
+  create src\app\server\server.component.css
+
+  create src\app\server\server.component.html
+
+  create src\app\server\server.component.spec.ts
+
+  create src\app\server\server.component.ts
+
+  update src\app\app.module.ts
+
+
+D:\js\Ang2\proj2\p3>ng g c servers
+
+installing component
+
+  create src\app\servers\servers.component.css
+
+  create src\app\servers\servers.component.html
+
+  create src\app\servers\servers.component.spec.ts
+
+  create src\app\servers\servers.component.ts
+
+  update src\app\app.module.ts
+
+
+D:\js\Ang2\proj2\p3>
+
+
+D:\js\Ang2\proj2\p3>ng g c home
+
+installing component
+
+  create src\app\home\home.component.css
+
+  create src\app\home\home.component.html
+
+  create src\app\home\home.component.spec.ts
+
+  create src\app\home\home.component.ts
+
+  update src\app\app.module.ts
+
+ 
+
+child components:-  
+
+    - server
+
+    - servers
+
+    - home  
+
+
+---
+
+
+v121, 122 (skipped)
+
+
+---
+
+TODOS:-
+
+
+http requests
+
+import {Http} from '@angular/http';
+
+           
+
+            class PokemonComponent{
+
+                constructor(private http: Http){
+
+               
+
+                    this.http
+
+                        .get(`${this._baseUrl}/pokemon/?offset=${offset}&limit=${limit}`)
+
+                          .map(response => response.json());
+
+
+                }
+
+            }
+
+ 
+
+Services:-
+
+    - component using a service
+
+    - service using a service
+
+        @Injectable
+
+       
+
+        ng generate service shared/services/pokemon
+
+            - may use models, so create shared/model/ folder too.
+
+            ng generate class shared/models/PokemonList
+
+            ng generate class shared/models/PokemonEntry
+
+               
+
+        pokemon.service.ts
+
+            import {Http} from '@angular/http';
+
+           
+
+            class PokemonComponent{
+
+                constructor(private http: Http){
+
+                }
+
+            }
+
+           
+
+testing angular code.
+
+
+    http://chariotsolutions.com/blog/post/testing-angular-2-0-x-services-http-jasmine-karma/
+
+    How to bootstrap a test bed
+
+    How to inject a service into the test bed
+
+   
+
+01    import {MarkdownService} from './markdown-service';
+
+02
+
+03    import {
+
+04      TestBed, inject
+
+05    } from '@angular/core/testing';
+
+06   
+
+07    describe('Markdown transformer service', () => {
+
+08      beforeEach(() => {
+
+09        TestBed.configureTestingModule({
+
+10          providers: [
+
+11            MarkdownService
+
+12          ]
+
+13        });
+
+14      });
+
+15   
+
+16      it('Should translate markdown to HTML!',
+
+17        inject([MarkdownService], (markdownService) => {
+
+18   
+
+19        expect(markdownService).toBeDefined();
+
+20   
+
+21        expect(markdownService.toHtml('hi'))
+
+22                              .toContain('<p>hi</p>');
+
+23      }) //inject ends
+
+    ); //it ends
+
+24    }); //describe ends   
+
+
+To run: ng test
+
+
+@HostListener/@HostBinding/renderer/etc.
+
+@Output
+
+view-layer & service-layer
+
+    (would use models like /shared/models/someclass.ts)
+
+    https://g00glen00b.be/services-angular-rxjs/
+
+    While $http for AngularJS 1.5 returned promises, the Http service of Angular 2 doesn’t. In stead of returning promises, it will return observables.
+
+    If you’re a fan of promises, no worries, an observable can be converted to a promise.
+
+   
+
+    Rxjs operators: take, timer, map, pluck, debounce
+
+        if we take the debounce operator, this operator will make sure that only the last item will come through if many items succeed quickly.
+
+
+
+    http://blog.brecht.io/A-scalable-angular2-architecture/
+
+            State Management Layer (Redux/NgRx)
+
+                Rest API Layer
+
+                    Abstraction Layer (some sort of abstraction)
+
+                        Presentation Layer (View Layer) DUMB COMPONENTS
+
+
+            Dumb or smart components should NOT know there is a state management layer.
+
+                Else these components would be tightly coupled with the state management layer.
+
+               
+
+                http://blog.angular-university.io/angular-2-smart-components-vs-presentation-components-whats-the-difference-when-to-use-each-and-why/
+
+
+---
+
+
+https://www.youtube.com/watch?v=ei7FsoXKPl0 
+
+
+> Programming paradigm that works with asynchronous data streams
+
+    >> Data streams can be created from :
+
+        UI Events
+
+        Http Requests
+
+        File Systems
+
+        Array like Objects
+
+        Machine's Memory/cache
+
+       
+
+            >> Stream: A sequence of ongoing events ordered in time
+
+                - emits a value, error and complete signal
+
+                    - some events complete, thats when we get a completed-signal, else we dont get completed-signal
+
+               
+
+                >> The way to work with stream is by something called an "observable":
+
+                    observable: are used to watch streams and emit functions when a value, error or completed-signal is returned
+
+                                - can be subscribed to by an "observer".
+
+                                    - there is no limit to how many subscriptions an observable can have.
+
+                                - we can interact with data streams as any regular array
+
+                               
+
+                    Currently, we CAN'T use ES5 or ES6 to work with observables and data streams
+
+                        Reactive extensions (Reactive X) is what allows us to do that.
+
+                        Reactive X is a library for composing async programs by using observable sequences
+
+                            - it provides us with a long list of operators, which allows us to filter, select , transform, combine and compose observables
+
+                            - this library is not limited to JS. in python it is RxPY, RxPHP, c# etc.
+
+
+===============================                           
+
+Topics to cover:
+
+> Examining data streams from events
+
+> Creating observables from array-like Objects
+
+> Creating observables from scratch
+
+        > Filtering and tranforming observables
+
+> Promises to observables
+
+> Many helpful operators
+
+> Error Handling
+
+---------------------                           
+
+
+Environment Setup:
+
+
+www.reactivex.io
+
+- see github repos
+
+- if u r using cdns instead, get the rx.all.js file.
+
+
+http://github.com/bradtraversy/rxjs_boiler (boiler plate for building rxjs applications with webpack and babel)
+
+- download the zip . extract its contents in a folder called "rxjs_sandbox"
+
+- goto rxjs_sandbox
+
+    >> npm install (creates the node_modules/ folder)
+
+    >> webpack -w (watch mode, creates the dist folder)
+
+    >> open another command line
+
+        - install live-server
+
+        npm install live-server -g
+
+        npm start
+
+    >> http://127.0.0.1/8000    
+
+       
+
+       
+
+--------------------
+
+observables from events:
+
+
+index.html, app.js
+
+- add a button in index.html
+
+- app.js
+
+
+//creating an observable
+
+const btn = $('#btn');
+
+const btnStream$ = Rx.Observable.fromEvent(btn, 'click'); //the element to watch, the event on that element
+
+       
+
+//subscribing to an observable
+
+//btnStream$.subscribe()
+
+//takes 3 functions as params for the data/value in the stream, error in the stream, completion function
+
+btnStream$.subscribe(
+
+    function(e){
+
+        console.log('clicked');
+
+    },
+
+    function(err){
+
+        console.log(err);
+
+    },
+
+    function(){
+
+        console.log('Completed');
+
+    });       
+
+
+    //only the first param function is mandatory, other 2 are optional
+
+    // this coding style is using callbacks
+
+   
+
+---------------------
+
+
+observables from arrays:
+
+
+eg1.
+
+const numbers = [10, 20, 30, 40];
+
+const numbers$ = Rx.observable.from(numbers);
+
+
+numbers$.subscribe(
+
+    e =>{
+
+        console.log(e);
+
+    },
+
+    err =>{
+
+        console.log(err);
+
+    },
+
+    completed =>{
+
+        console.log('completed');
+
+    },
+
+);
+
+
+// here we are using arrow functions. u can use callbacks too.
+
+
+eg2.
+
+//for json
+
+const posts = [
+
+    {title1: 'this is title1', body1:'this is body 1'},
+
+    {title2: 'this is title2', body2:'this is body 2'},
+
+    {title3: 'this is title3', body3:'this is body 3'},   
+
+];
+
+
+and same code as numbers
+
+
+eg.3 .
+
+
+// u can use sets n maps as well
+
+
+----------------------
+
+
+creating an observable from scratch:
+
+
+const source$ = new Rx.Observable(observer => {
+
+        console.log('creating an observable from scratch');
+
+       
+
+        //emitting a value from the stream
+
+        observer.next("Hello world"); // this is a decorator function
+
+        observer.next("Emiting another data/value");
+
+       
+
+        //to show u that this is a stream and is constantly open, lets do:
+
+        setTimeout(() => {
+
+            observer.next("Yet another value");
+
+            }, 3000); //so the first 2 values wiill emit, then there will be a 3 sec pause and then this value will be emitted.
+
+           
+
+        //notice the completed function never fires, because we havent ended our stream
+
+        // to do this add : observer.complete(); in the setTimeout() method's last line.
+
+            // if u put observer.complete() outside the setTimeout() then it would complete before the setTimeout() is executed.
+
+           
+
+        //for errors, use observer.error(new Error('Some error happened')).   
+
+    });
+
+
+//rest is same as above. the subscription part i mean
+
+//to capture errors during subscription, use source$.catch(err=> Rx.observable.of(err))
+
+                                                    .subscribe() syntax.
+
+
+-------------------------
+
+
+Observable from a promise:
+
+
+Promise: represents the eventual result of an async operation .
+
+
+const myPromise = new Promise((resolve, reject) => {
+
+    console.log ('creating Promise');
+
+    setTimeout(()=>{
+
+        resolve('Hellow from Promise');
+
+    }, 3000);    //setTimeout make an async call; we can also use $http.get in ang.1.
+
+});
+
+
+const source$ = Rx.observable.fromPromise(myPromise); //creating an observable
+
+source$.subscribe(x => {console.log(x);},
+
+);
+
+//we r subscribing to that promise.
+
+
+....
+
+....
+
+
+--------------------------
+
+
+Operators: Interval, Timer & Range
+
+
+const source$ = Rx.observable.interval(100)
+
+                             .take(5); //take allows to complete.
+
+
+const source$ = Rx.observable.timer(5000, 2000)
+
+                             .take(5); //take allows to complete.
+
+
+const source$ = Rx.observable.timer(25, 100);
+
+
+
+Operators: map, Pluck
+
+
+    const source$ = Rx.observable.interval(100)
+
+                             .take(5)
+
+                             .map(v => v*v)  //sinceonly one line {} is NOT required.
+
+                             ;
+
+                           
+
+
+
+
+xxxxxxxxxxxxxx
+
+
+
+
+2env. are required:-
+
+- console to watch the build of both client n server code
+
+- http (live-server) to c code on browser
+
+
+Any code changes (on server/client) should update both envs.
+
+
+---
+
+node -v
+
+v6.10.3
+
+npm install npm -g
+
+node -v
+
+v6.10.3
+
+node latest version
+
+
+npm init -y
+
+
+---
+
+https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md
+
+If you've previously installed gulp globally, run npm rm --global gulp before following these instructions.
+
+Install the gulp command
+
+    npm install --global gulp-cli
+
+Install gulp in your devDependencies
+
+Run this command in your project directory:
+
+    npm install --save-dev gulp
+
+
+create gulpfile.js
+
+    var gulp = require('gulp');
+
+
+    gulp.task('default', function() {
+
+      // place code for your default task here
+
+    });  
+
+  
+
+D:\js\Ang2\proj2\rx_extra>gulp
+
+[11:04:19] Using gulpfile D:\js\Ang2\proj2\rx_extra\gulpfile.js
+
+[11:04:19] Starting 'default'...
+
+[11:04:19] Finished 'default' after 93 µs
+
+
+D:\js\Ang2\proj2\rx_extra>gulp -v
+
+[11:04:26] CLI version 1.3.0
+
+[11:04:26] Local version 3.9.1
+
+
+---
+
+  
+
+npm install gulpjs/gulp#4.0  gulp-load-plugins  gulp-babel  babel-preset-es2015  browserify  watchify  babelify  gulp-cached  nodemon  vinyl-source-stream --save-dev
+
+
+gulpjs/gulp#4.0
+
+- not yet released. 3.9.1 was latest . that syntax is installing from their git repo.
+
+- this repo @ this branch, thats what that syntax means
+
+
+gulp-load-plugins
+
+gulp-babel
+
+- to compile server side code
+
+babel-preset-es2015
+
+browserify
+
+- to compile client side code
+
+- for client side package management
+
+watchify
+
+babelify
+
+gulp-cached
+
+nodemon
+
+- node monitor, monitors a directory. if anything changes, it runs a js file.
+
+vinyl-source-stream
+
+- to allow browserify to work with gulp
+
+
+---
+
+
+npm install jquery lodash moment colour --save
+
+
+colour
+
+- allows to change color of our console output
+
+
+---
+
+reactive extensions
+
+
+npm install rxjs --save
+
+
+rxjs
+
+- is ver. 5 of reactive extensions for js
+
+
+---
+
+
+--save-dev saves semver spec into "devDependencies" array in your package descriptor file,
+
+--save saves it into "dependencies" instead.
+
+
+we do NOT require devDependencies (like karma, etc.) to run the app in its normal state, so it is a --save-dev type dependency.
+
+for the app to run in its normal state, we require ONLY dependencies, so --save is required.
+
+
+---
+
+
+create src-server/
+
+& build/ folder
+
+
+src-server
+
+    - examples will go
+
+  
+
+build
+
+    - for build purposes
+
+---
+
+create ex_00.js
+
+    import moment from 'moment';
+
+    console.log (moment().format());  
+
+
+Modify gulpfile.js
+
+    var gulp = require('gulp')
+
+      $ = require("gulp-load-plugins")(),
+
+      source = require("vinyl-source-stream"),
+
+      browserify = require("browserify"),
+
+      watchify = require("watchify"),
+
+      babelify = require("babelify");
+
+
+    gulp.task("scripts:server", function() {
+
+        // place code for your default task here
+
+        return gulp.src("./src-server/**/*.js")
+
+          .pipe($.babel())
+
+          .pipe(gulp.dest("./build"));
+
+      });
+
+
+    gulp.task('watch:scripts:server', function() {
+
+        // place code for your default task here
+
+        return gulp.watch("./src-server/**/*.js", gulp.series("scripts:server"));
+
+      });
+
+
+
+    gulp.task('default', function() {
+
+      // place code for your default task here
+
+    });
+
+  
+
+  
+
+D:\js\Ang2\proj2\rx_extra>gulp scripts:server
+
+[11:24:15] Using gulpfile D:\js\Ang2\proj2\rx_extra\gulpfile.js
+
+[11:24:15] Starting 'scripts:server'...
+
+[11:24:15] Finished 'scripts:server' after 129 ms  
+
+  
+
+check build/ folder , we did NOT get a tranformation to es6/es2015.
+
+in order to get the transformation, we need to have a .babelrc file (same folder as gulpfile.js)
+
+
+.babelrc
+
+    {
+
+      "presets":["es2015"]
+
+    }
+
+
+D:\js\Ang2\proj2\rx_extra>gulp scripts:server
+
+[11:30:01] Using gulpfile D:\js\Ang2\proj2\rx_extra\gulpfile.js
+
+[11:30:01] Starting 'scripts:server'...
+
+[11:30:01] Finished 'scripts:server' after 327 ms
+
+
+(it took a little longer)
+
+now look in build/ex_00.js and its now transformed es6 code to es5 code.
+
+
+now lets launch the server
+
+D:\js\Ang2\proj2\rx_extra>gulp watch:scripts:server
+
+[11:34:21] Using gulpfile D:\js\Ang2\proj2\rx_extra\gulpfile.js
+
+[11:34:21] Starting 'watch:scripts:server'...
+
+
+
+Note:- if u add
+
+console.log('hello');
+
+in src-server/ex_00.js, its corresponding build/-file will be auto updated.
+
+
+---
+
+(we r going to keep nodemon out of gulp)
+
+nodemon's binary is at this location: node_modules/.bin/nodemon
+
+we do not want to type it every time, so we need some like "npm run nodemon"
+
+
+    - for this we will need to edit the scripts:[] in package.json
+
+        scripts: {
+
+            "nodemon" (alias) : "nodemon" (thing to execute)
+
+        }
+
+        but we want to run nodemon only if any file changes
+
+        scripts: {
+
+            "nodemon" : "nodemon --watch build"
+
+        }
+
+
+to test this:-
+
+
+open new cmd-prompt
+
+npm run nodemon build/ex_00
+
+
+    D:\js\Ang2\proj2\rx_extra>npm run nodemon build/ex_00
+
+    > rx_extra@1.0.0 nodemon D:\js\Ang2\proj2\rx_extra
+
+    > nodemon --watch build "build/ex_00"
+
+    [nodemon] 1.11.0
+
+    [nodemon] to restart at any time, enter `rs`
+
+    [nodemon] watching: D:\js\Ang2\proj2\rx_extra\build/**/*
+
+    [nodemon] starting `node build/ex_00 index.js`
+
+    2017-05-30T11:43:40+05:30
+
+    hello
+
+    [nodemon] clean exit - waiting for changes before restart      
+
+  
+
+if u change src-server/ex_00, the output will be automatically available in this console window  
+
+
+---
+
+did not do this:
+
+.pipe($.cached("server"))
+
+in below task:-
+
+gulp.task("scripts:server", function() {
+
+    // place code for your default task here
+
+    return gulp.src("./src-server/**/*.js")
+
+      .pipe($.cached("server"))
+
+      .pipe($.babel())
+
+      .pipe(gulp.dest("./build"));
+
+  });
+
+ 
+
+ 
+
+did this though:
+
+
+earlier:-
+
+    gulp.task('watch:scripts:server', function() {
+
+        // place code for your default task here
+
+        return gulp.watch("./src-server/**/*.js", gulp.series("scripts:server"));
+
+      });
+
+
+now:- //running scripts:server task before watch:scripts:server task
+
+gulp.task('watch:scripts:server', gulp.series("scripts:server", function() {
+
+    // place code for your default task here
+
+    return gulp.watch("./src-server/**/*.js", gulp.series("scripts:server"));
+
+  })
+
+  );
+
+ 
+
+restart gulp:
+
+gulp watch:scripts:server
+
+&
+
+npm run nodemon build/ex_00
+
+==========================
+
+
+Setting up the client:- (little bit complicated)
+
+
+- basic http server installed globally
+
+- browserify, watchify and babelify to compile our client examples
+
+ 
+
+create public/
+
+       public/build/
+
+        - compile client code (the code to run on the browser)
+
+       src-client/
+
+        - for things i want to run on the browser
+
+     
+
+> use gulp-watch to check files that exist in gulp-client/
+
+> any new files that come in we r going to launch gulp watchify      
+
+
+in gulpfile.js
+
+- lets create helper functions
+
+
+https://spapas.github.io/2015/05/27/using-browserify-watchify/
+
+Browserify
+
+With browserify you create a single main.js for each of your HTML pages and in it you declare its requirements using require. You’ll then pass your main.js through browserify and it will create a single file (e.g bundle.js) that contains all the requirements (of course each requirement could have other requirements - they’ll be automatically also included in the resulting .js file). That’s the only file you need to put to the script tag of your HTML!
+
+
+browserify not only concatenates your javascript libraries to a single bundle but can also transform your coffesscript, typescript, jsx etc files to javascrpt and then also add them to the bundle. This is possible through a concept called transforms — there are a lot of transforms that you can use.
+
+
+Watchify
+
+Using watchify, you can watch your main.js for changes (the changes may also be in the files included from main.js) and automatically generate the resulting bundle.js so that you’ll just need to hit F5 to refresh and get the new version!
+
+
+---
+
+
+Made lot of changes in gulpfile.js. steps are marked from 1 to 4.
+
+gulpfile.js:-
+
+
+        "use strict";
+
+
+        var gulp = require('gulp'),
+
+          $ = require("gulp-load-plugins")(),
+
+          source = require("vinyl-source-stream"),
+
+          browserify = require("browserify"),
+
+          watchify = require("watchify"),
+
+          babelify = require("babelify"),
+
+          path = require("path"),
+
+          fs = require("fs");
+
+
+        gulp.task("scripts:server", function() {
+
+            // place code for your default task here
+
+            return gulp.src("./src-server/**/*.js")
+
+              .pipe($.babel())
+
+              .pipe(gulp.dest("./build"));
+
+          });
+
+
+
+        //gulp.task('watch:scripts:server', function() {
+
+        //    // place code for your default task here
+
+        //    return gulp.watch("./src-server/**/*.js", gulp.series("scripts:server"));
+
+        //  });
+
+
+        //running scripts:server task before watch:scripts:server task
+
+        gulp.task('watch:scripts:server', gulp.series("scripts:server", function() {
+
+            // place code for your default task here
+
+            return gulp.watch("./src-server/**/*.js", gulp.series("scripts:server"));
+
+          })
+
+          );
+
+
+        //step 3.
+
+        //pre-requisite, make sure fs is require-d.
+
+        gulp.task('watch:scripts:client', () => {
+
+            //enumerate all files in our directory
+
+            const files = fs.readdirSync('./src-client'); //bad way to do it, but we dont care.
+
+            for (let i = 0; i< files.length; i++){
+
+              const file = files[i];
+
+              if (path.extname(file) !== '.js')
+
+                continue; //moveon
+
+
+                //else if extension is .js
+
+                initBundlerWatch(path.join("src-client", file));
+
+            }//for ends
+
+
+            //watch for any new files
+
+            return gulp.watch("./src-client/**/*.js") //if any file in client changes,
+
+              .on ("change", initBundlerWatch);
+
+        }); //task ends
+
+
+        //step 4.
+
+        gulp.task('watch:scripts', gulp.parallel(
+
+          "watch:scripts:client",
+
+          "watch:scripts:server" //dont put comma here, else gulp nukes
+
+        ));
+
+
+        //gulp.task('default', function() {
+
+        //  // place code for your default task here
+
+        //});
+
+
+        //step 2.
+
+        //browserify => for module loading; babel would not do it.
+
+        let bundlers = {};
+
+
+        function initBundlerWatch(file){ //helper function
+
+          if (bundlers.hasOwnProperty(file)){
+
+            return; //shortcircuit
+
+          }
+
+
+          const bundler = createBundler(file); //bundler is an instance of browserify
+
+          bundlers[file] = bundler; //helps in preventing multiple builds and it make faster
+
+
+          const watcher = watchify(bundler);
+
+          const filename = path.basename(file); //import "path" in require above.
+
+          //basename is the filename
+
+
+          //internal function
+
+            function bundle(){
+
+              return bundler  //bundler is instance of browserify
+
+                .bundle()
+
+                .on("error", error => console.error(error)) //printout our errors
+
+                .pipe(source(filename)) //browserify doesnt create files with names,
+
+                //but inorder to work with gulp, a filename is reqd.
+
+                .pipe(gulp.dest("./public/build")); //final output folder
+
+            } //bundle ends
+
+
+          //hook into watchify events, before calling bundle()
+
+          //update/time are events of watchify
+
+          watcher.on("update", bundle); //if any file changes, rebundle.
+
+          watcher.on("time", time => console.log(`Built client in ${time} ms`));
+
+
+          bundle();
+
+        }//initBundlerWatch ends
+
+
+        //step 1.
+
+        function createBundler(file){
+
+          const bundler = browserify(file); //instance of browserify
+
+          bundler.transform(babelify); //do babel transformation of es6 code to es5 code.
+
+          return bundler; //return the browserify-instance
+
+        }
+
+
+        //public ==> html files
+
+        //src-client ==> public/build/ will be output folder for client code
+
+        //src-server ==> build/  will be output folder for server code
+
+
+D:\js\Ang2\proj2\rx_extra>gulp watch:scripts:client
+
+[13:02:18] Using gulpfile D:\js\Ang2\proj2\rx_extra\gulpfile.js
+
+[13:02:18] Starting 'watch:scripts:client'...
+
+
+lets write something in src-client/ex_00.js
+
+
+D:\js\Ang2\proj2\rx_extra>gulp watch:scripts:client
+
+[13:07:41] Using gulpfile D:\js\Ang2\proj2\rx_extra\gulpfile.js
+
+[13:07:41] Starting 'watch:scripts:client'...
+
+Built client in 750 ms
+
+
+So, u can see client was built in 750 ms.
+
+output file is in public/build/ex_00.js
+
+    and u can see it is transformed.
+
+  
+
+if u change src-client/ex_00.js, the build will run again and the public/build/ex_00.js file will be updated.  
+
+gulp watch:scripts
+
+    -- will now launch both tasks "watch:scripts:client" and "watch:scripts:server" in parallel.
+
+    -- so if u edit src-server/ex_00.js or src-client/ex_oo.js, the build will automatically run.
+
+(it will be runnning, so let the cmd run )  
+
+---
+
+lets run a http server (globally)
+
+npm list -g
+
+npm list -g grunt
+
+    (i know grunt is not installed on my system)
+
+    D:\js\Ang2\proj2\rx_extra>npm list -g grunt
+
+    C:\Users\Jenson.Samuel\AppData\Roaming\npm
+
+    `-- (empty)
+
+npm list -g live-server
+
+    (looks like i already have live-server installed globally, so no need to do : npm install -g live-server)
+
+    D:\js\Ang2\proj2\rx_extra>npm list -g live-server
+
+    C:\Users\Jenson.Samuel\AppData\Roaming\npm
+
+    `-- live-server@1.2.0
+
+ 
+
+Note:- live-server allows us to "serve" any directory.
+
+just cd into a dir/
+
+and run "live-server"
+
+
+D:\js\Ang2\proj2\rx_extra\public>live-server
+
+Serving "D:\js\Ang2\proj2\rx_extra\public" at http://127.0.0.1:8080
+
+Ready for changes
+
+GET /favicon.ico 404 3.796 ms - 24
+
+GET /favicon.ico 404 1.512 ms - 24
+
+
+and browser opens automatically @ http://127.0.0.1:8080/
+
+
+---
+
+
+so, public/ will be for html files
+
+so, ex_00.html 
+
+ 
+
+src_client/ex_00.js
+
+    import moment from 'moment';
+
+    import $$ from 'jquery';
+
+    $$("body").text(moment().format());
+
+    console.log('kill the schmuc joker');
+
+
+public/ex_00.html
+
+    <!DOCTYPE html>
+
+
+    <html>
+
+      <head>
+
+      </head>
+
+      <body>
+
+        <h1>example 00 </h1>
+
+        <script src="/build/ex_00.js"></script>
+
+      </body>
+
+    </html>
+
+
+cd public/
+
+live-server
+
+  
+
+see   http://127.0.0.1:8080/
+
+click build/
+
+click ex_oo.html (click this html file) http://127.0.0.1:8080/ex_00.html
+
+
+After all this, we can now see that we have a tight-feedback loop.
+
+we can see all client and server changes as we do it and also see it on live-server
+
+
+2 consoles + 1 browser (pointing to localhost)
+
+- gulp watch:scripts
+
+D:\js\Ang2\proj2\rx_extra>gulp watch:scripts
+
+- live-server
+
+D:\js\Ang2\proj2\rx_extra\public>live-server
+
+
+src-server/ex_00.js    ==> build/ex_00.js
+
+src-client/ex_00.js    ==> public/build/ex_00.js
+
+html file is in public/ex_00.html
+
+
+gulp watch:scripts
+
+npm run nodemon build/ex_01_observables.js
+
+live-server
+
+
+---
+
+v 7 using the playground.
+
+(skipped)
+
+---
+
+
+https://stackoverflow.com/questions/30794356/why-do-i-have-to-use-vinyl-source-stream-with-gulp
+
+vinyl-source-stream
+
+A vinyl stream is a Virtual file format, and it is fundamental for Gulp. Thanks to this vinyl streams Gulp doesn't need to write a temporal file between different transformations. And this is one of the main advantages it have over Grunt.
+
+
+---
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+src-server/
+
+
+D:\js\Ang2\proj2\rx_extra>gulp watch:scripts
+
+D:\js\Ang2\proj2\rx_extra>npm run nodemon build/ex_01_observables.js
+
+D:\js\Ang2\proj2\rx_extra\public>live-server
+
+
+eg.1.
+
+src-server/ex_01_observables.js
+
+        import Rx from 'rxjs/Rx';
+
+        let simple$ = new Rx.Observable(observer => {    //$ is suffixed to indicate an observable.
+
+          setTimeout(() => {
+
+                              observer.next('val1');
+
+                              observer.next('val2');
+
+                              observer.complete();
+
+                            }, 3000);
+
+        });
+
+        console.log(typeof simple$); //object
+
+        console.log('xxxyyzz');
+
+        simple$.subscribe((e) => {console.log(e);},                    //next
+
+                          (err)=>{console.log(err);},                //2ndparam is optional
+
+                          ()=>{console.log('completed signal');}    //3rdparam is optional
+
+                         );
+
+        
+
+NOTE: until subscribe is called, nothing is outputted.
+
+- observables are lazy; they dont do anything until subscription.
+
+- observable is a generator function
+
+
+We can also write:-
+
+        simple$.subscribe( e => {console.log(e);},                    //next
+
+                           err =>{console.log(err);},                //2ndparam is optional
+
+                           ()=>{console.log('completed signal');}    //3rdparam is optional
+
+                         );
+
+
+ 
+
+eg.2. 
+
+        import Rx from 'rxjs/Rx';
+
+
+        let simple$ = new Rx.Observable(observer => {
+
+          setTimeout(() => {
+
+                              observer.next('val1');
+
+                              observer.next('val2');
+
+
+                            }, 3000);
+
+
+          setTimeout(()=>{observer.error(new Error('Jack Sparrow is dead'));}, 5000);
+
+          //observer.complete();
+
+        });
+
+
+        console.log(typeof simple$); //object
+
+        console.log('xxxyyzz');
+
+
+        simple$.subscribe((e) => {console.log(e);},
+
+                          (err)=>{console.log(err);},
+
+                          ()=>{console.log('completed signal');});
+
+
+ 
+
+---
+
+
+the observer being mentioned in above examples is actually an emitter.
+
+its not the observer. wtf ! name ur variables right.
+
+an emitter should be able to emit values using .next(<value>)
+
+
+eg. 1.1.
+
+
+import Rx from 'rxjs/Rx';
+
+
+//our observable is a generator.
+
+//typeof (simple$) is object . simple$ is an observable.
+
+let simple$ = new Rx.Observable(emitter => {
+
+  emitter.next('this is val2');
+
+  emitter.next('this is val3');
+
+  emitter.complete();
+
+});    //<<<==== name ur variables right. use emitter than observer
+
+
+simple$.subscribe(
+
+  (value) => {console.log(value);},
+
+  (err) => {}, //has to be comma separated since these r params
+
+  () => {}
+
+);
+
+
+---
+
+eg. 1.2 where to place emitter.complete()
+
+
+import Rx from 'rxjs/Rx';
+
+
+//our observable is a generator.
+
+//typeof (simple$) is object . simple$ is an observable.
+
+let simple$ = new Rx.Observable(emitter => {
+
+  setTimeout(()=>{
+
+    console.log('xxxx');
+
+    emitter.next('this is val1');
+
+    //emitter.complete();
+
+  },3000);
+
+  emitter.next('this is val2');
+
+  emitter.next('this is val3');
+
+  //dont write emitter.complete() here, else the async code doesnt emit!!! IMP!!!
+
+});
+
+
+simple$.subscribe(
+
+  (e) => { console.log(e);},
+
+  (err) => {}, //has to be comma separated since these r params
+
+  () => {}
+
+);
+
+ 
+
+// let x = simple$.subscribe( ....
+
+//console.log(typeof(x), x); //object, Subscriber ...<obj dump> 
+
+ 
+
+ 
+
+---
+
+
+VIMP: key concepts is shown in below example.
+
+
+data stream : in theory are a sequence of data/events
+
+observable: in theory, are a way to tap into data streams, TO EMIT values, errors, completed signal(wherever applicable)
+
+                > it can EMIT values, but ONLY during its creation. //i.e. new Rx.Observable(...).
+
+                    >> in below example simple$ (is object type &) is "Observable { _isScalar: false, _subscribe: [Function] }"
+
+                > observable CANNOT EMIT values AFTER ITS CREATION.
+
+                //VIMP:-simple$.next IS NOT possible after new Rx.Observable() ...
+
+                    >> for emitting values (after creation), use a subscriber.
+
+                            eg. let x = simple$.subscribe(...); x is a subscriber now.
+
+                    >> subscribers also have x.unsubscribe(). observables (like simple$) DO NOT have unsubscribe() method.      
+
+
+observer: in theory, has to subscribe/unsubscribe to get the EMITTED values.
+
+          they r not visible, but implemented internally.
+
+          >> subscribers are an implementation of observers.
+
+        
+
+Subject: > observable + observer
+
+         > allows an observable to EMIT values AFTER creation too.
+
+                //VIMP:- sub .next IS possible after let sub = new Rx.Subject() ...
+
+         > use it when u want the observable to emit values, even after its creation. <<=== this is the most important thing that nobody is taking about!
+
+        
+
+eg. 1.3
+
+            import Rx from 'rxjs/Rx';
+
+
+            //our observable is a generator.
+
+            //typeof (simple$) is object . simple$ is an observable.
+
+            let simple$ = new Rx.Observable(emitter => {
+
+              setTimeout(()=>{
+
+                console.log('xxxx');
+
+                emitter.next('this is val1');
+
+                //emitter.complete();
+
+              },3000);
+
+              emitter.next('this is val2');
+
+              emitter.next('this is val3');
+
+              //dont write emitter.complete() here, else the async code doesnt emit!!! IMP!!!
+
+            });
+
+
+            //i think below is the "observer". Because:
+
+            //1. observer/subscriber can ONLY subscribe to observables(which emits values from data streams)
+
+            //2. observer cannot emit values. (It can only be notified of new values.)
+
+            //3. observable cannot emit values after its creation. So, below is not possible.
+
+            //simple$.next('val4'); //error: this is not possible.
+
+            simple$.subscribe(
+
+              (e) => { console.log(e);},
+
+              (err) => {}, //has to be comma separated since these r params
+
+              () => {}
+
+            );
+
+
+            //simple$.next('val4'); //if u want this to work use a Subject.
+
+            //Subject = observable (emitting values) + observer (subscribing to those values) +
+
+                        //observable can emit values after its creation
+
+
+Q. What if I want to add more subscribers?
+
+A. Add more sections.
+
+
+            simple$.subscribe(
+
+              (e) => { console.log(e + 'subscriber/observer 2');},
+
+              (err) => {}, //has to be comma separated since these r params
+
+              () => {}
+
+            );
+
+
+
+            simple$.subscribe(
+
+              (e) => { console.log(e + 'subscriber/observer 3');},
+
+              (err) => {}, //has to be comma separated since these r params
+
+              () => {}
+
+            );
+
+          
+
+            -or-
+
+          
+
+            //method1:
+
+            /*
+
+            let x = simple$.subscribe(
+
+              (e) => { console.log(e);},
+
+              (err) => {}, //has to be comma separated since these r params
+
+              () => {}
+
+            );
+
+
+            x.next('xxx is badass');
+
+            //x.unsubscribe(); //IMP: this still allows u to unsubscribe.
+
+            //x.next('007 is badass');
+
+
+            -or-
+
+            VIMP:
+
+                > There is nothing "visible" to define "observer".
+
+                    >>simple$.subscribe() :- .subscribe() is the glue which connects the observer and observable internally.
+
+                        simple$ (which is an observable), does NOT provide a .unsubscribe() method.
+
+                    >>let x = simple$.subscribe(...); now x has a unsubscribe() method which can be called like x.unsubscribe();
+
+                        x is a subsciber.
+
+                        - Subscriber is an implementation of observer, which inturn is an implementation of IObserver<T>;
+
+                > If u want to emit AFTER observable-creation, use a subscriber.
+
+                                 
+
+            IMP: To create multiple subscribers obs1, obs2 use this:-
+
+          
+
+            Here the COMMON values between obs1 and obs2 will be executed by:-
+
+                let simple$ = new Rx.Observable(emitter => {
+
+                  setTimeout(()=>{
+
+                    //console.log('xxxx');
+
+                    //emitter.next('this is val1');
+
+                    //emitter.complete();
+
+                  },3000);
+
+                  emitter.next('this is val2');
+
+                  emitter.next('this is val3');
+
+                  //dont write emitter.complete() here, else the async code doesnt emit!!! IMP!!!
+
+                });
+
+              
+
+            And the DIFFERENTIAL Values can be emitted from obs1.next(...) and obs2.next(...) which will be independent of each other  
+
+          
+
+                function getObserver(xsimple$, id){
+
+                  let y = xsimple$.subscribe(
+
+                    (e) => { console.log(e + 'subscriber/observer' + id);},
+
+                    (err) => {}, //has to be comma separated since these r params
+
+                    () => {}
+
+                  );
+
+                  return y; //do not return xsimple$, else it will be an observable
+
+                            // y = observer/subscriber
+
+                            // xsimple$ = observable. Its pass by reference remember and we want Pbyref.
+
+                } //getObserver ends
+
+
+                let obs1 = getObserver(simple$, 1);
+
+                obs1.next('val4.1.1');
+
+                obs1.next('val4.1.2');
+
+                obs1.unsubscribe(); //if u unsubscribe, then val4 wont be displayed.
+
+                obs1.next('val4.1.3');
+
+                console.log("\n");
+
+                //console.log(obs1);
+
+                //console.log("\n");
+
+                let obs2 = getObserver(simple$, 2);
+
+                //console.log(obs2);
+
+                console.log('==========================');
+
+                obs2.next('val4.2.1');
+
+                obs2.next('val4.2.2');
+
+                obs2.unsubscribe();
+
+                obs2.next('val4.2.3');
+
+              
+
+              
+
+            */
+
+
+---
+
+          
+
+eg.2    Lets c example of a subject.   
+
+        NOTE:- the object keys of obs1 and obs2 is similar to the structure of "subscription" variable eg. let subscription = sub.subscribe(...);
+
+        So, it looks to me like obs1, obs2 and subscription are similar if NOT equal objs.
+
+        However, in JS, its impossible to compare 2 objects, as there is no inherent way to do it.
+
+        u can create ur own method like Object.prototype.myequal = ()=>{}
+
+        but then u will have to define what kind of "equality" needs to be checked, if only keys, or only keys/values, etc.
+
+      
+
+        NOTE:- the only place where obs1 and obs2 differ with subscription-var is in _subscriptions: null for them.
+
+      
+
+        back to Subjects:-
+
+      
+
+        import Rx from 'rxjs/Rx';
+
+
+        let sub = new Rx.Subject();
+
+        //console.log(typeof(sub)); //object
+
+        //console.log(sub);
+
+        /*
+
+        Subject {
+
+          _isScalar: false,
+
+          observers: [],
+
+          closed: false,
+
+          isStopped: false,
+
+          hasError: false,
+
+          thrownError: null }
+
+        */
+
+
+        let subscription = sub.subscribe(
+
+            function (x) { console.log('onNext: ' + x); },
+
+            function (e) { console.log('onError: ' + e.message); },
+
+            function () { console.log('onCompleted'); });
+
+
+        //console.log(typeof(subscription)) //object
+
+        console.log(subscription);
+
+        /*
+
+        Subscriber {
+
+          closed: false,
+
+          _parent: null,
+
+          _parents: null,
+
+          _subscriptions:
+
+           [ SubjectSubscription {
+
+               closed: false,
+
+               _parent: [Circular],
+
+               _parents: null,
+
+               _subscriptions: null,
+
+               subject: [Object],
+
+               subscriber: [Circular] } ],
+
+          syncErrorValue: null,
+
+          syncErrorThrown: false,
+
+          syncErrorThrowable: false,
+
+          isStopped: false,
+
+          destination:
+
+           SafeSubscriber {
+
+             closed: false,
+
+             _parent: null,
+
+             _parents: null,
+
+             _subscriptions: null,
+
+             syncErrorValue: null,
+
+             syncErrorThrown: false,
+
+             syncErrorThrowable: false,
+
+             isStopped: false,
+
+             destination:
+
+              { closed: true,
+
+                next: [Function: next],
+
+                error: [Function: error],
+
+                complete: [Function: complete] },
+
+             _parentSubscriber: [Circular],
+
+             _context: [Circular],
+
+             _next: [Function],
+
+             _error: [Function],
+
+             _complete: [Function] } }
+
+        */
+
+
+        console.log('==========================');
+
+        console.log(sub instanceof Rx.Subject); //true
+
+
+---
+
+
+2.1
+
+    import Rx from 'rxjs/Rx';
+
+    let sub = new Rx.Subject();
+
+
+    let subscription = sub.subscribe(
+
+        function (x) { console.log('onNext: ' + x); },
+
+        function (e) { console.log('onError: ' + e.message); },
+
+        function () { console.log('onCompleted'); });
+
+
+    //sub.unsubscribe(); //WONT WORK!!!! because sub is not a 'subscriber, its a Subject'
+
+
+    subscription.next(1); //subscriber type subscription
+
+    subscription.next(2);
+
+    subscription.next(3);
+
+    subscription.unsubscribe(); //WORKS !!! if u unsubscribe, none of following statements will execute
+
+    subscription.next(4);
+
+
+    sub.next(3.14); //works. subject-type subscription
+
+    sub.next(3.141);
+
+    sub.next(3.145);
+
+    sub.next(3.146);
+
+    sub.next(3.147);
+
+
+    //The Subject class inherits both Observable(IObservable<T>) and (Observer<T>)
+
+    //https://github.com/ReactiveX/RxJava/issues/792
+
+    //Publisher-subscriber is a network oriented architectural pattern and
+
+        //Observer is an object-event oriented pattern. They both are used at different Software levels.
+
+    //http://www.introtorx.com/Content/v1.0.10621.0/02_KeyTypes.html#IObserver  
+
+  
+
+---
+
+
+simple$:-
+
+Observable { _isScalar: false, _subscribe: [Function] }
+
+
+obs1,obs2, obs3:-
+
+Subscriber {
+
+  closed: false,
+
+  _parent: null,
+
+  _parents: null,
+
+  _subscriptions: null,
+
+  syncErrorValue: null,
+
+  syncErrorThrown: false,
+
+  syncErrorThrowable: false,
+
+  isStopped: false,
+
+  destination:
+
+   SafeSubscriber {
+
+     closed: false,
+
+     _parent: null,
+
+     _parents: null,
+
+     _subscriptions: null,
+
+     syncErrorValue: null,
+
+     syncErrorThrown: false,
+
+     syncErrorThrowable: false,
+
+     isStopped: false,
+
+     destination:
+
+      { closed: true,
+
+        next: [Function: next],
+
+        error: [Function: error],
+
+        complete: [Function: complete] },
+
+     _parentSubscriber: [Circular],
+
+     _context: [Circular],
+
+     _next: [Function],
+
+     _error: [Function],
+
+     _complete: [Function] } }
+
+
+sub:-   
+
+Subject {
+
+  _isScalar: false,
+
+  observers: [],
+
+  closed: false,
+
+  isStopped: false,
+
+  hasError: false,
+
+  thrownError: null }   
+
+   
+
+subscription:-
+
+Subscriber {
+
+  closed: false,
+
+  _parent: null,
+
+  _parents: null,
+
+  _subscriptions:
+
+   [ SubjectSubscription {
+
+       closed: false,
+
+       _parent: [Circular],
+
+       _parents: null,
+
+       _subscriptions: null,
+
+       subject: [Object],
+
+       subscriber: [Circular] } ],
+
+  syncErrorValue: null,
+
+  syncErrorThrown: false,
+
+  syncErrorThrowable: false,
+
+  isStopped: false,
+
+  destination:
+
+   SafeSubscriber {
+
+     closed: false,
+
+     _parent: null,
+
+     _parents: null,
+
+     _subscriptions: null,
+
+     syncErrorValue: null,
+
+     syncErrorThrown: false,
+
+     syncErrorThrowable: false,
+
+     isStopped: false,
+
+     destination:
+
+      { closed: true,
+
+        next: [Function: next],
+
+        error: [Function: error],
+
+        complete: [Function: complete] },
+
+     _parentSubscriber: [Circular],
+
+     _context: [Circular],
+
+     _next: [Function],
+
+     _error: [Function],
+
+     _complete: [Function] } }   
+
+   
+
+     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+     
+  //creating a DStream manually
+
+import Rx from 'rxjs/Rx';
+
+dstream$ = Rx.observable({
+
+    emitter => {
+
+        emitter.next('val1');
+
+        emitter.next('val2');
+
+        emitter.complete();
+
+    }
+
+})
+
+dstream$.subscribe();
+
+
+//creating a dstream from events.
+
+dstream$ = Rx.observable.fromEvent('btn', 'click');
+
+
+//creating a dstream from variables.
+
+dstream$ = Rx.observable.from([10, 20, 30]);
+
+
+//creating a data stream from promises.
+
+dstream$ = Rx.observable.fromPromise(some-Promise-defined-earlier);
+
+
+const source$ = Rx.observable.interval(100)
+
+                             .take(5); //take allows to complete. take only 5 vals.
+
+const source$ = Rx.observable.timer(5000, 2000)
+
+                             .take(5); //take allows to complete.
+
+
+const source$ = Rx.observable.interval(100)
+
+                             .take(5)
+
+                             .map(v => v*v)  //sinceonly one line {} is NOT required.
+
+                             ;
+
+                            
+
+---
+
+
+IObservable, IObserver in angular2
+
+Subject, Behavior Subject, Async Subject                            
+
+Communicating between 2 components that are deeply nested:-
+
+    1. EventEmitter: bad practise . bubbling event from child to parent is a deep cost.
+
+    2. Use an observable in a service instead:- http://jasonwatmore.com/post/2016/12/01/angular-2-communicating-between-components-with-observable-subject
+
+  
+
+---  
+
+ngrx: @ngrx/store
+
+
+//1.
+
+MathReducer.ts
+
+- import {Action} from '@ngrx/store';
+
+- define actions as serializable strings:- export const MULTIPLYBYTWO = 'MULTIPLYBYTWO';
+
+- export function MathReducer(state:number = 2000, action:Action){ //1stparam is state, 2ndparam is an instance of Action.
+
+    switch (action.type){
+
+    case 'MULTIPLYBYTWO':
+
+      return state * 2;
+
+The MathReducer has to return a new state.
+
+
+//2.
+
+create child1 component:- ng g c child1
+
+
+//3. child1.component.ts
+
+import {Store} from '@ngrx/store';
+
+import {Observable} from 'rxjs/Observable';
+
+
+export class Child1Component implements OnInit {
+
+  yr: Observable<number>; //step4.2. create an observable and
+
+
+  constructor(private store: Store<AppState> ) {    //3.1 create an instance of Store.
+
+    //we will then use this.store.select() and this.store.dispatch() .
+
+    //select() and dispatch() are instance methods.
+
+    this.yr = this.store.select('year');
+
+  }
+
+
+    multiplybytwo(){
+
+    this.store.dispatch({ type: 'MULTIPLYBYTWO'})
+
+  }
+
+...
+
+
+4. child1.component.html
+
+<button (click) = multiplybytwo() >* by 2</button>
+
+{{ yr | async }}
+
+
+---
+
+
+import {Routes, RouterModule} from '@angular/router'
+
+const someRoutesVar:Routes = [
+
+    {path: 'path1without/', component: 'component1'},
+
+    {path: 'path2without/', component: 'component2'}
+
+];
+
+
+app.module.ts:-
+
+    imports: [ RouterModule.forRoot(someRoutesVar), ... ]
+
+
+<router-outler></router-outler>    as placeholder in .html
+
+<a href="/server"></a>            dont use this . this will reload the page
+
+<a routerLink="/server"></a>  USE this. this will PREVENT page reload.
+
+
+-----
+
+Redux egghead 1st 10 videos
+
+
+- 1st principle:- state of ur app (whether small or large app) will be one SINGLE js object.
+
+This obj. is called the "state tree" 
+
+NOTE: the state is the minimal representation of the data in ur app
+
+
+- 2nd principle:- the state-tree is immutable/read-only
+
+Anytime u want to change it, u have to "dispatch an action"
+
+An action is a plain JS obj describing the change
+
+NOTE: the action is a minimal representation of the change to the data in ur app.
+
+
+The structure of the action obj is upto u. However, it is mandatory that the action obj should have
+
+"type" property . type-cannot be undefined. egghead suggests to use strings because they r serializeable.
+
+
+- 3rd principle:-pure n impure functions
+
+pure functions:
+
+> are predictable. they do NOT mutate their arguments/updatedb, etc.
+
+
+impure functions:
+
+> opp. of pure functions and have side-effects.
+
+> they may operate on the DOM
+
+
+---
+
+
+u might have heard:- the UI layer is a MOST PREDICTABLE when it is describe as a pure function of the APPLICATION STATE.
+
+
+Redux uses this and adds one more:=
+
+> the state mutations in ur app need to be describe as a pure function
+
+       - a pure function that takes the previous state + action-being-dispatched n returns the next-state of ur application.
+
+        - the previous state should NOT be modified and should be kept pure .
+
+
+So, pure function (previous-state,  action-being-dispatched) = next-state. this is the 3rd principle of redux. Such a pure function is called the reducer-function.
+
+---
+
++++++++++++++++++++++++++++
+
+
+type alias:- (v13)
+
+
+type PlayerArray = Array<string>; //this will be an array, but members should be string only
+
+let players: PlayerArray = ['Sachin', 'kapil']; //try adding a number here, it should croak.
+
+console.log(players);
+
+
+---
+
+
+union types:- (v14) (using |)
+
+- Lets say, we want the player Array to not only store string but also numbers.
+
+| number , makes it flexible now.
+
+
+eg.1
+
+type PlayerArray = Array<string| number>;
+
+let players: PlayerArray = ['...'];
+
+let player_numbers: PlayerArray = [10, 20, 30];
+
+
+console.log(player_numbers);
+
+
+eg.2
+
+var x :string[]; //we can also write this as var x: string[] | string; //so x can be a string array or a string in itself
+
+var x: string[] | string;
+
+
+x = ['' ...];
+
+x = '...';
+
+
+
+Q. Can u write type aliases without using = (equal to) ??
+
+---
+
+while
+
+for - in
+
+for - of (ES6, requires a presence of a iterable. i.e. Symbol.itera* property on it. )
+
+
+for (let player in players){ // gives index ONLY if players is an array
+
+}
+
+
+for (let player of players){ // gives values ONLY if players is an array
+
+}
+
+
+Q. What happens if it is an object instead of an array ??
+
+
+---
+
+
+typescript functions
+
+
+    function xyz(p1:number){
+
+    }
+
+   
+
+    function xyz(p1:number):string{ //return type HAS TO BE A STRING
+
+        return 'xyz'; //if u remove this line it should croak
+
+    }
+
+
+---
+
+
+TS function arguments
+
+
+   
+
+    function xyz(p1:number, p2:number, p3?:string){ //notice where the question mark is .
+
+     }   
+
+   
+
+---
+
+
+v23.
+
+
+
+function expression in typescript
+
+
+1) Separating method signature and definition.
+
+method 1.1
+
+let func = (p1:number, p2: number) => string; //here => string means that is the return value.
+
+func = function(p1:number, p2: number){
+
+...
+
+return 'abc';
+
+}
+
+
+- OR-
+
+
+1.2 (try to avoid this)
+
+let func = (p1:number, p2: number); //here => string means that is the return value.
+
+func = function(p1:number, p2: number):string {
+
+...
+
+return 'abc'; ///
+
+}
+
+
+2)
+
+method 2: combining the method signature and definition
+
+let func = (p1:number, p2: number) => string = function (p1:number, p2: number) { ... }
+
+
+
+---
+
+ GENERICS
+
+
+//why is generics required?
+
+//1. Lets understand an identity function: its a function,
+
+  // which returns AS IS anything that was passed to it. like an echo command.
+
+  //1.1 identity function with number datatype.
+
+  /*
+
+  function identity(arg: number): number {
+
+    return arg;
+
+  }
+
+  THis is not generic, so lets use any instead.
+
+  1.2
+
+  function identity(arg: any): any {
+
+    return arg;
+
+  }
+
+  However, here we do not know what type comes in and what type goes out.
+
+  So, the only way to do these for all types is to write 1.1. for all data types in TS other than any.
+
+  Which is cumbersome.
+
+  Generics solves this problem
+
+
+  */
+
+
+ 1.1.1 //no return type yet.
+
+ function identity(p1:number){
+
+ }
+
+ identity(10);
+
+ if u add : number as return value, TS expects u to put a return value in it too
+
+ function identity(p1:number):number{
+
+   console.log(p1);
+
+   return p1;
+
+ }
+
+ identity(10);
+
+
+---
+
+
+ 1.3
+
+ function identity<T>(p1:T): T{
+
+   console.log(p1);
+
+   return p1;
+
+ }
+
+ identity(100);
+
+
+ Note:- <T> is after the function name and before the params begin
+
+ T is applied, wherever necessary like, args, return type of function.
+
+
+ function identity<T>(p1:T){ //works. no return type mentioned
+
+ function identity<T>(p1){ //works. no return type and no type specified for param.
+
+
+--- 
+
+1.4 with function expressions
+
+
+let identity2 = function<T>(p2:T):T{
+
+  console.log(p2);
+
+  return p2;
+
+}
+
+identity2('hello');
+
+
+For FE, think of it this way: if u know 1.3,
+
+only move the function name to LHS and everything else remains on RHS (from 1.3)
+
+Another eg.
+
+function add<T>(p1: T, p2: :T) : T{ ... }
+
+let add = function <T>(p1: T, p2: :T) : T{ ...}
+
+
+---
+
+
+1.5 understanding return in TS Generics.
+
+
+> in JS & TS if return is NOT mentioned, it is implied as undefined. (Remember: All JS functions return something. )
+
+> in TS Generics if return is NOT mentioned (for corr. declaration), it errors.
+
+
+//Lets write a function using generics:-
+
+//Sol.1. using func declaration
+
+function display<T>(p1:T, p2:T):T{
+
+  console.log(p1, p2);
+
+  return ;            //works
+
+  // return undefined; //works; same as above return;
+
+  // return p1;        // works
+
+  // return p2;        //works
+
+  //return null;       //works
+
+
+    //default in JS; if return is NOT specified.
+
+    //But when using generics, return is necessary if :T return is expected.
+
+  //return 1;      //error. 1 is not assignable to T
+
+  //return true;   //error. boolean/string is not assignable to T
+
+  //return p1 + p2; //error. operator + cannot be applied to types T and T
+
+}
+
+
+// so, u cannot use operators, u cannot return number/boolean/string/objs/arrays
+
+
+calling styles:-
+
+style#1 explicit type calls
+
+    display<number>(10, 20); //works
+
+        NOTE:- display<number>('10', 20); //ERROR. '10' wont work as its a string
+
+    display<string>('hello', 'panda'); //works
+
+
+style#2 implied type calls. This is called "type argument inference" which is same as "type inference" for variables
+
+(when vars types are not explicitly defined).
+
+    display(10, 20); //works
+
+    display('hello', 'world'); //works.
+
+//if u have LHS in above func. calls, u will get undefined. bcoz return; is same as return undefined;
+
+
+1.5.1
+
+FE would be
+
+let display = function <T>(p1:T, p2:T):T{ ... }
+
+//same return rules apply.
+
+
+---
+
+
+1.6 handling arrays is tricky.
+
+
+//2 params can be confusing, lets switch to one params
+
+let display = function<T>(p1:T[]):T[]{
+
+  //p1.length will give an error, bcoz length is a property of only arrays.
+
+  //if u r using arrays but a [] next to T; so that it becomes T[] for param and return type
+
+  console.log(p1);
+
+  return p1;
+
+}
+
+
+let a1 = [1,2,3,4,5];
+
+display(a1);
+
+
+//p2 can be made optional using ?
+
+let display = function<T>(p1:T[], p2?):T[]{ ... }
+
+
+//Syntax changes, if u use Array obj. of JS.
+
+let display = function<T>(p1:Array<T>, p2?):Array<T>{ ... }
+
+Note:- how T[] got changed to Array<T> in param and return type.
+
+
+Till NOW, we have see how generic identity functions work with a range of types
+
+---
+
+---
+
+
+2. Generic Types / Generic Interfaces (of function themselves)
+
+
+2.1. lets say we wanted to create a new type called myidentity which is a copy of "identity" (function)
+
+function identity<T>(p1:T):T{
+
+  console.log(p1);
+
+  return; //undefined as expected.
+
+}
+
+
+//1. let myidentity = identity;               //function identity. Notice = on LHS
+
+  //if u use this syntax to create a new method, u cannot enforce params/return values
+
+
+//2.1
+
+   let myidentity: <T>(p1:T) => T = identity; //function identity. Notice : on LHS
+
+//2.2
+
+// let myidentity: <U>(p1:U) => U = identity;    //function identity.
+
+// we use these syntaxes to enforce params n returns.
+
+  //console.log(myidentity<string>('helloxxx'), myidentity<number>(100) );
+
+
+//3. DONT DO these errors.
+
+//let myidentity: <U>(p1:U):U = identity;     //Error: => expected. => need for return type
+
+// let myidentity: <T>(p1:T) => T;            //undefined. = identity is required on RHS
+
+
+---
+
+2.2
+
+
+
+
+GENERICS ENDS
+
+--- 
+
+
+interfaces
+
+- interfaces are a contract between ur objects and data.
+
+- they set the rules of how data should be used.
+
+- u r setting rules that the rest of the code has to follow.
+
+
+interface user{
+
+    first: string,
+
+    email: string,
+
+    last: string
+
+};
+
+
+function profile(user: User) {
+
+}
+
+
+function profile(user: User): string {
+
+}
+
+
+---
+
+---
+
+
+class Person { //Note: no () or no =
+
+    constructor(public name:string){ //if public is not written, it becomes public by default.
+
+        this.companyProfile = name;
+
+    }   
+
+}
+
+
+class Student extends Person {
+
+    constructor(public name:age){
+
+        super(name); //get me name property from the parent class.
+
+            //Q. what does super() do ??
+
+    }
+
+}
+
+
+Multiple inheritance:-
+
+- is not directly supported in TS.
+
+- Indirectly can be achieved using:- This is called "multiple inheritance of implementation"
+
+    -- MIXINS:- https://www.stevefenton.co.uk/2014/02/TypeScript-Mixins-Part-One/
+
+    -- INTERFACES:- https://stackoverflow.com/questions/34513594/multiple-class-inheritance-in-typescript
+
+        Java 8 supports multiple inheritance of implementation via Default Methods
+
+   
+
+---
+
+
+ eg. 3.
+
+class Person {
+
+  name;
+
+  constructor(){}
+
+  setname(n1){this.name = n1}
+
+  getname(){return this.name}
+
+
+  static designation = 'Mr.';
+
+  static getPerson = () => { return 'Mr. Person'}; //these do not have access to "this", which is possible in instance-methods
+
+}
+
+
+console.log(Person.getPerson());
+
+let p1 = new Person;
+
+p1.setname('jack bauer');
+
+console.log(p1.getname());
+
+
+---
+
+
+eg.4.
+
+
+//Abstract classes:-
+
+//direct instantiation is disallowed.
+
+//sub-class should only inherit
+
+abstract class AbstractPerson{
+
+  name: string;
+
+  //setname(n1:any): void {}; //works. //{} is required.
+
+  setname(n1:any): void { //this is called "implementation details of its members"
+
+    console.log('inside setname'); //never prints
+
+  };
+
+  abstract sneezes(): void;
+
+  //abstract classes can have abstract methods.
+
+  //use it if u dun want to give implementation.
+
+  //use it if u want to make it mandatory for sub-classes to implement sneezes()
+
+  //access modifiers are allowed on abstract methods.
+
+  //they r similar to interface methods, except u need to add "abstract" keyword
+
+  protected abstract cries(): void;
+
+}
+
+
+class Person extends AbstractPerson{
+
+  name;
+
+  constructor(){
+
+      super();
+
+  }
+
+
+  setname(n1){this.name = n1}
+
+  getname(){return this.name}
+
+
+  static designation = 'Mr.';
+
+  static getPerson = () => { return 'Mr. Person'};
+
+
+  sneezes(){ console.log('person sneezes'); }
+
+  cries(){ console.log ('person cries');}
+
+}
+
+
+console.log(Person.getPerson());
+
+let p1 = new Person;
+
+p1.setname('jack bauer');
+
+console.log(p1.getname());
+
+
+console.log(p1.cries(), p1.sneezes());
+
+
+---
+
+eg.5.
+
+
+interfaces can extend classes, because class also creates a type:-
+
+class Point {
+
+    x: number;
+
+    y: number;
+
+}
+
+
+interface Point3d extends Point {
+
+    z: number;
+
+}
+
+
+let point3d: Point3d = {x: 1, y: 2, z: 3};
+
+
+
+
+---
+
+see v32 if required again.
+
+- TOPIC: connecting: loosely and tightly  interfaces with classes
+
+---
+
+
+namespaces:-
+
+- used to be called modules in earlier versions of TS.
+
+- it gives ur program ability to nest items and essentially protect the naming of things.
+
+like one class name overwriting another class name
+
+- they can be kept together or they can be kept in separate files.
+
+- export may not be necessary in the below examples.
+
+
+namespace Blog{
+
+    export interface XPost{
+
+    }
+
+    export class Post implements XPost{
+
+    }
+
+}
+
+
+namespace Blog2{
+
+    export interface XPost{
+
+    }
+
+   
+
+    export class Post implements XPost{ //classes have same name as Blog-namespace
+
+    }
+
+}
+
+
+/* earlier
+
+var blogPost = new Post({
+
+    title: "",
+
+    blog: ""
+
+});
+
+*/
+
+
+var blogPost = new Blog.Post({
+
+    title: "",
+
+    blog: ""
+
+});
+
+
+Q. is @ in @angular/core a namespace ?
+
+A. No. Its a scope. Scope is an npm way of segregating namespaces.
+
+Scope in npm is what Namespace is in TS.
+
+
+"All of the packages are now distributed under the @angular npm scope. >This changes how Angular is installed via npm and how you import the code."
+
+"Scopes are like namespaces for npm modules. If a package's name begins >with @, then it is a scoped package. The scope is everything in between >the @ and the slash."
+
+
+https://stackoverflow.com/questions/37165779/what-is-angular-in-angular-2
+
+
+---
+
+
+Callbacks in TS.
+
+- what is the syntax when the argument is a function
+
+- we will see that
+
+
+VIMP!!!
+
+function xyz(p1:() => void){
+
+    c.log("header");
+
+    p1();
+
+    c.log("sidebar");
+
+    c.log("footter");
+
+}
+
+- p1 is a parameter
+
+- its a call back function and hence ()
+
+- its return type is void, so use => void .
+
+
+Expected output:-
+
+header, sidebar, footer
+
+p1's output.
+
+
+This means that the callback was executed asynchronously.
+
+
+Q. is this TS feature ? or is this JS feature?
+
+try this in JS as well .
+
+
+---
+
+
+v37 , 38
+
+
+Configuring TS to work with promises.
+
+- it does not come with promises
+
+- tsconfig.json
+
+target: "es6" //es6-promise and es6-collections can be installed
+
+
+module: "amd"
+
+Asynchronous Module Definition (AMD) (fork from commonJS, makers of AMD were not satisfied with CommonJS)
+
+
+Promises:
+
+
+let funcexp = function(p1:string): Promise<{p1: string}> {
+
+}
+
+
+:Promise is the return type
+
+:Promise<{p1: string}> is returning with a status of p1 which will be a string
+
+
+Q. Is <{p1: string}> really required? Try this plz
+
+
+---
+
+
+TS Decorators.
+
+
+configuration:-
+
+- make 3 changes to tsconfig.json
+
+target:"ES5",
+
+"experimentalDecorators": true,
+
+"emitDecoratorMetadata": true,
+
+}
+
+
+- we need these to get decorators working .
+
+
+- decorator has to return a function.
+
+
+class Post {
+
+    @processOne()
+
+    @processTwo()
+
+   
+
+    somefunction(){
+
+    }
+
+}
+
+
+function processOne(){
+
+    c.log('processOne has run');
+
+   
+
+    //below is what u require to convert processOne() from a normal function to a decorator.
+
+   
+
+    return function(target, propertyKey: string, descriptor: PropertyDescriptor){ //target, propertyKey and descriptor
+
+        c.log("process one has been called")
+
+    }
+
+}
+
+
+function processTwo(){
+
+    c.log('processTwo has run');
+
+   
+
+    //below is what u require to convert processOne() from a normal function to a decorator.
+
+   
+
+    return function(target, propertyKey: string, descriptor: PropertyDescriptor){ //target, propertyKey and descriptor
+
+        c.log("process Two has been called")
+
+    }
+
+}
+
+
+u can now run this .ts file. the code executes.
+
+O/p:-
+
+processOne has run
+
+processTwo has run
+
+process Two has been called
+
+process One has been called
+
+
+Note:-
+
+- we never instantiated Class, but still the code got executed.
+
+- they are called @runtime and not on the obj. instantiation
+
+    - u can still do obj instantiation and it would work same.
+
+   
+
+- very popular to build role/access structures like is this guy authorised to do this or not .
+
+   
+
+---
+
+v40
+
+class Decorators in TS :-
+
+
+eg.1.
+
+@detailedLog('billing')
+
+class AccountsPayable{
+
+    constructor(){}
+
+}
+
+
+function detailedLog(p1: string){
+
+    if (p1 === 'billing'){
+
+        c.log('working in the billing department');
+
+        return function(target: Object){}; //see who different class decorators are from the method decorator.
+
+    }
+
+    else{
+
+        return function(target: Object){};
+
+    }
+
+}
+
+
+var post = new AccountsPayable;
+
+
+- class decorators
+
+// needs a target mandatory parameter
+
+
+
+eg.2.
+
+
+@detailedLog('billing')
+
+class AccountsPayable{
+
+    constructor(){}
+
+}
+
+
+@detailedLog('warehouse')
+
+class ProductManager{
+
+    constructor(){}
+
+}
+
+
+function detailedLog(p1: string){
+
+    if (p1 === 'billing'){
+
+        c.log('working in the billing department');
+
+        return function(target: Object){}; //see who different class decorators are from the method decorator.
+
+    }
+
+    else{
+
+        return function(target: Object){};
+
+    }
+
+}
+
+
+var post = new AccountsPayable; //prints: working in the billing department
+
+var post = new ProjectManager; //does not print anything.    
+
+   
+
+So, here, we have moved our logging mechanism to be with another class (ProductManager) which does NOT have a logging mechanism of its own.'
+
+
+---
+
+
+v 41
+
+
+method decorators in TS:
+
+
+eg.1.
+
+@detailedLog('billing')
+
+class AccountsPayable{
+
+    constructor(){}
+
+   
+
+    @admin
+
+    deleteAccount(){
+
+        c.log('deleting account');
+
+    }
+
+}
+
+
+function detailedLog(p1: string){
+
+    if (p1 === 'billing'){
+
+        c.log('working in the billing department');
+
+        return function(target: Object){}; //see who different class decorators are from the method decorator.
+
+    }
+
+    else{
+
+        return function(target: Object){};
+
+    }
+
+}
+
+
+
+function admin(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) : any {
+
+    c.log('doing admin check');
+
+    return descriptor;
+
+}
+
+
+var post = new AccountsPayable;
+
+
+O/p:
+
+Doing admin check    //method decorator runs before the class decorator
+
+Working in the billing department    //class decorator
+
+deleting account     //critical action item
+
+
+this is how u implement a permission structure
+
+
+Q. What is the difference between TypedPropertyDescriptor and PropertyDescriptor ?
+
+
+---
+
+
+next to do:
+
+
+http://blog.wolksoftware.com/decorators-metadata-reflection-in-typescript-from-novice-to-expert-part-ii
+
+http://blog.wolksoftware.com/decorators-reflection-javascript-typescript
+
+
+next topics:
+
+- property decorator
+
+- atscript
+
+- typescript
+
+   
+
+---
+
+xxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
