@@ -1,0 +1,231 @@
+> implements OnInit if omitted, there wont be any compile errors, bcoz ngOnInit becomes just another function
+and angular does not give it any preferrential treatment. 
+
+>
+1. 
+let service = TestBed.get(TodoService); //usually uses providers[] in module.ts . omly one instance of that service. 
+providers[] in module.ts === omly one instance of that service. 
+providers[] in component.ts === another instance of that service specific only to this component !!!
+
+	//import {Observable} from 'rxjs/Observable' ; //this is still bulky because it gets all the operators
+	import {Observable} from 'rxjs'; //this is more light weight 
+
+	let service = TestBed.get(TodoService);
+	spyOn(service, 'getTodos').and.returnValue(Observable.from([ 
+		[1,2,3] //this array could be a response from the server. 
+	])
+	);
+	//, where getTodos() is a method in that service 
+	
+	fixture.detectChanges();
+	expect(component.todos.length).toBe(3) 
+	
+2. 
+in it block
+	fixture.debugElement.injector.get(TodoService)
+	
+---------------------------------------------------------------------------------------	
+Section 2
+L5
+- if ur component is simply incrementing or decrementing values in the it-block we can do:-
+	let component = new VoteComponent();	//Arrange
+	component.upVote();						//Act
+	expect(component.totalVotes).toBe(1);	//Assert 
+
+setup and teardown:- 
+beforeEach, afterEach, beforeAll, afterAll. 		
+	
+L6
+working with (reactive) forms: 
+	import {FormBuilder} from '@angular/forms' ;
+
+	let component: TodoFormComponent;
+	component = new TodoFormComponent(new FormBuilder}) 
+	expect(component.form.contains('name')).toBe(true); //returns true if there is a control by that name. 
+	
+	let control = component.form.get('name')
+	control.setValue('');
+	expect(control.valid).toBeFalsy();
+
+L7
+working with event Emitters
+NOTE: event emitters are observables
+	in beforeEach 
+		let component = new VoteComponent();
+	
+	in it-block 
+		let totalVotes = null;
+		component.voteChanged.subscribe(tv => totalVotes = tv) ; //Arrange
+
+		component.upVote();
+
+		expect(totalVotes).not.toBeNull();
+		expect(totalVotes).not.toBe(1);
+L8
+working with spies :- service calling a backend api.
+in the service we r doing this:-
+NOTE: we r unit testing component which use services.
+
+	//component
+	ngOnInit(){
+		this.service.getTodos().subscribe( t => this.todos = t);
+	}
+	
+	//service 
+	getTodos(){
+		return this.http.get('...').map(r => r.json() );
+	}
+	
+	this.service.getTodos() will return an Observable. 
+	however we do not want to use this.service as that would make a call to the backend 
+	So, in our unit test, we will create a fakeService, which does NOT make a call to the backend. 
+		but returns an Observable. 
+		
+	describe-block:
+		let component: TodosComponent;
+		let service: TodoService; 
+		
+	beforeEach-block:
+		//service = new TodoService (<requires http>); //but we r going to cheat here and use NULL
+		service = new TodoService (null);
+		component = new TodosComponent(service);
+
+		
+stub: 
+now there is also another approach i.e. when we r unit testing components that use services. 
+	Instead of giving the component a real instance of the TodoService , we give it  a fake implementation, which we call a stub .
+	we will see stubs in next section.
+
+	it-block: 
+		>> we want to change the implementation of the getTodos method. 
+		For this, we use spyOn. using it we can change it implementation, throw errors, check if it has been called, etc. 
+		
+		//spyOn(service, 'getTodos').and.callFake() // using callFake we can change the implementation of the getTodos method.
+		// we will have to write a fake function similar to getTodos
+		
+		
+		spyOn(service, 'getTodos').and.callFake( ()=> { //Arrange. we r changing the implementation to mimic an http-response
+			return Observable.from([ 
+				//here we need to simulate the response returned from the server. 
+				//[1,2,3]
+				{id:1, title: 'title#1' }
+			])
+		});
+		
+		the above code also needs : 
+			import {Observable} from 'rxjs/Observable' ;
+			import 'rxjs/add/observable/from' ;
+			
+		component.ngOnInit(); //Act 
+		expect(component.todos.length).toBeGreaterThan(0);
+		
+L9 
+interaction testing 
+		//todos.component.ts 
+
+		add(){
+			var newTodo = {title: '...'};
+			this.service.add(newTodo).subscribe(
+				t => this.todos.push(t),
+				err => this.message = err 
+			);
+		} //add ends
+		
+		delete(id){
+			if(confirm('Are you sure?'))
+				this.service.delete(id).subscribe();
+		}
+
+		//todos.service.ts
+		add(){
+			return this.http.post('...', todo).map(r => r.json()); 
+		}
+		
+		//spec.ts //
+		import 'rxjs/add/observable/empty'; 
+		it-block: 
+		//spyOn(service, 'add').and.callFake() // we will replace the add method of the SERVICE (vimp!!!) implementation in the callFake 
+		let spy = spyOn(service, 'add').and.callFake(()=>{	//Arrange.
+			return Observable.empty(); //we dont really care what is returned from the server. 
+		})
+		//LHS will be used for assertion 
+
+		component.add(); //Act 
+		
+		expect(spy).toHaveBeenCalled();
+		
+		Another 2nd way to write it would be to replace 
+			return Observable.empty();  //with
+		
+			let todos = {id: 1};
+			return Observable.from([ todos]);
+			
+			in this 2nd way, u will have to change the expect-ations too. 
+			
+		3rd way:- (which is a lot cleaner)
+			let spy = spyOn(service, 'add').and.returnValue(Observable.from([ todos]));  //Arrange 
+			component.add(); //Act 
+			expect(component.todos.indexOf(todo)).toBeGreaterThan(-1);
+			
+			
+		it-block: if the server returns an error, we put that in the msg property.
+			import 'rxjs/add/observable/throw' ; 
+			
+			let error = "error from the server";
+			let spy = spyOn(service, 'add').and.returnValue(Observable.throw(error));  //Arrange 
+			
+			component.add() //Act 
+			expect(component.message).toBe(error);
+		
+L10 
+working with confirmation boxes 
+	// here we have to change the implementation of the window.confirm method. 
+	// here we also want to change the implementation of the delete method() in the SERVICE !!!
+	
+	//method1.
+	//it-block:
+	spyOn(window, 'confirm').and.returnValue(true);
+	let spy = spyOn(service, 'delete').and.returnValue(Observable.empty() );
+	component.delete(1);
+	expect(spy).toHaveBeenCalled();
+	expect(spy).toHaveBeenCalledWith(1);
+	
+	//method2.
+	//it-block: should NOT call the server is user presses cancel .
+		spyOn(window, 'confirm').and.returnValue(false);
+		component.delete(1);
+		expect(spy).not.toHaveBeenCalled();
+	
+ng test --code-coverage 
+xit, xdescribe == use x to skip tests,
+
+-----------
+Section 3: Integration Testing: for testing templates, navigation, directives.
+dealing with async operations. 
+
+L16 Generating the setup code 
+In integration tests, we donot write code like this: new VoterComponent(); that style is used in unit testing only 
+in Itests, u need to ask angular to create an instance for you.
+
+L17 Testing Property and Class bindings
+fixture.debugElement is a wrapper around fixture.nativeElement (which has the dom root)
+
+L18 Testing Event Bindings
+
+L19 Providing the dependencies VIMP
+
+L20 Getting the dependencies 
+L21 Providing Stubs 
+L22 Testing the Navigation 
+
+L23 Dealing with Route parameters 
+L24 Testing RouterOutlet Components
+
+L25 Shallow Component Tests
+L26 Testing attribute directives
+L27 Dealing with asynchronous operations
+	
+	
+	
+	
+	
