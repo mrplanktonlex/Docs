@@ -43,3 +43,31 @@ If you want your editor to work and look exactly the same way as mine does in th
 --- 
 
 Natours project 1: Download starter pack from https://github.com/mrplanktonlex/advanced-css-course/tree/master/Natours/starter 
+
+The 3 shades of green we will use:-
+/*
+COLORS:
+
+Light green: #7ed56f
+Medium green: #55c57a
+Dark green: #28b485
+
+*/
+
+L 06:
+GOAL: Building the Header - Part1:-
+G1. Best way to perform basic reset using the universal selector
+G2. How to set project-wide font definitions
+G3. How to clip parts of elements using clip-path. (modern css)
+
+G1.
+- normalize.css is used to do a cross-browser reset. Its no longer necessary as browsers are becoming smarter and the need for normalize.css is waning.
+Instead lets just do a basic reset using the universal selector.
+- what is a universal selector? 
+* {  
+}
+This is an universal selector.
+
+see L6-7-8-9-10.txt
+
+
