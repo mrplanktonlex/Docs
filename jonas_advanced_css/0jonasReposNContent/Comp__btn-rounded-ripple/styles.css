@@ -1,0 +1,19 @@
+/* You can add global styles to this file, and also import other style files */
+
+* {
+    margin: 0;    
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* we sent font on the body to facilitate inheritance to all child elements. Always keep it in body and not he universal selector */
+    /* if Lato is not available, use sans-serif. Lato comes from googlefonts and is included in the index.html  */
+body {
+    font-family: "Lato", sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #777;
+    padding: 30px;
+    background-color: orange;
+}

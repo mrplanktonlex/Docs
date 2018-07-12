@@ -1,0 +1,237 @@
+/*
+COLORS:
+
+Light green: #7ed56f
+Medium green: #55c57a
+Dark green: #28b485
+
+*/
+
+/* resetting begins */
+/* the universal selector */
+    /* reset the margins, paddings added by the browsers*/
+    /* border-box: changes the box-model, so that borders and paddings are no longer added to the total width / height */
+
+    /* * {
+        margin: 0;    
+        padding: 0;
+        box-sizing: border-box;
+    } */
+    
+    /* we sent font on the body to facilitate inheritance to all child elements. Always keep it in body and not he universal selector */
+        /* if Lato is not available, use sans-serif. Lato comes from googlefonts and is included in the index.html  */
+    body {
+        font-family: "Lato", sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 1.7;
+        color: #777;
+        padding: 30px;
+    }
+    /* resetting ends */
+    
+    /*  Making the header */
+        /* 95vh means 95% of the viewport */
+        /* !!! GOTCHA!!! hero.jpg should be in '' in url(), else the image does not become responsive  */
+        /* IDE trick: type backimg and the editor auto shows background-image, type backsize and it shows background-size */
+        /* cover: what the width of the element, it will always try to fit the element inside of the box */
+        /* "background-position: top" will keep the top of the image "always top of the container", even if width changes; bottom gets cropped.
+           "background-position: bottom" will keep the bottom of the image "always bottom of the container", even if width changes; top gets cropped.
+           center: top & bottom gets cropped. 
+           Inspect the element and see this at runtime. 
+        */
+        /* linear-gradient: to right , to right bottom*/
+        /* 
+            to have green opacity over hero.jpg.
+            change: #7ed56f to rgba(126, 213, 111, 0.8)
+            change: #28b485 to rgba()
+            background-image: linear-gradient(to right bottom, rgba(126, 213, 111, 0.8), rgba(40, 180, 131, 0.8) ), url('../img/hero.jpg');
+         */
+         /* 
+            clip-path: uses polygon() ; in this case the co-ordinates start from left top corner onwards, clockwise.
+            Refer: http://bennettfeely.com/clippy/  as it gives some clip-path examples
+          */
+    
+    /* .header {
+        height: 95vh;
+        background-image: linear-gradient(to right bottom, rgba(126, 213, 111, 0.8), rgba(40, 180, 131, 0.8) ), url('../img/hero.jpg');
+        background-size: cover;
+        background-position: top;
+        
+        clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);
+    
+        position: relative;
+    } */
+    
+    
+    /* Building the header -- part2 */
+        /* where does the measurement start??  It starts from an parent element which has position: relative, here <header is the parent 
+        */
+    /* .logobox {
+        position: absolute;
+        top: 40px;
+        left: 40px;
+    } */
+    
+        /* if height is mentioned, width will be figured out by the browser. */
+    /* .logo {
+        height: 35px; 
+    } */
+    
+    /* top + left: 50% of the width of the parent element */
+    /* transform: translate(-50%, -50%); is not related to the parent element */
+        /* background-color: red; */
+
+    .text-box {
+        position: absolute;
+        top: 40%;
+        left: 50%; 
+    
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+        /* backface-visibility: hidden; */
+    
+    /* .heading-primary {
+        color: #fff;
+        text-transform: uppercase;
+    
+        margin-bottom: 60px;
+    } */
+        /* 
+            animation-delay: 3s 
+            animation-iteration-count: 3;
+            animation-timing-function: ease-out, ease, ease-in, ease-in-out, linear, step-start, step-end;
+        */
+  
+    /* .heading-primary-main {
+        display: block;
+        font-size: 60px;
+        font-weight: 400;
+        letter-spacing: 35px;
+    
+        animation-name: moveInLeft;
+        animation-duration: 1s;
+    
+    } */
+    
+    /* .heading-primary-sub {
+        display: block;    
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 17.4px;
+    
+        animation-name: moveInRight;
+        animation-duration: 1s;
+    } */
+    
+    
+    /* L8: CSS Animations using keyframes */
+    
+    /* 0% means beginning, 100% means ends, any other percentage is in between */
+    /* opacity: 0 means hidden, opacity : 1 means seen */
+    @keyframes moveInLeft {
+        0% {
+            opacity: 0;
+            transform: translateX(-100px);
+        }
+    
+        80% {
+            transform: translateX(10px);
+        }
+    
+        100% {
+            opacity: 1;
+            transform: translate(0);
+        }
+    }
+    
+    
+    @keyframes moveInRight {
+        0% {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+    
+        80% {
+            transform: translateX(-10px);
+        }
+    
+        100% {
+            opacity: 1;
+            transform: translate(0);
+        }
+    }
+    
+    
+    /* Building complex button with Animation -- Part 1 */
+    
+    /* pseudo-classes are a state of the selector. Here, :link is a state/condition of the btn-selector */
+        /* :link and :visited are pooled here, because we want them to look the same. */
+        /* if only 2 values, 1st value is for top bottom, 2nd value is for left & right. */
+    .btn:link, .btn:visited {
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 15px 40px;  
+        display: inline-block;
+        /* transform: translate(50%); */
+        /* works but would be an overkill, since this is an inline-block, just put text-align: center in the parent-class i.e. text-box */
+    
+        border-radius: 100px;
+        transition: all .2s ;  
+        /* all properties are enabled to be animated */
+        
+        position: relative;
+    }
+    
+    .btn-white {
+        background-color: #fff;
+        color: #777;
+    }
+    
+    .btn:hover {
+        transform: translateY(-3px); 
+        /* minus means bottom-to-top and +ve means top-to-bottom */
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        /* x-offset, y-offset, blur, color-using-rgba */
+    }
+    
+    .btn:active{
+        transform: translateY(-1px); 
+    }
+    
+    
+    /* Building complex button with Animation -- Part 2 */
+    /* pseudo-elements allow to style certain parts of the element */
+        /* 
+            trick with ::after is to add an element which looks exactly like the btn, but we put it behind the btn 
+                and when we hover out, this hidden psweudo elements goes back behind the btn element
+    
+            - content-property and display property are mandatory
+            - height and width 100% means it is same as the parent-btn. pseudo-elements are child aping the parent element
+            - 
+         */
+    .btn::after {
+        content: "";
+        display: inline-block;
+        height: 100%;
+        width: 100%;
+        border-radius: 100px;
+        position: absolute;
+        top:0;
+        left:0;
+        z-index: -1;
+        transition: all .4s;
+    }
+    
+    .btn-white::after {
+        background-color: #fff;
+        color: #777;
+    }
+    
+    .btn:hover::after {
+        /* transform: scale(1.5);  */
+        transform: scaleX(1.4) scaleY(1.6); 
+        opacity: 0; /* set something to become invisible */
+    }
