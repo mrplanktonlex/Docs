@@ -39,3 +39,7 @@ If you want your editor to work and look exactly the same way as mine does in th
   "less.validate": false,
   "editor.wordWrap": "on"
 }
+
+--- 
+
+Natours project 1: Download starter pack from https://github.com/mrplanktonlex/advanced-css-course/tree/master/Natours/starter 
