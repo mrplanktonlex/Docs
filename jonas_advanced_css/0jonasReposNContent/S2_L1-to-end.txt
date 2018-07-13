@@ -1,0 +1,242 @@
+S2
+
+3-pillars of HTML and CSS 
+
+1. Responsive Design
+2. Maintainable and Scalable code
+3. Web performance -- Smaller n faster
+    > make min API calls
+    > reduce use of images, compress images
+    > use a css preprocessor
+
+---
+
+L2: How CSS works behind the scenes : VIMP!!!
+> Load HTML: Browser picks up the HTML
+> Parse HTML: Browser parses/de-codes the code line by line 
+    - Browser buils the DOM and while building the DOM, it also
+        - loads the CSS
+        - Parses the CSS 
+            -- conflicting CSS declarations (called as cascade) are resolved
+            -- Process final css values ( eg. converting margin in % to pixels )
+        
+        - browser creates the CSSOM (CSS Object Model) 
+
+- DOM + CSSOM = Render Tree + Visual Formatting Model ==> Final Page
+    - Render Tree is displayed on the page using the algorithm, Visual Formatting Model.
+        -  VFM calculates and uses a bunch of stuff like floats, box model and positioning.      
+
+---
+
+L3: CSS Parsing Phase
+
+Quick review of official terms in a css-rule:-
+- selector eg. .btn-class is the selector in .btn-class { }
+- declaration block is the { }-block assigned to .btn-class
+    - declaration block consists of many "property: declared value;" 
+
+step 1 (CSS parsing phase):-
+    - first step is to resolve conflicting declarations i.e. cascade (Thats why its called cascaded style sheets)
+    = cascade : process of combining diff. stylesheets and resolving conflicts between different CSS rules and declarations,
+                when more than one rule applies to a certain element.
+
+
+    = author CSS/declarations: stylesheets we write.
+    = user CSS/declarations: stylesheets coming from the user. eg. user changing font-size of the browser.
+    = UserAgent CSS/declarations: eg. anchor tag is blue and underlined.
+
+    Q. So, how are the conflicting declarations resolved (when more than 1 rule applies) ?
+    A. Importance/Weight -> (Selector) Specificity -> Source Order (of conflicting declarations)
+    
+    1. Importance: Cascade starts resolving by giving conflicting declarations, importance.
+        - User Css : with !important declarations (highest)
+        - Author Css: with !important declarations 
+        - Author declarations
+        - User declarations
+        - default browser declarations
+
+
+    2. (Selector) Specificity: This happens when there are declarations with same importance eg. background-color: blue and green, without !important 
+        in the Author Css.
+        - Inline styles (highest)
+        - IDs
+        - Classes, pseudo-classes, attribute
+        - Elements, pseudo-elements 
+
+        We give #s and calc it eg. 0(inline) 0(IDs) 1(classes) 0(Elements) , so its Specificity is 0010
+        Other examples: 0122, 0001, 0121
+        Specificities are evaluated from left to right 
+            - if anyone declaration has 1 for the inline, it wins hands down. But that is not the case here.
+            - if anyone declaration has 1 for ID, they are taken into considerations, others are ignored.
+                In this case, we have 0122 and 0121 
+            - if anyone declaration has 1 for Classes, both have 2 and are tied
+            - if anyone declaration has 1 for Elements, 0122 is the winner here. This is how cascade decides.    
+
+    3. Source Order: Comes into effect, in case of same specificity.
+        - The last declaration in the code will override all others.
+
+
+NOTE:-
+    - !important should be used as last resort
+    - universal selector has no specificity 0000
+    - Inline styles taken precedence over external stylesheets; but are no longer the trend.
+    - selector with 1 ID is more specific than one with 1000 classes
+    - selector with 1 class is more specific than one with 1000 elements
+    - Its a good practise to rely more on specificity, than on !important / source order
+
+    - Source order: using 3rd party stylesheets; Author CSS should be able to override the 3rd party stylesheets
+        & to do that, your OWN Author Css should be the LAST ONE TO BE INCLUDED IN THE HTML !!! VIMP!!!
+
+---
+
+Skipped:
+
+L4 Specificity in  practice:
+L5: Value processing:
+- Declared Value
+- cascaded Value
+- Specified Value
+- Computed Value
+- Used Value
+- Actual Value
+
+L6
+CSS Parsing: Inheritance: Inheritance of a property only works if no one declares a value for that property.
+- properties related to text like font-size, etc. are inherited 
+- propertes related to margin, padding, etc. are not inherited.
+- inherit-keyword forces inheritance on a certain property.
+- initial-keyword can be used to reset to its initial value.
+
+---
+
+L7 : Convert px to rem 
+- rem : rems are root font-size. (deffault is 16px and set by the browser)
+
+html {
+    font-size: 10px ; /* This is root font-size : This overrides the 16px set by the browser & its easy to remember now, 1 rem = 10px */
+}
+
+/* 
+    You can now replace px with rem, i.e. by diving px with 10, eg. 16px becomes 1.6rem. 
+    This is a better solution as there is no need to write hundreds of LOCs in media queries.
+*/
+
+NOTE: 
+EMs:-
+    - are worse and not scalable as they depend on the font-sizes of their parent elements and NOT the root property
+    - are calculation intensive
+
+---
+
+So, we have converted all px to rem by dividing by 10, which is the root font-size.
+
+Problem:
+- the root-font-size is still in px 
+- it does not change if the user changes his settings for font-size 
+
+html {
+    font-size: 10px ;
+}
+
+html {
+    font-size: 62.5%; /* 10/16px (browsers default) = 0.625  */
+}
+
+---
+
+L8 : Visual Formatting Model (algorithm)
+it calculates boxes and determines the layout of these boxes, for each element in the render tree.
+
+The algorithm takes into account
+- Dimensions of the boxes: the box model 
+- Box type: inline, block and inline-block
+- positioning scheme: floats and positioning 
+- Stacking contexts 
+- Other elements which are in the render tree.
+- Viewport size, dimension of images, etc.
+
+Box model: 
+- content, padding, border, margins
+- padding is inside the box 
+- border is the border of the box 
+- margin is outside the box.
+
+1. Box model with box-sizing: border-box;
+- fill area: content, padding, border (not the margin)
+- total width and total height does NOT include margins; 
+- width usually mentions the width the use wants; but internally it also includes left+right border & left+right padding
+    Hence use "box-sizing: border-box (it includes )"
+
+2.
+Block level boxes:
+    - display: block (flex/list-item/table), line breaks, box model
+inline boxes: 
+    - display: inline
+    - height and width do not apply
+    - padding is only possible horizontally i.e. to the left n right side.    
+    - no line breaks
+    - Occupies Only contents space
+    - No BOX model
+inline-block boxes:
+    - A mix of block and inline
+    - No line breaks
+    - Occupies Only contents space
+    - BOX model
+
+3. positioning schemes: normal flow, absolute positioning and floats 
+    3.1. Normal flow 
+        - not floated, not absolutely positioned.
+        - position: relative is in normal flow 
+        - elements laid according to their source order. 
+
+    3.2 Floats 
+        - element removed from its normal flow
+            - text & inline elements will wrap around the floated element
+            - container will not adjust its height to the element. Imp ! use clearfixes for this.
+            float: left 
+            float: right
+
+    3.3 absolute positionig 
+        - element removed from its normal flow
+            - no impact on surrounding content / elements 
+            - use top, bottom, left n right to offset element from its relatively positioned container.
+            position: absolute
+            position: fixed
+
+
+4. Stacking Context : layers that are painted
+    - using z-index: higher is on top
+    - filter, tranform, opacity other than 1 :- are other ways to create a stacking context
+    - z-index alone may not cater to the stacking context (common misconception)
+
+---
+
+L10: Css architecture, components and BEM 
+
+- divide page into components, help together by the layout 
+
+BEM: Block Element Modifier : use this to create low-specificity BEM selectors
+    .block{}
+    .block__element{}
+    .block__element--modifier {}
+    .block--modifier {}
+
+    Block: standalone component that has meaning of its own. eg. recipe
+    Element: part of a block that has no standalone meaning. eg. recipe__info
+    Modifier: a different version of a block/element eg. recipe__btn btn btn--round
+
+Architecting folder:-
+- 7-1 pattern: 
+    7 different folders for partial sass files and 1 main sass file to import all others => into one compiled css stylesheet 
+        base/               --> put basic product definitions
+        components/         --> 1 file for each component
+        layout/             --> define the overall layout of the project
+        pages/              --> styles for specific pages of the project
+        themes/             --> 
+        abstracts/          --> code that doesnt output any css like variables, mixins, etc.
+        vendors/            --> 3rd party css 
+
+
+L11 : Implementing BEM in the Natours project.
+
+---
