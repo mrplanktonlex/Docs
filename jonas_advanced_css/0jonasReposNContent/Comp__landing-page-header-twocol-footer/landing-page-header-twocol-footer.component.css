@@ -1,0 +1,77 @@
+* {
+    margin: 0; padding: 0;
+    /* border: 1px solid orange; */
+    /* background-color: rgba(0, 0, 0, 0.05);  */
+    /* IMP!! no space after rgba()*/
+}
+
+.container {
+    display: grid;                              /* 1. layout uses 'grid' and not 'flex' */
+    grid-template-columns: repeat(12, 1fr);     /* 2. how many cols? */
+    grid-template-rows: 50px 350px 50px;        /* 3. Width of each row */
+}
+
+/* 4. How many cols should each tag span ?? */
+header {
+    grid-column: span 12;
+}
+aside {
+    grid-column: span 2;
+}
+main {
+    grid-column: span 10;
+}
+footer {
+    grid-column: span 12;
+}
+
+
+/* 5 expanding headers */
+/* BEM: header is Block */
+.header{
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    display: flex;  /* 5.1. fcking makes it horizontal */
+    background-color: rgba(0, 0, 0, 0.05); /* IMP!! no space after rgba()*/
+    border: 2px solid orange;
+}
+/* BEM: header-left and header-right are modifiers */
+.header--left {
+}
+.header--right {
+    margin-left: auto;  /* 5.3. flex is freaking awesome. puts it to extreme right and figures out the columns */
+}
+/* BEM: header__text is an element */
+.header__text {
+    padding: 10px;
+    text-transform: uppercase;
+}
+
+
+/* 6. expanding aside */
+/* IMPNOTE: aside is spanning 2 cols */
+.aside{
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    display: flex;  /* 5.1. fcking makes it horizontal */
+    background-color: rgba(0, 0, 0, 0.05); /* IMP!! no space after rgba()*/
+    border: 2px solid orangered;
+}
+.aside__item{
+    display: block; text-decoration: none; color: black;
+    padding-left: 15px; padding-top: 6px; 
+    text-align: center;
+    /* border: 2px solid blue; */
+}
+
+
+/* 7. content expanding pending */
+/* 8. footer expanding pending */
+
+
+
+
+
+
+
+
+
+
