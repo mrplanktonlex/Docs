@@ -1,0 +1,153 @@
+This is actually Section 4
+
+L2: Sass 
+- Variables
+- nesting selector : allows lesser code
+- operators: for mathermatical operations
+- partials and imports: 
+- mixins
+- functions: similar to mixins, but they produce a value which can be  used
+- extends: allows selectors to inherit declarations common to them
+- control directives: writing complex code using conditionals and loops (not covered in this course)
+
+sass-syntax: indentation sensitive 
+scss-syntax: indentation insensitive. we will use this.
+
+---
+
+Variables:-
+
+* { 
+    margin: 0;
+    padding: 0;
+}
+
+$color-primary: #f9ed69; // yellow color
+$color-secondary: #f9ed69; // yellow color
+
+nav {
+    margin: 30px;
+    background-color: $color-primary ;
+}
+
+---
+
+Nested selectors:
+Eg. 1.
+    Before:- 
+        .navigation li {}
+        .navigation li:first-child {}
+    
+    SCSS:- 
+        1.1)
+        .navigation {
+            li{
+                ...
+            }
+
+            li:first-child {
+                margin: 0;
+            }
+        }
+
+    -OR- 
+        
+        1.2) 
+            .navigation {
+            li{
+                ...
+
+                &:first-child {
+                margin: 0;
+                }
+            }
+        }
+
+        & means .navigation li:
+        &:first-child means .navigation li:first-child
+
+---
+L24: for creating a nav-menu: skipped intermittently
+---    
+S3 L25:
+
+mixins:
+    1. Simple mixin without argument
+        @mixin clearfix {
+            &::after {
+                content:"";
+                clear: both;
+                display: table;
+            }
+        }
+        + 
+            use @include to use this code wherever u want to reuse. 
+        +
+        @include clearfix;
+        @include clearfix;
+        @include clearfix;
+
+    2. Mixin with an argument
+        @mixin someMixin ($color){
+            ...
+        }
+        + 
+        @include someMixin($primarycolor);
+
+---
+
+functions:
+    Inbuilt:-
+        background-color: darken($var, 15%);
+            darken($var, 15%);
+            lighten($var, 15%);
+
+We can write our own functions:-
+    @function divide($var1, $var2) {
+        @return $var1/$var2;
+    }
+
+    + 
+
+    divide (60, 2); // wont work, bcoz css does know if its px, rem, % what??
+    divide (60, 2) * 1px; // works
+---
+
+extends
+- write a placeholder using %placeholder
+- @extend the placeholder 
+- use extends only when they r related.
+
+%btn-placeholder {
+    ...
+}
+
++ 
+&:link { // or whatever
+    @extend %btn-placeholder;
+}
+
+Q. Why didn't we use a mixin here ?
+A. With extend, the select is copied to the placeholder (in the final compiled CSS), 
+    whereas with a mixin, the code-block is copied (repeatedly) to the physical LOCs in the compiled .css file.
+
+   - use extends only when they r related.
+   - please note:- it is perfectly ok to have repeated LOCs in the final compiled .css , so long as the original .scss remains DRY
+        So, mixins are NOT a problem; infact its better to use mixins on unrelated-code.
+
+---
+
+operators: not covered in course?
+partials and imports: not covered in course?
+
+---
+
+S3 L26: Intro to the command line. : skipped.
+L27: Installing sass locally. This will be different for us for Angular projects.
+
+--- 
+L28: skipped
+    main.scss
+L29: 
+    npm install live-server -g 
+
