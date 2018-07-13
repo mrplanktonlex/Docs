@@ -1,0 +1,54 @@
+/* https://hackernoon.com/the-ultimate-css-battle-grid-vs-flexbox-d40da0449faf */
+/* + some of my customization */
+
+/* Flexbox:
+    - use for one dimensional stuff like headers, footers
+    - less code.
+   CSS Grid:
+    - use for 2 dimensional stuff.
+    - use for layout. 
+ */
+.header {
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.4);
+    /* background-color: white; */
+}
+
+/* 3 = logout */
+/* 
+    margin-left: auto; 
+    This is because flexbox allows us to forget about the columns and does it automatically
+    If this was done in CSS Grid, then this would have been a pain.
+
+*/
+div:nth-child(3){ 
+    margin-left: auto; 
+}
+
+/* use BEM 
+    Block:    .header {} 
+    Element:  .header__home {}
+    Modifier: Changes to either block / element
+        Element Modifier: .header__home--red {}
+        Block Modifier:   .header--red {}
+ */
+
+.header__home{
+    text-transform: uppercase;
+    padding: 10px;
+}
+
+.header__products{
+    text-transform: uppercase;
+    padding: 10px;
+}
+
+.header__logout{
+    text-transform: uppercase;
+    padding: 10px;
+}
+
+.header--text{
+    color: black;
+    weight: 400;
+}
