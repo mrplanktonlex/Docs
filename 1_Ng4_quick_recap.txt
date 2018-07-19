@@ -145,9 +145,45 @@ Module:
 	- Core module 
 			- will be used ONLY in AppModule.
 			- should NOT be used anywhere else like LLM, SharedModule or FM1.
+			- U can move providers (services) from AppModule to CoreModule. Keeping the AppModule leaner is a good practise.
+			- CoreModule should ALWAYS be eagerly loaded.
 	- Ahead of time compilation
-	- Pre-Loading lazy loaded routes 
-		
+			- 2 types of compiling the code. :- JIT or AOT.
+				-- What is compiling the code? It does NOT mean angular is moving TS code to ES5, that is done by the cli.
+					A. Angular needs to compile ur templates by parsing. It moves html-code to JS-code. (html-elements have JS-equivalents).
+					   Ang. does this because accessing JS-equivalents is much faster than parsing DOMs.
+				Such compilation can be done using Just in Time / Ahead of time compilation.		
+			- Just in time:- is default and what we regularly do using ng-serve
+				-- Development -> production -> App downloaded to browser -> Angular parses and compiles the templates to JS
+				Here, in the last step, parsing and compilation happens on the browser.
+				- Bulkier. Because the compiler is shipped.
+			-- Ahead of time:-
+				-- Development -> Angular parses and compiles the templates to JS -> Production -> App downloaded to browser
+				This has advantages:-
+				- Faster startup. ZERO parsing and compilation on the browser.
+				- Templates are checked during development.
+				- Smaller File Size. Compiler is NOT shipped. Any other features which are NEVER used are never shipped.
+				
+			AOT using cli:-
+			- open network tab and the vendor.js/anyother file are very bulky. It has the compiler and so on.
+			- cancel "ng serve"
+			- ng build (uses JIT)
+			- ng build --prod (uses minification + JIT )
+			- ng build --prod --aot (uses minification + AOT)
+			- see dist folder and check sizes of all files.
+			
+			Usually servers gzip it, but that is another discussion.
+			
+	- Pre-Loading lazy loaded routes
+			- if LL, u will load the chunk of LLMs at that time, when the route is visited, so there may be a lag of few secs.
+			- it would be nice to use LL, but still pre-load the code, so that there is no lag.
+			
+			AppRoutingModule, where we define all our routes.
+			import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
+
+			before:- RouterModule.forRoot(appRoutes)	// Hidden Default is { preloadingStrategy: DontPreload }		// ???
+			after:- RouterModule.forRoot(appRoutes, { preloadingStrategy: PreloadAllModules } // This property takes a type-definition. PreloadAllModules
+										); 
 RouterModule, Routes, routerlinks, <router-outlet>, ActivatedRoutes
 	
 Guards
