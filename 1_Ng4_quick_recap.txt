@@ -8,7 +8,7 @@ Renderer, Renderer2 :- Renderer2 is used to write mobile + desktop code. no sepa
 RouterModule, Routes, Router, routerlinks, <router-outlet>, Navigation Paths, 
 Navigating Programmatically, Using relative paths in navigating programmatically, L120
 ActivatedRoutes, Passing Params to Routes, Fetching Route Params Reactively, Passing Query Params and Fragments, Common Gotchas (skipped)
-ChildRoutes, 
+ChildRoutes, queryParamsHandling, Redirecting and Wildcarding Routes
 	AppModule:-	
 		import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 		const appRoutes: Routes = [{}, {}]; // Its an array of objects.
@@ -87,6 +87,18 @@ ChildRoutes,
 		- child routes: 
 			{ path: 'servers/:id/edit', component: 'ServComp' , children: [{}]},
 			and add a second <router-outlet></router-outlet>
+		
+		- queryParamsHandling: preserving queryParams when we navigate to another route.
+			this.router.navigate(['servers'], 
+									{relativeTo: this.route, queryParamsHandling: {'preserve'}
+								);
+			queryParamsHandling: {'preserve'}
+			queryParamsHandling: {'merge'}
+		- Redirecting and Wildcarding Routes	
+				{ path: 'not-found', component: 'NotFoundComp' },
+				{ path: '**', redirectTo: '/not-found' },   //NOTE:- its double **
+			
+					
 Guards
 	- canactivate, candeactivate, resolve, canLoad 
 Pipes: 
