@@ -1,0 +1,207 @@
+ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel
+Directives (selector) + Components (selector, template, styles, providers)
+@Input, @Output
+@HostListener, @HostBinding, L88, 89
+@Viewchild
+Renderer, Renderer2 :- Renderer2 is used to write mobile + desktop code. no separate code for mobile.
+Pipes: Pure, impurepipe, async pipe, PipeTransform
+Module:
+	- @NgModule (declarations, imports, providers, bootstrap) Note :- import is a TS-keyword, where imports:[] is an angular feature.
+				(exports, etc.) 
+	- Feature module: L271 , say RecipesModule
+		- IMP NOTE:- You cannot declare components, directives and pipes, in more than 1 module. Duplications not allowed.
+		- In RecipesModule, in @NgModule({}). add CommonModule from @angular/common to imports:[] array of the new Feature Module. Gives access to ngClass, etc.
+			NOTE: The AppModule has BrowserModule, instead of CommonModule. BrowserModule is a superset of CommonModule.
+		- Add RecipesModule to the AppModule.	
+	- Registering routes to a feature module: L272
+		- Maintain import order in the imports:[] array in AppModule. 
+		- If routing is in an AppRoutingModule, it should be the last item in imports:[] array, so that all wildcards can be accounted for.
+		- create RecipesRoutingModule.
+			-- const recipesRoutes: Routes = [
+					{ path: 'new', component: 'Parent1', children: [
+							{ path: 'new', component: 'Comp1', canActivate: [AuthGuard] },
+							{ path: '', redirectTo: 'DefaultComp', pathMatch: 'full' },
+							{ path: ':id', component: 'Comp2' },
+						] // children ends.
+					}, // parent1 ends	
+				]; // recipesRoutes ends
+			-- NOTE:- RouterModule.forRoot() should ALWAYS be used in AppModule, RouterModule.forChild() should always be used in the child component.
+			-- 
+				@NgModule ({
+					imports:[
+						RouterModule.forChild(recipesRoutes)
+					],
+					exports: [RouterModule]			//<<<<===== NOTE how we are exporting from the current RecipesRoutingModule
+				})
+		- goto the feature module RecipesModule and add RecipesRoutingModule to the imports:[] array.
+		- the feature module RecipesModule will be in the AppModule::imports:[]
+	- Shared module
+		-- AppModule = FeatureModule1 + FeatureModule2
+						-- FM1 and FM2 uses SharedModule
+						
+		-- L274 
+		-- shared/shared.module.ts 
+			@NgModule({
+				declarations: [
+					DropDownDirective	// has to be declared ONCE, somewhere. Its accessible only in current module.
+				],
+				exports: [
+					DropDownDirective	// so that it can be imported in FM1 and FM2. It should be be accessible outside too.
+				],
+			})
+		-- Add SharedModule to the RecipesModule::imports:[]	
+		-- Add SharedModule to the AppModule::imports:[]
+	
+	-- 	Another Feature Module : ShoppingListModule
+		- import {CommonModule} from '@angular/common'
+		- imports:[ CommonModule, FormsModule]
+		- Add ShoppingListModule to AppModule.
+		- For routing, we could use RouterModule.forChild() which is fine, but lets c another way i.e. "Loading Components Via Selectors":-
+			Loading Components Via Selectors:- 
+					- 1. include the <app-shopping-list> </app-shopping-list>, add it to the declarations:[] array. (else u will get errors)
+				-- OR--
+					- 2. u have to import (TS-style) a module, which exports app-shopping-list component. (this we already saw with RecipesRoutingModule/ RecipesModule ?)
+					
+					1. 
+					- FormsModule can be a problem, if its used @ multiple places, then should be mentioned everywhere.
+					- OR it should be exported . But its a bad practise to export a module from a FM1 to be used in FM2.
+			
+	- Lazy Loading: Improving App Performance
+		(Note: Opp. of Lazy Loading is Eagerly Loading, which loads everything)
+		AppModule
+			-- RootRouter
+				-- ChildRoutes
+				
+		FM1 (RecipesModule) :-
+			-- child router 
+			-- component
+			-- directive
+			
+		All Angular code is downloaded at the beginning.	
+		But, If the user NEVER visits the FM1, then that particular code is never used and we downloaded too much code at the beginning.
+		We can lazyload, FM1 and its children.
+			-- i.e. FM1 is loaded ONLY if the route for FM1 is hit.
+			
+			
+	- Adding Lazy load to the RecipesModule		
+		- ng g c home --spec false
+		- { path: '', redirectTo: 'HomeComp'},
+			- { path: 'recipes', component: RecipesModule }, // Before: EAGERLY LOADING
+			- { path: 'recipes', loadChildren: './recipes/recipes.module#RecipesModule', }, //After: LAZY LOADING.
+					IMPNOTE:- loadChildren takes a string, which of the format: '<path>#<ModuleName>' 
+		- restart ng serve
+		- network tab: disable caching is checked
+			-- check chunk.js was added when the route was requested for.
+	
+	- Protect Lazy loaded Routes with ...
+		-- using canActivate with lazy loaded is useless as the code wont be reachable until the route is loaded.
+		-- we need something which can help us check before the route is called.
+		-- use canLoad guard.
+			eg. - { path: 'recipe', loadChildren: './recipes/recipe.module#RecipesModule', canLoad: [AuthGuard] }, 
+			Note: AuthGuard should implement the "canLoad" interface.
+			
+	- Understanding Modules & Service Injection (when using FMs and Lazy Loaded modules)
+		eg. 1. 
+		
+			AppModule (Serv1), providers: Serv1	
+			FM1 (Serv1), providers: Serv1
+			LLM1 (Serv1) , no providers for Serv1
+			Because, FM1 is injected into AppModule, using it at two places, wont hurt as the Root Injector will create ONLY one instance of the Serv1.
+			LLM1, since its lazy loaded will also use the same global instance of Serv1 (provided by the Root Injector).	
+			
+			- Since, AppModule and FM1 are eagerly loaded, it uses the global instance of Serv1
+			- Since no providers are used, LLM1 also uses the global instance of Serv1
+			
+		eg. 2. 	
+			AppModule (Serv1), providers: Serv1	
+			FM1 (Serv1), providers: Serv1
+			LLM1 (Serv1) , providers: Serv1
+			Here, LLM1, angular will create a child injector i.e. a local instance of Serv1.
+	
+			- Since, AppModule and FM1 are eagerly loaded, it uses the global instance of Serv1
+			- Since providers are used @ module level, LLM1 will use a local instance of Serv1.
+			
+		Q. In eg.1., can FeatureModule1 be forced to use a local instance of Serv1 ?
+		A. Yes, it can be done.
+			If FeatureModule1, needs to be forced to use a local instance of Serv1, Serv1 should be removed from FeatureModule1::providers[] 
+				and should be added to its child comp., say FMChild1::providers[]
+				
+		Q. In eg.1., 		
+			AppModule (Serv1), providers: Serv1	
+			FM1 (Serv1), providers: Serv1
+			SharedModule (Serv1), providers: Serv1
+			LLM1 (Serv1) , no providers for Serv1
+			(i.e. AppModule, FM1 and SharedModule are eagerly loaded)
+
+			- Here, SharedModule will have access to global instance of Serv1 
+			- LLM1 will NOT have global instance, it will have a local instance of Serv1. 
+			- So, be very careful when adding services to SharedModule !!!
+			
+			V. V.IMP:- DO NOT add services to shared modules, especially, if those services will be used in Lazy Loaded Modules !!!!
+
+	- Understanding the core module:-
+			AppModule: AppComponent + Component + Directive 
+									> Component + Directive should be move to a Core Module, because they apply to our App Module.
+	- Core module 
+			- will be used ONLY in AppModule.
+			- should NOT be used anywhere else like LLM, SharedModule or FM1.
+	- Ahead of time compilation
+	- Pre-Loading lazy loaded routes 
+		
+RouterModule, Routes, routerlinks, <router-outlet>, ActivatedRoutes
+	
+Guards
+Observable
+	- operators
+	- queryparams L126, L127
+Subjects:-
+	- using them as observables
+Template-driven:- 
+	- form
+Reactive-driven:-
+	- form
+	- validators
+Life-cycle hooks:- https://codecraft.tv/courses/angular/components/lifecycle-hooks/ 
+	- (hooks are executed in this order)
+		- constructor, 
+		- ngOnChanges (invoked when input properties are changed), ngOnInit (invoked on initialized, invoked ONLY ONCE after the 1st ngOnChanges), 
+		- ngDoCheck (invoked when the change detector of the given component is invoked, allows us to implement alternative change detection algo).
+			IMP: ngDoCheck and ngOnChanges should NOT be implemented on the SAME Component
+		- ngOnDestroy
+			-- invoked just before angular destroys the component.
+	- Hooks for the components children	
+			-- ngAfterContentInit ( invoked after any content projection is done into the components-view. )
+			-- ngAfterContentChecked ( invoked each time the CONTENT of the given component has been checked. )
+			-- ngAfterViewInit ( invoked when the components view has been fully initialized)
+			-- ngAfterViewChecked ( invoked each time the VIEW of the given component has been checked. )
+Types of communications:- https://angularfirebase.com/lessons/sharing-data-between-angular-components-four-methods/
+	- Parent to child
+	- child to parent using ViewChild 
+	- child to Parent using @output + EventEmitter
+	- Using Subjects/BehaviorSubjects
+Simple API unit testing using jasmine
+Angular animations
+
+Ultimate angular:-
+- Content Projection n its types
+- ngTemplateOutletContext
+
+Services:- egghead:-
+
+---
+
+ElementRef,
+ViewContainerRef, ViewContainerRef::createEmbeddedView, TemplateRef<any>, 
+OOS:- ViewContainerRef::createComponent()
+
+---
+
+ES6:-
+- call, apply & bind
+- Spread (... operator). 
+	[1,2,3] ==> ...numbersArray
+- Generics, interfaces
+	interface:- is a contract that needs to be implemented.
+	generics:- allow us to be less flexible 
+		let numberArray: Array<number>;
+- type alias
