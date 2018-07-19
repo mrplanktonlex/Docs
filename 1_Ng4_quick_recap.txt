@@ -4,6 +4,31 @@ Directives (selector) + Components (selector, template, styles, providers)
 @HostListener, @HostBinding, L88, 89
 @Viewchild
 Renderer, Renderer2 :- Renderer2 is used to write mobile + desktop code. no separate code for mobile.
+RouterModule, Routes, Router, routerlinks, <router-outlet>, Navigation Paths, 
+Navigating Programmatically, Using relative paths in navigating programmatically, L120
+ActivatedRoutes
+	AppModule:-	
+		import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
+		const appRoutes: Routes = [{}, {}]; // Its an array of objects.
+		
+		- routerLink replaces href in an <a href...> and help with NOT reloading the page; href reloads the page i.e. it sends a request to the server
+			[routerLink] = ['users']  // users is an absolute path.
+			[routerLink] = ['./users']  // users is an relative path.
+			You can use this relative syntax because routerLink is aware of which component u r currently on . Will give errors, if the path does not exist.
+			
+		- NavigationPaths:- if you use a relative path, then it becomes relative to the current comp (i.e. the component u are on).
+							use absolute paths, to prevent breaking ur routes, unknowingly.
+		- Navigating Programmatically:-  L120
+			-- this.router.navigate(['/servers']);  /servers is an absolute path. and router: Router
+		- Using relative paths in navigating programmatically, L121
+			-- this.router.navigate(['servers']);	//servers is a relative path.
+				// Unlike, routerLink, it WONT give errors, if the path does not exist. 
+				// This is because Router does NOT know which component u r currently on. This is the difference between Router and RouterLink
+		- To fix this use:- ActivatedRoute + optionsObj having relativeTo: route
+			import { ActivatedRoute } from '@angular/router';
+				route: ActivatedRoute
+					-- this.router.navigate(['servers'], {relativeTo: this.route});	//servers is a relative path.	
+Guards
 Pipes: Pure, impurepipe, async pipe, PipeTransform
 Module:
 	- @NgModule (declarations, imports, providers, bootstrap) Note :- import is a TS-keyword, where imports:[] is an angular feature.
@@ -184,9 +209,6 @@ Module:
 			before:- RouterModule.forRoot(appRoutes)	// Hidden Default is { preloadingStrategy: DontPreload }		// ???
 			after:- RouterModule.forRoot(appRoutes, { preloadingStrategy: PreloadAllModules } // This property takes a type-definition. PreloadAllModules
 										); 
-RouterModule, Routes, routerlinks, <router-outlet>, ActivatedRoutes
-	
-Guards
 Observable
 	- operators
 	- queryparams L126, L127
@@ -223,7 +245,7 @@ Ultimate angular:-
 - ngTemplateOutletContext
 
 Services:- egghead:-
-
+Interceptors:-
 ---
 
 ElementRef,
@@ -231,6 +253,7 @@ ViewContainerRef, ViewContainerRef::createEmbeddedView, TemplateRef<any>,
 OOS:- ViewContainerRef::createComponent()
 
 ---
+http://qnimate.com/post-series/ecmascript-6-complete-tutorial/ 
 
 ES6:-
 - call, apply & bind
