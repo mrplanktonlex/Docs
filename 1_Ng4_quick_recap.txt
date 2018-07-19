@@ -372,6 +372,17 @@ Life-cycle hooks:- https://codecraft.tv/courses/angular/components/lifecycle-hoo
 			-- ngAfterContentChecked ( invoked each time the CONTENT of the given component has been checked. )
 			-- ngAfterViewInit ( invoked when the components view has been fully initialized)
 			-- ngAfterViewChecked ( invoked each time the VIEW of the given component has been checked. )
+	
+	- ngOnChanges eg.
+		ngOnChanges(changes: SimpleChanges) {
+		  console.log(`ngOnChanges - data is ${this.data}`);
+		  for (let key in changes) {
+			console.log(`${key} changed.
+		Current: ${changes[key].currentValue}.
+		Previous: ${changes[key].previousValue}`);
+		  }
+		}	
+			
 Types of communications:- https://angularfirebase.com/lessons/sharing-data-between-angular-components-four-methods/
 	- Parent to child
 	- child to parent using ViewChild 
