@@ -3,10 +3,12 @@ Directives (selector) + Components (selector, template, styles, providers)
 @Input, @Output
 @HostListener, @HostBinding, L88, 89
 @Viewchild
+
 Renderer, Renderer2 :- Renderer2 is used to write mobile + desktop code. no separate code for mobile.
 RouterModule, Routes, Router, routerlinks, <router-outlet>, Navigation Paths, 
 Navigating Programmatically, Using relative paths in navigating programmatically, L120
-ActivatedRoutes
+ActivatedRoutes, Passing Params to Routes, Fetching Route Params Reactively, Passing Query Params and Fragments, Common Gotchas (skipped)
+ChildRoutes, 
 	AppModule:-	
 		import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 		const appRoutes: Routes = [{}, {}]; // Its an array of objects.
@@ -28,8 +30,68 @@ ActivatedRoutes
 			import { ActivatedRoute } from '@angular/router';
 				route: ActivatedRoute
 					-- this.router.navigate(['servers'], {relativeTo: this.route});	//servers is a relative path.	
+
+		- Passing Params to Routes:
+				{ path: 'users/:id', component: 'UserComp' },
+				{ path: 'users/:id/:name', component: 'UserComp' },
+			- In UserComp::ngOnInit()
+				this.route.snapshot.params['id'], where route: ActivatedRoute
+				this.route.snapshot.params['name'], where route: ActivatedRoute
+		
+			this.route.snapshot.params should be used ONLY for 1-time loading. For subsequent changes, use this.route.params (see below) 
+		- Fetching Route Params Reactively
+			- the above approach may break sometimes
+			Problem eg.
+				<a [routerLink] = "['/users', 10, 'Anna']"> Load Anna </a>
+					>> The route changes, but the template does not change to reflect anna. (because Angular doesnt know the data in the template change)
+					
+			Solution :- 
+			import { ActivatedRoute, Params } from '@angular/router';	
+				// NOTE: this.route.params is an observable. 
+				this.route.params.subscribe(
+					params: Params {
+					this.templatevar1 = params['id']
+					this.templatevar2 = params['name']
+				})
+		- Passing Query Params and Fragments.		
+			QueryParams: eg. ?mode=editing&name=plankton
+			Fragments: eg. ?mode=editing#loading   (loading is a fragment)
+
+			Passing Query Params and Fragments.	
+			A.1.
+				{ path: 'servers/:id/edit', component: 'ServComp' },
+				+
+				<a 
+					[routerLink] = "['/servers', 5, 'Serv1']"
+					[queryParams] = "{ allowEdit: '1'}"
+					[fragment]="'loading'"
+				> Server1 </a>
+				
+				Use:- [fragment]="'loading'"  -OR- fragment="loading"   // both are the same
+				
+			A.2.
+				this.route.navigate(
+										['/servers', id, 'edit'],  // 1st param
+										{							// 2nd param is an options object
+											queryParams: {allowEdit: '1'},
+											fragment: 'loading'
+										}
+									)
+		- 	Retrieve Query Params and Fragments:
+				Retrieve using snapshot:- this.route.snapshot.queryParams -or- this.route.snapshot.fragment
+				Retrieving reactively:- this.route.queryParams.subscribe();
+										this.route.fragment.subscribe();
+										
+				Angular will unsubscribe automatically.
+		- Common Gotchas: 
+		- child routes: 
+			{ path: 'servers/:id/edit', component: 'ServComp' , children: [{}]},
+			and add a second <router-outlet></router-outlet>
 Guards
-Pipes: Pure, impurepipe, async pipe, PipeTransform
+	- canactivate, candeactivate, resolve, canLoad 
+Pipes: 
+Pure, PipeTransform, impurepipe, async pipe
+
 Module:
 	- @NgModule (declarations, imports, providers, bootstrap) Note :- import is a TS-keyword, where imports:[] is an angular feature.
 				(exports, etc.) 
