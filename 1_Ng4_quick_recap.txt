@@ -1,14 +1,32 @@
 ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel
 Directives (selector) + Components (selector, template, styles, providers)
 @Input, @Output
-@HostListener, @HostBinding, L88, 89
+@HostListener, @HostBinding, L88, 89 : used to create reactive directive
+	- use them with directives
+	HostListener:	(from @angular/core)	we can capture the events of the host-element (on which this directive sits).
+		In Directive's class:
+			ngOnInit(){ ... }
+			@HostListener('mouseenter')mouseover( eventData: Event) {
+				this.renderer2.setStyle(this.elRef.nativeElement, 'background-color', 'blue', false, false);
+			}
+	HostBinding: Alternative to renderer.   we can specify style-properties of the host-element(on which this directive sits).	
+		- camelcase in 'style.backgroundColor' is VIMP!!!
+		- needs to be used with a HostListener
+		
+		In Directive's class:
+			@HostBinding('style.backgroundColor')tmpbackgroundColor: string;
+			@HostListener('mouseenter')mouseover( eventData: Event) {
+				this.renderer2.setStyle(this.elRef.nativeElement, 'background-color', 'blue', false, false);
+				this.tmpbackgroundColor = 'blue';
+			}
+			
 @Viewchild
 
 Renderer, Renderer2 :- Renderer2 is used to write mobile + desktop code. no separate code for mobile.
 RouterModule, Routes, Router, routerlinks, <router-outlet>, Navigation Paths, 
 Navigating Programmatically, Using relative paths in navigating programmatically, L120
 ActivatedRoutes, Passing Params to Routes, Fetching Route Params Reactively, Passing Query Params and Fragments, Common Gotchas (skipped)
-ChildRoutes, queryParamsHandling, Redirecting and Wildcarding Routes
+ChildRoutes, queryParamsHandling, Redirecting and Wildcarding Routes, LocationStrategy
 	AppModule:-	
 		import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 		const appRoutes: Routes = [{}, {}]; // Its an array of objects.
@@ -98,9 +116,27 @@ ChildRoutes, queryParamsHandling, Redirecting and Wildcarding Routes
 				{ path: 'not-found', component: 'NotFoundComp' },
 				{ path: '**', redirectTo: '/not-found' },   //NOTE:- its double **
 			
-					
-Guards
-	- canactivate, candeactivate, resolve, canLoad 
+		- LocationStrategy:-
+				RouterModule.forRoot(appRoutes, { useHash: true });
+				
+				This will be useful when we deploy on Apache/ which will parse the string before the #; whereas angular will parse after the #.
+				
+Guards L135
+	- CanActivate, CanActivateChild, CanDeactivate, CanLoad, Resolve
+
+	- canActivate
+		{ path: 'comp', component: 'SomeComp', canActivate: [AuthGuard] },
+
+		@Injectable()
+		export class AuthGuard implements canActivate {
+			// 2 I/p params: route: ActivatedRouteSnapshot, state: RouterStateSnapshot from '@angular/router'. Angular will give us this data.
+			// O/p: Observable<boolean> | Promise<boolean> if async, boolean if ran synchronously.
+
+			canActivate( route: ActivatedRouteSnapshot, state: RouterStateSnapshot ) : Observable<boolean> | Promise<boolean> | boolean {
+				// check if user is logged in.
+			}
+		} // class ends
+	
 Pipes: 
 Pure, PipeTransform, impurepipe, async pipe
 
@@ -290,9 +326,39 @@ Subjects:-
 	- using them as observables
 Template-driven:- 
 	- form
-Reactive-driven:-
+Reactive-driven:- L193:  @angular/forms
 	- form
-	- validators
+		this.signupForm = new FormGroup({
+			'username' : new FormControl (null),
+			'email': new FormControl (null),
+			'gender': new FormControl('male'),
+		});
+		
+		- sync HTML template with FormGroup, using formControlName
+			<form [formGroup]="signupForm">
+				<input ... id="username" formControlName ="username" ... >
+				<input ... id="email" formControlName ="email" ... >
+				<input ... id="gender" formControlName ="gender" ... >
+				
+		- submit the form using ngSubmit
+				<form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+					<input ... id="username" formControlName ="username" ... >
+					<input ... id="email" formControlName ="email" ... >
+					<input ... id="gender" formControlName ="gender" ... >		
+					
+				onSubmit(){ ... }	
+	- Validators
+		this.signupForm = new FormGroup({
+			'username' : new FormControl (null, Validators.required), // DO NOT execute it like Validators.required(); angular will do that.
+			'email': new FormControl (null, [Validators.required, Validators.email]),
+			'gender': new FormControl('male'),
+		});
+		
+	- Getting access to controls:-
+		<span *ngIf="signupForm.get('username').valid && signupForm.get('username').touched">  // Note:- .get(name) or path-to-the-name, if its nested.
+			...
+		</span>
+	- 		
 Life-cycle hooks:- https://codecraft.tv/courses/angular/components/lifecycle-hooks/ 
 	- (hooks are executed in this order)
 		- constructor, 
@@ -316,10 +382,132 @@ Angular animations
 
 Ultimate angular:-
 - Content Projection n its types
+	ng-content :- to form pieces of the form. 
+		eg.1. simple ng-content
+			AppComp: 		
+						<auth-form () = "" <h3>Create Account<h3> ></auth-form>
+						<auth-form () = "" <h3>Login<h3> ></auth-form>
+			AuthFormComp: Put <ng-content></ng-content> as placeholder, to show where the h3 should be inserted.
+		
+		eg.2. ng-content with projection/injection slots. (same for login)
+			AppComp: 		
+						<auth-form () = "" <h3>Create Account<h3> 
+										   <button type="submit">Join Us</button>
+						></auth-form>
+						
+			AuthFormComp: 
+						<ng-content select="h3"></ng-content>		where it requires to be projected/injected
+						<ng-content select="button"></ng-content>	where it requires to be projected/injected
+
+			Do same for Login
+			
+		eg.3. Content-project a component & bind to it 
+			AuthRemember:
+			AppComp: 
+						<auth-form (submitted) = "loginuser($event)" <h3>Login<h3> 
+										   <auth-remember (checked) = "rememberUser($event)></auth-remember>
+										   <button type="submit">Login</button>
+						></auth-form>	
+			checked is of EventEmitter
+			
+			AuthFormComp: 
+						<ng-content select="h3"></ng-content>
+						<ng-content select="auth-remember"></ng-content>						
+						<ng-content select="button"></ng-content>	
+						
+			Note:= we can also use <ng-content select = ".somecssclass"	> </ng-content>		
+			Binding can be done using class-var.
+			
+		eg.4. @ContentChild and ngAfterContentInit
+			In eg.3., h3, auth-remember and button are contentchild of auth-form 
+			
+			AuthFormComp:
+				
+				In its template:-
+						<ng-content select="h3"></ng-content>
+						<ng-content select="auth-remember"></ng-content>						
+						<div *ngIf="showMessage"> 
+							You will be logged in for 30 days.
+						</div>
+						<ng-content select="button"></ng-content>	
+			
+				import { AuthRememberComp } from '';  // We r importing, so that we can query it after the content has been initialized.
+				import { ContentChild, AfterContentInit} ... 
+				
+				@ContentChild(AuthRememberComp) remember: AuthRememberComp ;
+				
+				ngAfterContentInit() {
+					if(this.remember) {
+						this.remember.checked.subscribe( (checked: boolean) => {
+							this.showMessage = checked;
+						});
+					}
+				}
+			
+			
+		eg.5. @ContentChildren and QueryLists
+				
+				AppComp: 
+			
+						<auth-form (submitted) = "loginuser($event)" <h3>Login<h3> 
+										   <auth-remember (checked) = "rememberUser($event)></auth-remember>
+										   <auth-remember (checked) = "rememberUser($event)></auth-remember>
+										   <auth-remember (checked) = "rememberUser($event)></auth-remember>
+										   <button type="submit">Login</button>
+						></auth-form>
+			
+			
+				import { ContentChildren, QueryList, AfterContentInit} ... 
+				@ContentChildren(AuthRememberComp) remember: QueryList<AuthRememberComp> ;
+			
+				ngAfterContentInit() {
+					if(this.remember) {
+						this.remember.forEach( (item) => {
+							item.checked.subscribe( (checked:boolean) => this.showMessage = checked; );
+						});
+					}
+				}
+			
+			
+		eg.6. ViewChild and ngAfterViewInit 
+		
+				AuthMessageComp: 
+					<div *ngIf="showMessage"> 
+							You will be logged in for 7 days.
+						</div>
+						
+				Pending.		
+					
+		eg.7. ViewChildren and ngAfterViewInit 	
+			
+						
 - ngTemplateOutletContext
+- Dynamic components using ComponentFactoryResolver:-
+	What we are going to do:-
+		import {AuthFormComp}...
+		<div>					// this serves as a container
+			<div #entry></div>  // We will use the ComponentFactoryResolver to inject the AuthFormComp here. We will create a factory method for it.
+		</div>
+		- Note:  @Output()Submitted = new EventEmitter(); 
+
+	App Comp implement AfterContentInit:-
+		@ViewChild('entry', { read: ViewContainerRef}) entry: ViewContainerRef;  
+		// the 2nd param here by default is an ElementRef, until we explicitly ask for a ViewContainerRef
+		
+		constructor(
+			private resolver: ComponentFactoryResolver		// from @angular/core
+		){}
+	
+		ngAfterContentInit() {
+			const authFormFactory = this.resolver.resolveComponentFactory(AuthFormComp);
+			const component = this.entry.createComponent(authFormFactory); // We will get error. Add entryComponents:[AuthFormComp] to auth-form.module.ts 
+		}
+		
+		
 
 Services:- egghead:-
 Interceptors:-
+
 ---
 
 ElementRef,
@@ -331,6 +519,17 @@ http://qnimate.com/post-series/ecmascript-6-complete-tutorial/
 
 ES6:-
 - call, apply & bind
+	Obj1: properties & methods 	 
+	Obj2: properties & methods 
+	
+	var obj = { num: 10};
+	var addToThis = function (p1) {
+		return this.num + p1;  // num is not yet accessible here
+	};
+	addToThis.call(obj, 20); //fn-name.call(obj, fn-args);
+	addToThis.apply(obj, [20, 30]);
+	addToThis.bind(obj, [20, 30])(); // bind returns a call
+
 - Spread (... operator). 
 	[1,2,3] ==> ...numbersArray
 - Generics, interfaces
