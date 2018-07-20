@@ -1,4 +1,4 @@
-ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel
+ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel, (ngSubmit) = doSubmit() [for both template n reactive form], ngForm
 Directives (selector) + Components (selector, template, styles, providers)
 @Input, @Output
 @HostListener, @HostBinding, L88, 89 : used to create reactive directive
@@ -27,8 +27,9 @@ RouterModule, Routes, Router, routerlinks, <router-outlet>, Navigation Paths,
 Navigating Programmatically, Using relative paths in navigating programmatically, L120
 ActivatedRoutes, Passing Params to Routes, Fetching Route Params Reactively, Passing Query Params and Fragments, Common Gotchas (skipped)
 ChildRoutes, queryParamsHandling, Redirecting and Wildcarding Routes, LocationStrategy
+named router outlet 
 	AppModule:-	
-		import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
+		import { RouterModule, Routes, Router, PreloadAllModules } from '@angular/router';
 		const appRoutes: Routes = [{}, {}]; // Its an array of objects.
 		
 		- routerLink replaces href in an <a href...> and help with NOT reloading the page; href reloads the page i.e. it sends a request to the server
@@ -120,7 +121,58 @@ ChildRoutes, queryParamsHandling, Redirecting and Wildcarding Routes, LocationSt
 				RouterModule.forRoot(appRoutes, { useHash: true });
 				
 				This will be useful when we deploy on Apache/ which will parse the string before the #; whereas angular will parse after the #.
+		
+		- named router outlet 
+			https://www.concretepage.com/angular-2/angular-2-4-named-router-outlet-popup-example#navigate
+			app.component.html
+				<router-outlet></router-outlet>
+				<router-outlet name="green"></router-outlet>
+				<router-outlet name="red"></router-outlet>
 				
+			app-routing.module.ts
+				import { RouterModule, Routes } from '@angular/routes';
+				
+				const appRoutes: Routes {
+
+					{ path: 'color', component: 'colorcomp'},
+					{ path: 'green', component: 'greencomp', outlet: 'green'},
+					{ path: 'red', component: 'redcomp',  outlet: 'red'},
+					{ path: '', redirectTo: '/color', pathMatch: 'full'},					
+				}
+				
+				imports: [
+					RouterModule.forRoot( appRoutes )
+				],				
+				
+				exports: [ RouterModule ],  // this is very important because without this, u will get router-outlet unknown errors !!!
+			
+			ng g c red 
+			ng g c green
+			
+		- How to detect route changes? 
+		A. Subscribe to this.router.events . Events are like : // example: NavigationStart, RoutesRecognized, NavigationEnd
+			For more events look at: 
+				https://angular.io/api/router/RouterEvent
+			
+			https://toddmotto.com/dynamic-page-titles-angular-2-router-events 
+			https://stackoverflow.com/questions/33520043/how-to-detect-a-route-change-in-angular
+			this.router.events
+			  .subscribe((event) => {
+				if (event instanceof NavigationEnd) {
+				  console.log('NavigationEnd:', event);
+				}
+			  });			
+			
+		A.2. 
+		this.router.events
+			.filter(event => event instanceof NavigationEnd)
+			.map(() => this.activatedRoute)	// getting the activatedRoute at the end of NavigationEnd.
+			.map(route => route.firstChild)
+			.switchMap(route => route.data)
+			.map(data => data['asdf'])
+		
+			
+		
 Guards L135
 	- CanActivate, CanActivateChild, CanDeactivate, CanLoad, Resolve
 
@@ -139,7 +191,34 @@ Guards L135
 	
 Pipes: 
 Pure, PipeTransform, impurepipe, async pipe
+	// default pipes: date, json 
+	
+	Create custom pipe:-
+		filesize.pipe.ts 
+			import { Pipe, PipeTransform } from '@angular/core';
+			
+			@Pipe({
+				name: 'filesize'
+			})
+			export class FileSizePipe implement PipeTransform {
+				transform( ipvalue: number, extension: string = 'MB' ) {
+					return ( size/ (1024*1024)).toFixed(2)) + extension
+				}
+			} // class ends 
+			
+			{{ data | filesize: 'megabytes' }}  // if megabytes is no given as extension, default MB kicks in
 
+	Pipes as providers/services:- transform() method is the key.
+		In SomeComp:-
+			import { FileSizePipe } ...
+			providers: [ FileSizePipe ];
+			
+			constructor (
+				private filesizePipe: FileSizePipe;
+			){}
+		
+		
+			// NOW WE CAN USE transform():- this.filesizePipe.transform( somevar, 'mb');
 Module:
 	- @NgModule (declarations, imports, providers, bootstrap) Note :- import is a TS-keyword, where imports:[] is an angular feature.
 				(exports, etc.) 
@@ -493,6 +572,15 @@ Ultimate angular:-
 			
 						
 - ngTemplateOutletContext
+
+- Change Detection & immutability:
+	OnPush + Immutable Data Objects :- Angular is faster when using immutable objects;
+	We can build stateless/presentation/dummy components. (?)
+	
+	SomeComp:-
+		changeDetection: ChangeDetectionStrategy.Default
+		changeDetection: ChangeDetectionStrategy.OnPush 
+		
 - Dynamic components using ComponentFactoryResolver:-
 	What we are going to do:-
 		import {AuthFormComp}...
@@ -519,6 +607,39 @@ Ultimate angular:-
 Services:- egghead:-
 Interceptors:-
 
+PrimeNg:-
+	PrimeNg v4.1, font-awesome v4.7.0
+		npm install primeng --save 
+		npm install primeicons --save
+		npm install font-awesome --save 
+		npm install @angular/animations --save 
+	
+	angular-cli.json:-
+		styles: [ font-awesome.min.css, primeng/resources/themes/omega/theme.css, primeng/resources/primeng.min.css ]
+	module.ts: 
+		import { BrowserModule } from '@angular/platform-browser';
+		import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+		import { AngularFontAwesomeModule } from 'angular-font-awesome';
+		import { AccordionModule } from 'primeng/components/accordion/accordion';
+		import { MenuItem } from 'primeng/components/accordion/accordion';
+		import { MenuModule, MenubarModule } from 'primeng/primeng';
+
+		Add to imports:[]
+
+	AppComp:-
+		{
+			label: 'label1',
+			icon: 'edit',
+			items: [
+				{label: 'Undo', icon: 'fa-mail-forward'}.
+				{label: 'Undo', icon: 'fa-mail-forward'}
+			]
+		}
+		
+	<link rel="stylesheet" type="text/css" href="/node_modules/primeicons/primeicons.css" />
+	<link rel="stylesheet" type="text/css" href="/node_modules/primeng/resources/themes/omega/theme.css" />
+	<link rel="stylesheet" type="text/css" href="/node_modules/primeng/resources/primeng.min.css" />
+	
 ---
 
 ElementRef,
