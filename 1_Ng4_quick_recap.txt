@@ -641,6 +641,27 @@ PrimeNg:-
 	<link rel="stylesheet" type="text/css" href="/node_modules/primeng/resources/primeng.min.css" />
 	
 ---
+	ng new primeproj1 --style=sass
+	npm install primeng --save 
+	npm install primeicons --save
+	npm install font-awesome --save 
+	npm install @angular/animations --save 
+	
+	app/app-routing.module.ts
+		
+		- RouterModule.forRoot(appRoutes);
+		
+			@NgModule({ 
+				imports: [ RouterModule.forRoot(appRoutes) ],
+				Exports: [ RouterModule ]
+			})
+			
+			export class AppRouting {}
+		
+		- <router-outlet></router-outlet> 
+		
+		
+---
 
 ElementRef,
 ViewContainerRef, ViewContainerRef::createEmbeddedView, TemplateRef<any>, 
@@ -669,3 +690,79 @@ ES6:-
 	generics:- allow us to be less flexible 
 		let numberArray: Array<number>;
 - type alias
+
+
+---
+
+morgan project:-
+
+ng new primeproj1 --style=sass
+	npm install primeng --save 
+	npm install primeicons --save
+	npm install font-awesome --save 
+	npm install @angular/animations --save 
+	
+- json server for products 
+	-- unit test for same
+- App Routing Module
+app.module.ts
+		-> imports app-routing.module.ts			
+			-> imports FM products.modules.ts
+			-> imports CommonModule
+				-> declarations + imports products.component.ts
+		-> exports RouterModule + FM Products Module		
+		
+- Products Featured Module ( Component + Service + Directive ) 
+		Products.Component.ts	
+			-- dispatch an action 
+			-- reducer
+				-- products service
+			-- comp has data 
+			
+npm install @ngrx/core @ngrx/store --save
+create store/
+	step 1: create App level interface AppStore (app.store.ts).
+			>>  { products: any } 
+	
+	step 2: StoreX.module.ts  (StoreXModule class)
+		Maps interface-keys of app.store.ts to reducers (defined in various *.reducer.ts file) using ActionReducerMap<AppStore>
+			>> 
+				export const reducers: ActionReducerMap<AppStore> = {
+					products: ProdReducer.productreducerFn
+				};
+			
+				import * as ProdReducer from './product.reducer';
+				NOTE.:- productreducerFn in ProdReducer.productreducerFn will be an exported function name "productreducerFn"
+	
+	step 3: store/reducers/products.reducer.ts
+			export function productreducer(state = initialState, action, any) {}
+				where 
+					- initialState implement an interface like IProducts for string-type.
+					- action is of type any for now, but it should change to ALLACTIONS (from store/actions/products.action.ts)
+
+	step 4: store/actions/products.actions.ts 
+			- import { Action } from 'ngrx/store';
+			- export type AllActions = Class1implementsAction | Class2implementsAction ;
+			
+			- export class class1 implements Action {  // Here u can name the class1 anything, its not of significance outside this file.
+					readonly type = someConstValue;	   // This is v.imp
+				}
+				
+			- export const someConstValue = 'GetProducts'; // RHS is very imp. Will be used in the switch-case in the reducers.	
+
+			eg. 
+				import { Action } from 'ngrx/store';
+				export const getProducts = 'GetProducts';
+				export class FetchProducts implements Action {
+					readonly type = getProducts;
+				}
+				export type ALLACTIONS = FetchProducts;
+
+- Shared Module
+	- Shared components ( Prime Ng )
+		-- Data Table Component
+		-- Shared Prime Ng button.
+- Ngrx
+	- Storemodule
+	- action creators, reducer
+	- Unit test for reducer
