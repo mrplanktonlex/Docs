@@ -691,7 +691,139 @@ ES6:-
 		let numberArray: Array<number>;
 - type alias
 
+---
 
+Angular Material Design:- Adding a custom theme 
+	http://github.com/angular/material2
+
+style.scss
+	/* You can add global styles to this file, and also import other style files */
+
+	@import "~@angular/material/theming";	// actual filename is _theming.scss, _ because its a partial. sass pre-processor ignores _ files.
+
+	// Include non-theme styles for core.
+	@include mat-core();
+
+	// Define a theme.
+	$primary: mat-palette($mat-pink);	// -OR- mat-palette($mat-indigo)  -OR-  $mat-red
+	$accent:  mat-palette($mat-deep-purple, A200, A100, A400);	// -OR- $mat-pink
+
+	$theme: mat-light-theme($primary, $accent); // we could also use mat-dark-theme().
+
+	// Include all theme styles for the components.
+	@include angular-material-theme($theme);
+
+Add to to styles: [] in angular.json and restart ng serve
+
+---
+
+Rxjs6 In Practise:-
+		Rxjs6:-
+		git clone https://github.com/angular-university/rxjs-course.git
+		git checkout -b 1-operators
+
+		npm start (will start the dev-server which provides courses & lessons rest apis)
+
+		interval(1000), timer(3000, 1000), fromEvent(document, 'click');
+
+		1. 
+		Non-Completing streams:- keeps emitting, but never completes.
+			document.addEventListener('click', (event) => {
+				console.log (event);
+			});
+			
+			const counter = 0;	// emits a value after every 1 sec but never completes.
+			setInterval(() => { counter++; c.log(counter); }, 1000);
+
+		Completing stream:- executes only once.
+			setTimeout(() => { console.log('Finished...'); }, 3000);
+			
+		2.
+		Observable is a blueprint of a stream.
+		subscribe() gives us an instance of the stream.
+		 
+			const interval$ = interval(1000); // rxjs interval() does same thing as setInterval();
+			interval$.subscribe(	// instance of a stream.
+				(val) => { console.log(val); }
+			);
+			interval$.subscribe(
+				(val) => { console.log(val); }
+			);
+			
+		3.	Wait for 3 seconds and then emit the values. Use timer()
+				const interval$ = timer(3000, 1000);	// waits for 3 seconds before starting to emit.
+				interval$.subscribe(
+					(val) => { console.log(val); }
+				);
+				
+		4. Define a stream of clicks: use fromEvent()
+
+				const click$ = fromEvent(document, 'click');
+				click$.subscribe(	// instance of a stream.
+					(event) => { console.log(event); }
+				);
+			
+		5. Stream Errors & Stream Completion.
+
+				click$.subscribe(
+					(event) => {},
+					(err) => {},
+					() => { console.log ('completed'); }
+				);
+
+			Subscription & Cancellation using unsubscribe
+				// subscription
+				const subscription = interval$.subscribe(	// instance of a stream.
+										(val) => { console.log(val); }
+									);
+				
+				// cancellation/unsubscribe
+				subscription.unsubscribe();					
+				
+		6.  
+		- How do observables work under the hood?
+		- Build ur own http observable.
+
+		fetch() is a browser api. it can be used to call rest apis.
+		fetch('/api/courses') will return a promise.
+			- promise get executed as soon as they r defined.
+			-	observer.next()  to emit a value. will only be called on subscribe() call.
+				observer.error()
+				observer.complete() to complete it.
+				
+
+			const http$ = Observable.create( observer => {
+				fetch('/api/courses')
+					.then( response => response.json())  // response.body(), response.ok(), response.status() are few other.
+					.then ( body => {					 // body here meants the json-body/json-data
+						observer.next(body);
+						observer.complete();
+					})
+					.catch ( err => {
+						observer.error(err);
+					})
+					;	
+			});
+
+			http$.subscribe(
+				( data ) => console.log(courses),
+				noop, // -OR- ( err ) => {}, // noop is an rxjs function for no operation
+				() => {}
+			);
+			
+		7. 
+			pipe operator: chain multiple observables eg. pipe(map ( ... ) )
+			Map operator: eg. map (x => 10*x)
+			
+			const courses$ = http$.pipe(
+				map( res => Object.values (res["payload"]) );	// payload is a property which has array of objects. REST API response is : obj-of-payload: Arr-of-objects
+			);
+			
+			courses$.subscribe( ... );
+		---
+
+		L10:- stopped. to be continued later.
+			
 ---
 
 morgan project:-
@@ -766,3 +898,5 @@ create store/
 	- Storemodule
 	- action creators, reducer
 	- Unit test for reducer
+
+	
