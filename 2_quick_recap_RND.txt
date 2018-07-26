@@ -1,0 +1,79 @@
+npm install @angular/material @angular/cdk hammerjs @ngrx/core @ngrx/store @ngrx/effects --save
+
+Sol.1.
+app
+app-routing.module.ts
+	product/ (FM)
+				products.module.ts
+		models/, services/, components/
+		store/
+			store.module.ts		ActionReducerMap can be exported as a const from somewhere else, but it would become too huge.
+			actions/
+			reducers/
+			effects/
+			
+- Accessing from outside the store:-
+	- individually call out all actions/reducers/effects. this will lead to a lot of convulted import-statements.
+	- it would be nice to have one single object interface through which we can access all actions/reducers and effects.
+	- import * as fromStore from 'store';
+
+- Within the store:-
+	- import * as fromActions from 'actions'; n so on
+
+- Lazy loading StoreModule.forFeature('products', reducers ); can be tricky.	
+reducers will have to be created from so many reducers.
+
+-------------------------------------------------------------------------------	
+	
+Sol.2.
+app
+app-routing.module.ts
+	product/ (FM)
+			products.module.ts
+		models/, 
+			- wont have index.ts
+		services/, components/	
+			- will have services[], components[] in 2 respective index.ts
+		store/
+			index.ts		  
+			actions/
+					index.ts
+			reducers/	
+					index.ts  The ActionReducerMap can be done here if there is no store.module.ts. This can again become too huge too quick.
+							  - createFeatureSelector, createSelector, somehigherlevelInterface eg. ProductsState
+			effects/
+					index.ts
+
+- Accessing from outside the store:-
+						
+- Within the store:-
+	- import * as fromActions from 'actions'; n so on
+
+- Lazy loading StoreModule.forFeature('products', reducers );					
+import { reducers } from './store';	
+
+================================================================================
+
+import {
+  Component,
+  Input,
+  forwardRef,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Topping } from '../../models/topping.model';
+
+const PIZZA_TOPPINGS_ACCESSOR = {
+  provide: NG_VALUE_ACCESSOR,
+  useExisting: forwardRef(() => PizzaToppingsComponent),
+  multi: true,
+};
+
+@Component({
+  selector: 'pizza-toppings',
+  providers: [PIZZA_TOPPINGS_ACCESSOR],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['pizza-toppings.component.scss'],
+  template: `
+  
+  =============================================================================
