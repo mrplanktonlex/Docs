@@ -77,3 +77,547 @@ const PIZZA_TOPPINGS_ACCESSOR = {
   template: `
   
   =============================================================================
+Ultimate NG:-
+
+Store Creation & Initial State
+
+store/
+	store.ts 
+	index.ts 
+	reducers.ts 
+	actions.ts
+app.ts
+
+---
+
+store.ts 
+export class Store {
+	private subscribers : Function[];
+	private reducers: { 
+		[ key : string ] : Function
+	};
+	private state: { 
+		[ key : string ] : Any
+	}; // state of the app
+	
+	constructor (
+		reducers = {}, initialState = {}
+	){
+		this.state = initialState;
+	}
+	
+	get value() {  // -OR- getValue() {
+		return this.state;
+	}
+} // class ends
+
+index.ts
+	export * from './store'; // i.e. store.ts
+
+app.ts 
+	import * as fromStore from './store';	// Note:- here we are getting the store-folder and not store/store.ts. We can do this because of store/index.ts
+
+	const store = new fromStore.Store(		// this is same as new Store(), but simple we r using index.ts, we need to write like this.
+		{}, 	// 1st param: reducers		
+		{		// 2nd param: initialState
+			todos: [ {label: 'Eat pizza', complete: false }]
+		}
+		); 
+	
+	console.log (store.value);
+---
+---
+
+Dispatching Actions:
+
+
+store.ts 
+	dispatch(action) {
+		this.state = {
+			...this.state, todos: [ ...this.state.todos, action.payload ]
+		};
+		console.log (this.state);
+	}
+
+app.ts 
+
+	store.dispatch({
+		type: 'ADD_TODO',
+		payload // same as payload: payload
+	});
+
+---
+---
+
+All about reducers 
+
+reducers.ts 
+
+		// create initialState obj 
+		export const initialState = {
+			loaded: false;
+			loading: false;
+			data: []; /// collection of data, when it is loaded.
+		};
+		
+		export function reducer (state = initialState, action: { type: string, payload: any } ) {
+			switch(action.type) {
+				case 'ADD_TODOS' 
+					return { ...state, data }
+			}
+		} 
+app.ts 
+		constructor (
+		reducers = {}, initialState = {}
+		){
+			this.state = initialState;
+			this.reducers = reducers;
+		}
+		
+		const reducers = {
+			todos: fromStore.reducer
+		}
+		// reduce it to 
+		const store = new fromStore.Store(reducers);
+		
+
+index.ts
+		export * from './store'; // i.e. store.ts
+		export * from './reducers'; // i.e. reducers-folder 
+		
+store.ts 
+		... we should be able to iterate over all actions and reducers and call reducers dynamically.
+			
+			const newState = {};
+			for (const prop in this.reducers) { 
+				newState[prop] = this.reducers[prop]( state[prop], action ); // same as newState.todos = this.reducers.todos();
+			}
+			return newState;
+			
+---
+---
+
+Store subscriptions
+
+store.ts 
+		subscribe(fn) {
+			this.subscribers = [...this.subscribers, fn];	// when the action dispatched is completed, we want to notify all our subscribers. 
+			this.notify(); // will notify all our subscribers;
+		}
+		
+		private notify () {  // notify should be private to the class.
+			this.subscribers.forEach( fn => fn(this.value) );	// this.value will call "get value()", which gives us the state.
+		}
+		
+app.ts 
+		store.subscribe(state => console.log('STATE:::', state));
+		
+		
+cool code:-
+		subscribe(fn) {
+			this.subscribers = [...this.subscribers, fn];	// when the action dispatched is completed, we want to notify all our subscribers. 
+			this.notify(); // will notify all our subscribers;
+			return () => {
+				this.subscribers = this.subscribers.filter( sub => sub !== fn)
+			}
+		}
+
+---
+---
+
+Actions to Action Creators:
+- Action constants + Action Creators + ALL_ACTIONS = Class1ImplementingAction | Class2ImplementingAction
+
+actions.ts 
+		export const ADD_TODO = '[todos] Add Todo'; // action constant
+		
+index.ts
+		export * from './store'; // i.e. store.ts 
+		export * from './reducers'; // i.e. reducers.ts
+		export * from './actions'; // i.e. actions.ts
+		
+Note:- 
+	if u want data from store/ folder, outside of store folder, do :-
+		import * as fromStore from './store'; // here u have the whole folder.
+			// u can now do fromStore.x 
+			
+	if u r within store-folder and still want to use other-ts file then do like this:-
+		say reducers wants actions 
+		import * as fromActions from './actions';
+		
+	
+Action creator:-
+	export class AddToDo {
+		readonly type = ADD_TODO; // type cannot be changed after the class has been instantiated.
+		constructor ( private payload: any) {}	// so, new AddToDo({}) will initialize with the action const ADD_TODO and the payload. 
+												NOTE: payload will be auto created, so we dont have to pass it everytime.
+	}
+
+---
+---
+
+Reactive Component Architecture 
+	Presentational components:-
+		Not aware of Store
+		@Input + @output
+		
+	Container/Smart Components:-
+		Aware of store, dispatches actions, reads data from store
+		
+---
+---
+
+Branch 1: Action Constants and Creators	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/01-first-actions 
+Branch 2: Creating and Registering our Reducer	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/02-reducer-setup
+Branch 3: State composition with Selectors	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/03-store-selectors
+Branch 4: Our first @Effect	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/04-ngrx-effects
+Branch 5: Optimizing Data Structures with Entities	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/05-entities
+Branch 6: Hooking up @ngrx/router-store	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/06-router-store-setup
+Branch 7: Custom Router State Serializers	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/07-custom-router-serializer
+Branch 8: Router State and Entity Composition	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/08-router-selectors
+Branch 9: Further Action Creators	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/09-toppings-actions
+Branch 10: Multiple Reducers	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/10-toppings-reducer
+Branch 11: Further Effects	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/11-toppings-effect
+Branch 12: Selector Composition	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/12-toppings-selectors
+Branch 13: Mapping IDs to Entities	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/13-selected-toppings
+Branch 14: Store Selectors and Async Pipe	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/14-visualise-dispatch
+Branch 15: Creating, via Dispatch, Reducer and Effect	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/15-create-pizza
+Branch 16: Updating, via Dispatch, Reducer and Effect	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/16-update-pizza
+Branch 17: Deleting, via Dispatch, Reducer and Effect	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/17-remove-pizza
+Branch 18: Router Actions and Effect	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/18-router-actions-effects
+Branch 19: Multiple Actions in Effects, Router Actions	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/19-effect-dispatch-router-actions
+Branch 20: Preloading across multiple Routes	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/20-pizzas-guard
+Branch 21: Guards that check Store Entities	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/21-pizza-exists-guard
+Branch 22: One more Guard	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/22-toppings-guard
+Branch 23: OnPush, everywhere	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/23-change-detection-onpush
+Branch 24: Testing Actions 	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/24-testing-actions
+Branch 25: Testing Reducers	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/25-testing-reducers
+Branch 26: Testing Selectors	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/26-testing-selectors
+Branch 27: Testing Effects	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/27-testing-effects
+
+---
+Pizza Ngrx app:-
+
+app/
+products/
+	components/
+	containers/
+	models/
+	services/
+	store/
+		actions/
+		reducers/
+					pizza.reducer.ts
+					index.ts (for reducers/) implements a const "reducers: ActionReducerMap<interface which uses interface in pizza.reducer.ts>
+		index.ts (for store/)
+			- export * from './reducers'
+	products.module.ts 
+		import { reducers } from './reducers' ; 
+		StoreModule.forFeature('products', reducers);
+---
+---
+
+Branch 1: Action Constants and Creators	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/01-first-actions 
+Branch 2: Creating and Registering our Reducer	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/02-reducer-setup
+Branch 3: State composition with Selectors	https://github.com/UltimateAngular/ngrx-store-effects-app/tree/03-store-selectors
+
+Action Constants and creators
+	products/store/actions/ 
+		pizzas.action.ts 
+				Action const 	:- LOAD_PIZZAS, LOAD_PIZZAS_FAIL, LOAD_PIZZAS_SUCCESS
+				Action creators	:- LoadPizzas, LoadPizzasFail (with payload in constructor), LoadPizzasSuccess 
+				
+				Action type:-
+				export type PizzasAction = Class1ImplementingAction | Class2ImplementingAction
+					
+	products/models/pizza.model.ts 
+		its an interface representing json data in db.json.
+			id, name, topping
+			
+Creating & Registering our reducer
+	> PizzaInterface, PizzaInitialState, PizzaReducerFn() 
+	> products/store/reducers/
+								pizza.reducer.ts
+								index.ts (for reducers/) implements a const "reducers: ActionReducerMap<interface which uses interface in pizza.reducer.ts> 	
+	
+									index.ts 
+									import { ActionReducerMap } from '@ngrx/store';
+									import * as fromPizzas from './pizzas.reducer';
+									
+									export interface somehigherlevelInterface {
+										actioname : fromPizzas.whateverReducerFn
+									}
+									
+									export const reducers : ActionReducerMap <somehigherlevelInterface> = {
+										actioname : fromPizzas.whateverReducerFn
+									};
+	
+State Composition with selectors 
+	> Selectors allow us to select a particular slice of state. 
+	> Every slice of slate should have a reducer+interface+initialState && a selector to select that slice.
+		- are functions
+			-- compose diff. levels of state 
+			-- returns new state.
+			-- written in the reducer.
+			-- somehigherlevelInterface > PizzaState (Interface)
+						
+				pizza.reducer.ts 
+					export const getPizzasLoading = (state: PizzaState ) => state.loading;
+					export const getPizzasLoaded = (state: PizzaState ) => state.loaded;
+					export const getPizzas = (state: PizzaState ) => state.data;
+					
+				Now, we will use a create-selector one level up in index.ts (using somehigherlevelInterface)
+				reducers/index.ts
+					import { ActionReducerMap, createSelector, createFeatureSelector } from '@ngrx-store';
+					// getProductsState = somehigherlevelInterface
+					export const getProductsState = createFeatureSelector('products');	
+													// This string products is coming from the products.module.ts:: StoreModule.forFeature('products', reducers)
+																												  // u get products: { pizzas:{} }		
+					export const getPizzaState = createSelector	(getProductsState, (state: ProductsState ) => state.pizzas; //1st param = starting selector n going down the tree
+																	gimme products, gimme data in the products 		
+																												  // u get pizzas: { data:[], loaded, loading}
+																	
+					export const getAllPizzas = createSelector	(getPizzaState, fromPizzas.getPizzas);			  // u get data:[]
+					export const getPizzasLoaded = createSelector	(getPizzaState, fromPizzas.getPizzasLoaded);  // u get only "loaded"					
+					export const getPizzasLoading = createSelector	(getPizzaState, fromPizzas.getPizzasLoading); // u get only "loading"	
+
+			
+			state tree looks like this: {
+				products : {	// somehigherlevelInterface -OR- ProductsState Interface		<<<=== Selector is getProductsState = createFeatureSelector('products');
+					pizzas: {	//PizzasState Interface
+						data: [],
+						loaded: false/true,
+						loading: false/true
+					}
+				}
+			}
+
+					
+	> this.store.select(<a string> / <function>); // where store: Store<fromStore.somehigherlevelInterface>
+		this.store.select<any>('products').subscribe( state => c.log(state));
+		
+	IMP: This is what i keep forgetting. how to get data from reducer -> component.	
+	STYLE 1:-	
+	> this.store.select<any>('products').subscribe( state => c.log(state)); 
+		-- WILL CHANGE TO --
+	  this.store.select(fromPizzas.getAllPizzas).subscribe( state => this.pizzas = state); 
+	  // THIS IS AN EX. OF HOW U CAN FETCH DATA with initialState. For the next stateslice, u need to dispatch an action.
+	  
+	STYLE 2:- 
+	  this.pizzas$ = this.store.select(fromPizzas.getAllPizzas);
+		where pizzas$ = Observable<pizzas[]>
+		
+	   *ngIf = "((pizzas$ | async)?.length)"		
+	   *ngFor = "let pizza of (pizzas$ | async)"
+	   
+Recap:-
+- In Component, remove all PizzaServices.
+		import * as fromStore  from store;
+		constructor ( private store: Store<fromStore.ProductsState> ) {}
+		
+		this.store.select()
+			- u can pass in a string or a function.
+			- if u pass in a function then it should return a slice of state.
+
+- a selector can be used with this.store.select()
+- pizza.reducer.ts 
+	export properties of the PizzaState via 3 function definitions.
+	
+- reducer/index.ts 
+	- create a somehigherlevelInterface like ProductsState
+	- create const reducers: ActionReducerMap<ProductsState>
+	- createFeatureSelector (takes 1 param)
+		export const getProductsState = createFeatureSelector<ProductsState>('products');						  /// products : { pizzas: { ... }}		
+	- createSelector (takes 2 params, beginning from , to)
+		export const getPizzaState = createSelector(getProductsState, (state: ProductsState) => state.pizzas);  /// pizzas : { ... }		
+	- createSelector (takes 2 params, beginning from , to)
+		export const getAllPizzas/getPizzasLoaded/getPizzasLoading = createSelector (getPizzaState, fromPizzas.exposedreducerselector#1() -OR- #2() -OR- #3() // import * as fromPizzas from './pizzas.reducer';
+		These are what we will use with:=
+			this.store.select()
+	
+	From the component:-
+		this.store.select(fromPizzas.getAllPizzas).subscribe( state => this.pizzas = state);
+	
+---
+---
+
+Effects and Entities 
+	Concept of Effects 
+		- listen for ngrx/store actions , isolate side effects, 
+		- communicate outside of angular
+	Our first Effect
+		product/store/actions/
+							 pizza.action.ts 
+							 index.ts  // export * from './pizza.action.ts';
+			   /store/index.ts 
+					export * from './reducers'; // folders reducers, actions .
+					export * from './actions';	
+		
+			   /store/effects/
+							pizzas.effect.ts 
+								import { Effect, Actions } from '@ngrx/effects';
+								import * as PizzaActions from '../actions/pizza.action';
+								import { map, switchMap, catchError } from 'rxjs/operators'; // it was catch earlier
+								import { of } from 'rxjs/Observable/of';
+								
+								@Injectable()
+								export class PizzasEffects {
+									constructor(
+										private actions$: Actions
+									){}
+
+									@Effect()				// @Effect({ dispatch: false }) This WONT dispatch an action.
+									loadPizzas$ = this.actions$
+													  .ofType( pizzaAction.LOAD_PIZZAS )
+													  .pipe (
+														switchMap ( () => {
+															// We need a pizzasService. 
+															return this.pizzaService.getPizzas().pipe(
+																	map( pizzas => new pizzaActions.LOAD_PIZZAS_SUCCESS(pizzas) )    // map is called only when its successful.
+																	, catchError ( error => of(new pizzaActions.LOAD_PIZZAS_FAIL(err) ))
+																);
+														})
+													  )
+									
+								} // class ends 
+								
+								/effects/index.ts 
+									export const effects: any = [ PizzasEffects ]
+									export * from './pizza.effect'
+								
+								products.module.ts
+									EffectsModule.forFeature(effects)	
+									
+									
+								NOTE: new pizzaActions.LOAD_PIZZAS_SUCCESS(pizzas) will give the data in action.payload in the reducer.	
+	
+Optimizing Data Structures with Entities
+	
+	Earlier:-
+		export interface PizzaState {
+			data: Pizza[],				// [{ id: 1}, { id: 2}]
+			loaded: boolean,
+			loading: boolean
+		}
+		
+	Now:-	
+		export interface PizzaState {
+			entities: { [id: number] : Pizza },			
+			loaded: boolean,
+			loading: boolean
+		}
+		
+		export const initialState : PizzaState = {
+			entities: {},
+			loaded: boolean,
+			loading: boolean
+		}
+		
+	- this is more scalable. Pizza is coming from pizza.model i believe.	
+	- using entities, we r converting // [{ id: 1}, { id: 2}] into
+			{
+				1 : {
+					id: 1,
+					name: 'pizza1'
+					toppings: []
+				}
+			}
+			
+			this will help us traversing urls quickly eg. allpizzas/1
+				since id is same as the 1-param, we can just say pizza[1-from-the-param]
+				
+				
+---
+---
+
+'State' is IState in my code
+
+Router State Composition
+	Hooking up @ngrx/router-store
+		- routes are also a state ; mapping routes and router state to the store make it more powerful
+			- create a new project
+				@ngrx/router-store will merge the router state to the store (where out application state is)
+				
+				NOTE:- we have app/product/store/* too along with the new app/store/*. So there are 2 folders called store/ 
+		- app/store/	
+				index.ts	export * from './reducers'; (reducers folder)
+				reducers/
+						index.ts 
+							import * as fromRouterStore from '@ngrx/router-store';
+							import { Params } from '@angular/router';
+							import { ActionReducerMap, createFeatureSelector } from '@ngrx/store';
+							
+							// step 3: create an interface for the route state.
+							export interface RouterStateUrl {
+								url: string;
+								queryParams: Params;	eg. ? key1= value1
+								params: Params; // eg. /1  or /2
+							}
+				
+							// step 1: create an interface 
+							export interface IState {
+								routerReducer: fromRouterStore.RouterReducerState<RouterStateUrl> // Note this word "routerReducer" is mandatory, u cannot give it any other name
+							}
+							
+							// step 2: create routeReducers. 
+							export const routeReducers: ActionReducerMap<IState> = {
+								routerReducer: fromRouter.routeReducer	// Q. should the key remain "routeReducer" like before or can it be renamed ?
+							};
+							
+							// step 4: createFeatureSelector('routeReducer')
+							export const getRouterState = createFeatureSelector('routeReducer');
+							-OR-
+							export const getRouterState = createFeatureSelector<fromRouterStore.RouterReducerState<RouterStateUrl>>('routeReducer');
+							
+			app.module.ts
+				import { reducers } from './store';
+				StoreModule.forRoot(reducers);  // earlier it could have been StoreModule.forRoot({})
+	
+	Custom (Router State) Serializer:-
+		- is passed the route state, 
+		- we can take properties of the snapshot and them bind them to the store.
+		
+			reducer/index.ts 
+				import { ActivatedRouteSnapshot, RouterStateSnapshot, Params } from '@angular/router';
+				
+				export class CustomSerializer implements fromRouterStore.RouteStateSerializer<RouterStateUrl> {
+					serialize( routerState: RouterStateSnapshot ) {
+						
+						const { url } = routerState; // This is ES6 destructuring. same as writing:- const url = RouteState.url; 
+							NOTE:- in import statements too, we are destructuring using {} braces.
+						
+						const { queryParams } = routerState.root; 
+						
+						let state: ActivatedRouteSnapshot = routerState.root;
+						while ( state.firstChild ) {
+							state = state.firstChild;
+						}
+						
+						const { params } = state;
+						return { url, queryParams, params };		// return obj should be like RouterStateUrl. This returnobj WILL BE BOUND TO THE state tree.
+					}
+				}
+		
+		app.modulet.ts 
+			import { StoreRouterConnectingModule, RouterStateSerializer } from '@ngrx/router-state';
+			import { reducers, CustomSerializer } from './store';
+			
+			providers: [
+				{
+					provide: RouteStateSerializer, useClass: CustomSerializer
+				}
+			];
+---
+---
+Extending our state tree
+
+---
+---
+Entity Patterns, CRUD Operations
+
+---
+---
+
+		
+		
+	
