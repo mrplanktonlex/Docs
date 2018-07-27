@@ -532,8 +532,8 @@ Optimizing Data Structures with Entities
 
 'State' is IState in my code
 
-Router State Composition
-	Hooking up @ngrx/router-store
+Router State Composition: In 1 & 2 we are setting up the boilerplate, which is lengthy but is very powerful.
+	1. Hooking up @ngrx/router-store
 		- routes are also a state ; mapping routes and router state to the store make it more powerful
 			- create a new project
 				@ngrx/router-store will merge the router state to the store (where out application state is)
@@ -573,7 +573,7 @@ Router State Composition
 				import { reducers } from './store';
 				StoreModule.forRoot(reducers);  // earlier it could have been StoreModule.forRoot({})
 	
-	Custom (Router State) Serializer:-
+	2. Custom (Router State) Serializer:-
 		- is passed the route state, 
 		- we can take properties of the snapshot and them bind them to the store.
 		
@@ -581,20 +581,24 @@ Router State Composition
 				import { ActivatedRouteSnapshot, RouterStateSnapshot, Params } from '@angular/router';
 				
 				export class CustomSerializer implements fromRouterStore.RouteStateSerializer<RouterStateUrl> {
-					serialize( routerState: RouterStateSnapshot ) {
+					
+					serialize( routerState: RouterStateSnapshot ) {		// VIMP: Any time the route changes, this function will be called !!!
 						
+						// 2.1
 						const { url } = routerState; // This is ES6 destructuring. same as writing:- const url = RouteState.url; 
 							NOTE:- in import statements too, we are destructuring using {} braces.
 						
-						const { queryParams } = routerState.root; 
+						// 2.2
+						const { queryParams } = routerState.root; 	
 						
+						// 2.3
 						let state: ActivatedRouteSnapshot = routerState.root;
-						while ( state.firstChild ) {
-							state = state.firstChild;
+						while ( state.firstChild ) {		// on state, u can extract fragments, etc. etc. too
+							state = state.firstChild;		// eg. products/1
 						}
 						
-						const { params } = state;
-						return { url, queryParams, params };		// return obj should be like RouterStateUrl. This returnobj WILL BE BOUND TO THE state tree.
+						const { params } = state;   // or const params = state.params; 
+						return { url, queryParams, params }; // VIMP:- return obj should be like RouterStateUrl. This returnobj WILL BE BOUND TO THE state tree.
 					}
 				}
 		
