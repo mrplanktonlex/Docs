@@ -591,6 +591,46 @@ Module:
 
 			before:- RouterModule.forRoot(appRoutes)	// Hidden Default is { preloadingStrategy: DontPreload }		// ???
 			after:- RouterModule.forRoot(appRoutes, { preloadingStrategy: PreloadAllModules } // This property takes a type-definition. PreloadAllModules
+			
+---
+Interceptors.
+
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+app.module.ts
+	imports: [ HTTP_INTERCEPTORS, HttpClientModule, n other modules ]
+	providers: [
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: MyHttpInterceptor,
+			multi: true
+		}
+	]
+	
+.ts
+import { Injectable, Injector } from '@angular/core';
+import { HttpClient, HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';
+
+export class MyHttpInterceptor implements HttpInterceptor: Observable<HttpEvent<any>> {
+	intercept (req: HttpRequest<any>, next: HttpHandler) {
+		console.log("intercepted request ... ");
+
+		// Clone the request to add the new header.
+		const authReq = req.clone({ headers: req.headers.set("headerName", "headerValue")});
+		console.log("Sending request with new header now ...");
+		
+		//send the newly created request
+		return next.handle(authReq)
+				   .catch((error, caught) => {
+						//intercept the respons error and displace it to the console
+						console.log("Error Occurred");
+						console.log(error);
+						//return the error to the method that called it
+						return Observable.throw(error);
+					}) as any;
+	}
+} // class ends
+
+---
 										); 
 Observable
 	- operators
