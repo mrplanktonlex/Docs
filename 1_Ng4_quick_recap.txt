@@ -18,6 +18,9 @@ Passing Data with EventBinding:-
 			c.log( ev.target.value ); // where target shows the html-element on which the event occured.
 		}
 ---
+FormsModule + ReactiveFormsModule
+import { FormModule } from '@angular/forms'; // shouls be inthe imports[] too of app.module.ts
+---
 
 ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel, (ngSubmit) = doSubmit() [for both template n reactive form], ngForm
 *ngIf = "someconditionevaluatesToTrue"
@@ -40,6 +43,12 @@ eg.
 	      class="text-warning">{{ person.name }} ({{ person.country }})
 	  </li>
 	</ul>`
+
+ngModel: 2-way data binding = EventBinding + PropertyBinding
+[(ngModel)] = "somevar" + {{somevar}}
+Using ngModel is considered a better way, than to pass $event around. See doSomething($event) above.
+
+---
 
 Directives (selector) + Components (selector, template, styles, providers)
 @Input, @Output
