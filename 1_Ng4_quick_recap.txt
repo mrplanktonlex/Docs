@@ -160,7 +160,39 @@ Types of component communication:-
 	To keep one of them out of sync: use a local service-providers in that comp., which needs to be out of sync
 	
 	https://angularfirebase.com/lessons/sharing-data-between-angular-components-four-methods/	
+	This is applicable for unrelated-parents/siblings.
 	
+	Why BehaviorSubject ?:-
+	> It will always return the current value on subscription - there is no need to call onnext
+	> It has a getValue() function to extract the last value as raw data.
+	> It ensures that the component always receives the most recent data.
+	
+	(may not work, put in here as a reference only.)
+	eg. 4.1. The service
+		@Injectable()
+			export class DataService {
+
+			  private messageSource = new BehaviorSubject('default message');
+			  currentMessage = this.messageSource.asObservable(); // NOTE:= currentmessage will be used to get curr. val.
+
+			  constructor() { }
+
+			  changeMessage(message: string) {
+			    this.messageSource.next(message)
+			  }
+	4.2 Parent comp:-
+		ngOnInit() {
+		    this.data.currentMessage.subscribe(message => this.message = message)
+		  }
+		  
+	4.3 Sibling comp:-
+		ngOnInit() {
+   		  this.data.currentMessage.subscribe(message => this.message = message)
+  		}
+
+		  newMessage() {
+		    this.data.changeMessage("Hello from Sibling")
+		  }
 ----
 
 @HostListener, @HostBinding, L88, 89 : used to create reactive directive
