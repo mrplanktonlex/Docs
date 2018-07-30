@@ -1,3 +1,24 @@
+String Interpolation:-
+{{ classvar }} // will be a class variable.
+{{ classmethod() }} // Works, but Dont do this as it will call it multiple times
+
+Property binding:-
+[disabled] = "some property name"
+
+String Interpolation can be replaced with property binding:-
+before:- <p> {{ someclassvar }} </p>
+after:- <p [innertext]="someclassvar"> </p>	DONT DO:- <p [innertext]="{{someclassvar}}"> </p>
+
+Event Binding:-
+	(click) = "callSomeMethod()"   // VanillaJS:- onClick = "doSomething()"
+Passing Data with EventBinding:-
+	(input) = "doSomething($event)" // $event will give access to data like clicked-details, etc.
+	where,
+		doSomething(ev: any) {
+			c.log( ev.target.value ); // where target shows the html-element on which the event occured.
+		}
+---
+
 ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel, (ngSubmit) = doSubmit() [for both template n reactive form], ngForm
 *ngIf = "someconditionevaluatesToTrue"
 *ngFor="let item of products"
