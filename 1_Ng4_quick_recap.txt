@@ -91,7 +91,23 @@ Variations:-
   
 ---
 
-How to create your own ngIf:- eg. myNgIf
+Q. How to create your own ngIf:- eg. myNgIf
+A.1. Use ViewContainerRef + ViewContainerRef::CreateEmbeddedView() + TemplateRef<obj|any>
+A.2. Use ng-container + ngTemplateOutlet + context-obj.
+
+A.1. 
+ng g d myNgIf
+constructor (
+	private  viewContainerRef: ViewContainerRef, private templateRef: TemplateRef<Object>
+){}
+ngOnInit(){
+	const condition = true;
+	if (condition ) { this.viewContainerRef.createEmbeddedView (this.templateRef); }
+	else { this.viewContainerRef.clear(); }
+}
+
+<p *myNgIf> ... </p> -OR- <ng-template myNgIf> </ng-template> (NOTE: no asterisk)
+PS: We can add @Input to make RHS accept conditions.
 
 ---
 
