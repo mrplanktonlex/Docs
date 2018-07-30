@@ -97,18 +97,34 @@ A.1. Use ViewContainerRef + ViewContainerRef::CreateEmbeddedView() + TemplateRef
 A.2. Use ng-container + ngTemplateOutlet + context-obj.
 
 A.1. 
-ng g d myNgIf
-constructor (
-	private  viewContainerRef: ViewContainerRef, private templateRef: TemplateRef<Object>
-){}
-ngOnInit(){
-	const condition = true;
-	if (condition ) { this.viewContainerRef.createEmbeddedView (this.templateRef); }
-	else { this.viewContainerRef.clear(); }
-}
+	ng g d myNgIf
+	constructor (
+		private  viewContainerRef: ViewContainerRef, private templateRef: TemplateRef<Object>
+	){}
+	ngOnInit(){
+		const condition = true;
+		if (condition ) { this.viewContainerRef.createEmbeddedView (this.templateRef); }
+		else { this.viewContainerRef.clear(); }
+	}
 
-<p *myNgIf> ... </p> -OR- <ng-template myNgIf> </ng-template> (NOTE: no asterisk)
-PS: We can add @Input to make RHS accept conditions.
+	<p *myNgIf> ... </p> -OR- <ng-template myNgIf> </ng-template> (NOTE: no asterisk)
+	PS: We can add @Input to make RHS accept conditions.
+
+A.2.
+ng-container + ngTemplateOutlet + context-obj (helps with interpolation) + ng-template.
+
+2.1
+   Inside class have an obj ready 
+   	ctx = { estimate: 10}; // NOTE: if more than 1 properties, then more let-variables can be used.
+
+	<ng-container *ngTemplateOutlet="loadingTemplate; context: ctx"></ng-container>
+	<ng-template #loadingTemplate let-var1 = "estimate">
+		<p>loading {{ var1 }} pages ... </p>
+	</ng-template>
+>> ng-container is the table on which the template is laid and the context is interpolated into the template
+>> let-variables are in local template-context meaning, access to them is not available from outside.
+>> Note: if a let-variable does not have a RHS value assigned to it, then it latches up to $implicit; if more than one let-vars dont have RHS vallue, then all such let-vars are initialized to $implicit.
+	ctx = { estimate: 10}; can be rewritten as ctx = { $implicit: 'World' };
 
 ---
 
