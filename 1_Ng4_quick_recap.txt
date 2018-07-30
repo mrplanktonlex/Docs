@@ -1,4 +1,25 @@
 ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel, (ngSubmit) = doSubmit() [for both template n reactive form], ngForm
+*ngIf = "someconditionevaluatesToTrue"
+*ngFor="let item of products"
+ngswitch = [ngSwitch] *ngSwitchCase + *ngSwitchDefault 
+eg.
+	<ul *ngFor="let person of people"
+	    [ngSwitch]="person.country"> 
+
+	  <li *ngSwitchCase="'UK'" 
+	      class="text-success">{{ person.name }} ({{ person.country }})
+	  </li>
+	  <li *ngSwitchCase="'USA'"
+	      class="text-primary">{{ person.name }} ({{ person.country }})
+	  </li>
+	  <li *ngSwitchCase="'HK'"
+	      class="text-danger">{{ person.name }} ({{ person.country }})
+	  </li>
+	  <li *ngSwitchDefault 
+	      class="text-warning">{{ person.name }} ({{ person.country }})
+	  </li>
+	</ul>`
+
 Directives (selector) + Components (selector, template, styles, providers)
 @Input, @Output
 	eg.1. for Input:-
