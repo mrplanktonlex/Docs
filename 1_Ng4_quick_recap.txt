@@ -88,7 +88,8 @@ Variations:-
 	<ul *ngFor="let item of products; let i = index"></ul>
 	<ul *ngFor="let item of products; index as i"></ul>
 	<ul *ngFor="let item of products; let i = index; let even = even; let odd=odd"></ul>
-  
+  	<tr *ngFor="let employee of employees; trackBy: trackByEmpcode">
+	NOTE:- ngFor may perform poorly with large lists; recreating the whole table on small changes; this is bcoz angular doesnt know its dealing with the same obj. When trackBy is used, angular only does incremental changes to the DOM.
 ---
 
 Q. How to create your own ngIf:- eg. myNgIf
@@ -111,6 +112,10 @@ PS: We can add @Input to make RHS accept conditions.
 
 ---
 
+<p [ngStyle] = "{backgroundColor: getColor()}"
+   [ngClass] = "{somecsscolor: somevar === 'true' }"	> </p>
+   
+---
 Directives (selector) + Components (selector, template, styles, providers)
 @Input, @Output
 	eg.1. for Input:-
