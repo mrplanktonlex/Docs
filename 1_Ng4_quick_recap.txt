@@ -49,6 +49,51 @@ ngModel: 2-way data binding = EventBinding + PropertyBinding
 Using ngModel is considered a better way, than to pass $event around. See doSomething($event) above.
 
 ---
+ngIf and ngFor: Rabbits hole. (uses ng-template)
+
+1. *ngIf="someexpressionWhichReturnsTrue" eg. *ngIf="1===1" and it will work.
+2. ngIf + else.
+	>> semi-colon, else condition requires <ng-template> + local-reference
+	<p *ngIf="someexpression; else noServerCondition"> iftext1 </p>
+		<ng-template #noServerCondition> 
+			<p> elseText </p>
+		</ng-template>
+output:-  iftext1 is shown if condition is true, else elseText is shown.
+3. ngIf + then + else
+	>> semi-colon, then-condition && else-condition requires <ng-template> + local-reference
+	<p *ngIf="someexpression; then thenTemplate else elseTemplate"> iftext1 </p>
+		<ng-template #thenTemplate>ThenText1</ng-template>
+		<ng-template #elseTemplate>ElseText1</ng-template>
+output:-
+	if condition is true, thenTemplate is shown, else elsetemplate is shown.
+	NOTE:= iftext1 will NEVER BE shown. This is a gotcha. so be careful when using ngIg-then-else
+	
+---
+*ngIf deeper, *ngFor deeper
+
+1. <p *ngIf = "someconditionevaluatesToTrue"> </p>
+Angular does this:-
+   <ng-template	[ngIf] = "someconditionevaluatesToTrue">
+   	<p> ,,,, </p>
+   </ng-template>
+   Note:- [ngIfElse]="someotherconditiion"
+2.    
+<ul *ngFor="let item of products"> //NOTE: let is mandatory
+Angular does this internally:-
+  <ng-template ngFor let-item [ngForOf] = "products" let-i = "index">
+  	<p> .... </p>
+  </ng-template>
+
+Variations:-
+	<ul *ngFor="let item of products; let i = index"></ul>
+	<ul *ngFor="let item of products; index as i"></ul>
+	<ul *ngFor="let item of products; let i = index; let even = even; let odd=odd"></ul>
+  
+---
+
+How to create your own ngIf:- eg. myNgIf
+
+---
 
 Directives (selector) + Components (selector, template, styles, providers)
 @Input, @Output
