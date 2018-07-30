@@ -1,6 +1,15 @@
 ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel, (ngSubmit) = doSubmit() [for both template n reactive form], ngForm
 Directives (selector) + Components (selector, template, styles, providers)
 @Input, @Output
+	eg.1. for Input:-
+		@Input() hero: Hero;	// =OR=
+  		@Input('master') masterName: string; // master is the alias for masterName and master will be used everywhere.
+	eg.2. for output:-
+	In some class
+		@Output() valueChange = new EventEmitter();
+		in some method:-
+			this.valueChange.emit(this.counter); // where counter is a class variable.
+			
 @HostListener, @HostBinding, L88, 89 : used to create reactive directive
 	- use them with directives
 	HostListener:	(from @angular/core)	we can capture the events of the host-element (on which this directive sits).
