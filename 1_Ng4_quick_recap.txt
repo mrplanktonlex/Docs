@@ -125,7 +125,8 @@ ng-container + ngTemplateOutlet + context-obj (helps with interpolation) + ng-te
 >> let-variables are in local template-context meaning, access to them is not available from outside.
 >> Note: if a let-variable does not have a RHS value assigned to it, then it latches up to $implicit; if more than one let-vars dont have RHS vallue, then all such let-vars are initialized to $implicit.
 	ctx = { estimate: 10}; can be rewritten as ctx = { $implicit: 'World' };
-
+>> *ngTemplateOutlet is of type TemplateRef<any>
+   *ngTemplateOutletContext is of type Object. (We may see this later in ultimate angular)
 ---
 
 <p [ngStyle] = "{backgroundColor: getColor()}"
@@ -142,7 +143,26 @@ Directives (selector) + Components (selector, template, styles, providers)
 		@Output() valueChange = new EventEmitter();
 		in some method:-
 			this.valueChange.emit(this.counter); // where counter is a class variable.
-			
+
+----
+Types of component communication:-
+1. Parent-to-child using @Input
+2. Child-to-parent using @Output + EventEmitter
+3. Child-to-parent using @Viewchild + ngAfterViewInit()
+	@ViewChild(ChildComponent) child; 
+	message:string;
+
+	ngAfterViewInit() {
+	   this.message = this.child.message
+	}
+4. Unrelated Components: Sharing Data with a Service
+	To keep them in sync: use a global service-providers
+	To keep one of them out of sync: use a local service-providers in that comp., which needs to be out of sync
+	
+	https://angularfirebase.com/lessons/sharing-data-between-angular-components-four-methods/	
+	
+----
+
 @HostListener, @HostBinding, L88, 89 : used to create reactive directive
 	- use them with directives
 	HostListener:	(from @angular/core)	we can capture the events of the host-element (on which this directive sits).
