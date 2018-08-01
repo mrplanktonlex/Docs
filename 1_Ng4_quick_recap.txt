@@ -413,6 +413,38 @@ Pure, PipeTransform, impurepipe, async pipe
 		
 		
 			// NOW WE CAN USE transform():- this.filesizePipe.transform( somevar, 'mb');
+
+few examples:-
+{{ text | shorten:5 }}
+{{ text | shorten:15:2ndparam }} // param1 and param2 will be argument2 and argument3 in the transform() method.
+*ngFor = "let server of servers | filter: filteredStatus: 'status'	
+	(filteredString is ngModel and is a class var too)
+	('status' is a column)
+
+Creating a filter pipe:- (Pure vs Impure Pipe)
+eg. u have a table of contents and u want to search some content in it:-
+ ng g p filter
+ 	... 
+	transform ( value: any, filteredString: string): any {
+		if (value.length === 0 || filterString === '') {
+			return value;
+		}
+ 	}
+
+>> angular is NOT re-running the pipe when the data changes. (thanksfully).
+	When ur data (in arrays / objects changes), then angular will not rerun the pipe.
+>> if u add a space to the filteredString, then it will start showing the new changes.
+This is because, changing the input of the pipe (param1 i.e. filteredString) will trigger angular to rerun the pipe.
+
+The reason such a filtering condition exists is because, there is a high performance cost. (pure: true by default)
+If u still wanted the pipe to re-run when the data changes, we have to create an impure pipe:-	
+		pure: false;
+	if u make the pipe impure, then it will respond to data changes.
+
+---
+
+---
+
 Module:
 	- @NgModule (declarations, imports, providers, bootstrap) Note :- import is a TS-keyword, where imports:[] is an angular feature.
 				(exports, etc.) 
