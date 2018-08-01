@@ -442,6 +442,13 @@ If u still wanted the pipe to re-run when the data changes, we have to create an
 	if u make the pipe impure, then it will respond to data changes.
 
 ---
+Asyncpipe
+| async 
+	> if an observable, it auto subscribes and unsubscribes
+	> if a promise, then it watches the promise object and if the promise returns a string, it will display that string.
+		someclassVar = new Promise ( (resolve, reject) => {
+			...
+		});
 
 ---
 
