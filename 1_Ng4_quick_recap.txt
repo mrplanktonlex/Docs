@@ -799,7 +799,7 @@ You are not creating the form in template, u r creating it in the class; but u r
   Steps in short:-
   >> FormGroup(), FormControl() in TS
   >> [formGroup] = classvarForSignupForm, formControlName="username" where username was a key defined in FormGroup()
-
+  >> formGroupName="userData" + userData.username in ngif custom errors ( both r in HTML)
 	- ReactiveFormsModule
 	- Class Variable
 		import { FormGroup } from '@angular/forms';
@@ -838,12 +838,42 @@ You are not creating the form in template, u r creating it in the class; but u r
 			'gender': new FormControl('male'),
 		});
 		
-	- Getting access to controls:-
-<span *ngIf="signupForm.get('username').valid && signupForm.get('username').touched">  
-              // Note:- .get(name) or path-to-the-name, if its nested.
-			...
+	- Getting access to controls:- (for custom-errors)
+		<span *ngIf="signupForm.get('username').valid && signupForm.get('username').touched">  
+	        	// Note:- .get(name) or path-to-the-name, if its nested.
+		  Please enter a valid username.
 		</span>
-	- 		
+		>>> unlike template driven, we dont have to write like:- #email="ngModel", etc.
+		+ 
+		input.ng-invalid.ng-touched { border: 1px solid red  } (same as in )
+	
+	- .get() also takes "path to an element": Nested FormGroups. (Grouping controls, unlike ngModelGroup in TD)
+		// add a new nested FormGroup.
+		this.signupForm = new FormGroup({
+			'userData' = new FormGroup ({  // added a nested FormGroup
+				'username' : new FormControl (null, Validators.required), 
+				'email': new FormControl (null, [Validators.required, Validators.email]),
+				});
+			'gender': new FormControl('male'),	
+		});
+		
+		+ // add a wrapper div with formGroupName, formGroupName="userData"
+		
+		<form [formGroup] = "signupForm" (ngSubmit) = "doSubmit()" >
+			<div formGroupName="userData">
+				<div > ... previous form elements username + email are here </div>
+			</div>
+		</form>
+
+		+ // structure ur paths using dots (and NOT slashes!!!) eg. userData.username
+		
+		<span *ngIf="signupForm.get('userData.username').valid && signupForm.get('username').touched">  
+	        	// Note:- .get(name) or path-to-the-name, if its nested.
+		  Please enter a valid username.
+		</span>
+		
+---
+
 Life-cycle hooks:- https://codecraft.tv/courses/angular/components/lifecycle-hooks/ 
 	- (hooks are executed in this order)
 		- constructor, 
