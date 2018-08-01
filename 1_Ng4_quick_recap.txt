@@ -932,6 +932,12 @@ VIMP note:- if an index is used, then PROPERTY binding will be REQUIRED. (like i
 		
 		// this will give error
 		'username' : new FormControl (null, [ Validators.required, this.forbiddenUserNames.bind(this)]), 
+
+	- Using Error Codes :- (custom-error for our custom-validator)
+		<span *ngIf = "signupForm.get('userData.username').errors['nameIsForbidden']" > ... </span>
+		
+
+
 ---
 
 Life-cycle hooks:- https://codecraft.tv/courses/angular/components/lifecycle-hooks/ 
