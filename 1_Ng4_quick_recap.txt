@@ -19,6 +19,16 @@ Passing Data with EventBinding:-
 		}
 ---
 ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel, (ngSubmit) = doSubmit() [for both template n reactive form], ngForm
+
+<input ... ngModel name="email">
+<input ... ngModel name="email" #email="ngModel"> (for displaying custom errors)
+
+<div ... ngModelGroup="customKeyInNgFormObject"> </div>
+<div ... ngModelGroup="customKeyInNgFormObject" #customKeyInNgFormObject="ngModelGroup"> ... </div> (for displaying custom errors)
+
+Note:- (for displaying custom errors), u can use like email.invalid && email.touched, etc.
+---
+
 *ngIf = "someconditionevaluatesToTrue"
 *ngFor="let item of products"
 ngswitch = [ngSwitch] *ngSwitchCase + *ngSwitchDefault 
@@ -721,6 +731,18 @@ Template-Driven forms:-
 	    <select ... [ngModel] = "defaultQuestion" name="secret"> </select>
 	    where defaultQuestion is a class var i.e. defaultQuestion = 'pet';
   
+  > Custom-Grouping Values in our form-structure:-
+  	Use ngModelGroup on ur parent-element and give it a name.
+	eg. 
+	<div id= ... ngModelGroup="userData"> 
+		where userData will be shown as a key in the #f obj. i.e. in NgForm::value::userData
+		-OR-
+	<div id= ... ngModelGroup="userData" #userData="ngModelGroup"> (to access the userData as a JS object)
+		and add custom-error msgs.
+	
+  > Handling radio buttons 
+  	
+  > Handling checkbox 
 ---
 
   <!-- Email error block -->
