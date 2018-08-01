@@ -905,13 +905,33 @@ VIMP note:- if an index is used, then PROPERTY binding will be REQUIRED. (like i
 		</div>
 		
 	- Creating custom validators:- (say custom validator for forbidden usernames)
+		- Custom-Validators should return a value; should be a JS obj.
+		- [s: string]: boolean
 		class variable:-
 			forbiddenUsernames = ['Chris', 'Anna'];
 			
-		forbiddenNames (control: FormControl) {
+		forbiddenNames (control: FormControl): {[s: string]: boolean } {
+			if(this.forbiddenUsername.indexOf(control.value) !== -1) { 
+				//NOTE:= -1 if it is not found, but it is interpreted as true in JS, so we will have to use !== -1
+				return {'nameIsForbidden': true};
+			}
+		   return null; // VIMP !!! NOTE: U SHOULD NOT PASS return {'nameIsForbidden': false} or OMIT this return statement
 		}
-	
+		where 
+			"[s: string]: boolean" is TS, which implies a key-value pair, with the key being a string. VIMP!!!
 		
+		+ 
+		// NOTE:- this.forbiddenUserNames and NOT this.forbiddenUserNames()
+		this.signupForm = new FormGroup({
+			'userData' = new FormGroup ({  
+				'username' : new FormControl (null, [ Validators.required, this.forbiddenUserNames]), 
+				'email': new FormControl (null, [Validators.required, Validators.email]),
+				});
+			'gender': new FormControl('male'),	
+		});
+		
+		// this will give error
+		'username' : new FormControl (null, [ Validators.required, this.forbiddenUserNames.bind(this)]), 
 ---
 
 Life-cycle hooks:- https://codecraft.tv/courses/angular/components/lifecycle-hooks/ 
