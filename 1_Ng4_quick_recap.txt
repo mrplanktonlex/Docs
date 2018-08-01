@@ -795,16 +795,25 @@ Just some code for extra knowlege :-
 ---
 
 Reactive-driven:- L193:  @angular/forms
+  >> FormGroup(), FormControl() in TS
+  >> [formGroup] = classvarForSignupForm, formControlName="username" where username was a key defined in FormGroup()
+
 	- ReactiveFormsModule
 	- Class Variable
-	signupForm: FormGroup where 
 		import { FormGroup } from '@angular/forms';
+		...
+		signupForm: FormGroup
 	- form
 		this.signupForm = new FormGroup({
 			'username' : new FormControl (null),
 			'email': new FormControl (null),
 			'gender': new FormControl('male'),
 		});
+		
+		// method signature for FormControl().
+			new FormControl (null),
+			new FormControl (null, SingleValidator -OR- ArrayOfValidators),
+			new FormControl (null, SingleValidator -OR- ArrayOfValidators, Asynchronous Validators),
 		
 		- sync HTML template with FormGroup, using formControlName
 			<form [formGroup]="signupForm">
