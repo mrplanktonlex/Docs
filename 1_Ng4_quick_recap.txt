@@ -18,8 +18,30 @@ Passing Data with EventBinding:-
 			c.log( ev.target.value ); // where target shows the html-element on which the event occured.
 		}
 ---
+
 FormsModule + ReactiveFormsModule
 import { FormModule } from '@angular/forms'; // shouls be inthe imports[] too of app.module.ts
+
+Template-Driven Forms:-
+- Angular infers the form object from the DOM, based on foll. conditions:-
+- FormsModule 
+
+Reactive Forms:-
+- Form is created programmatically and synchronized with the DOM.
+- Gives finer control.
+- ReactiveFormsModule
+
+Template-Driven forms:-
+  > Add ngModel (yes, just 'ngModel') as an attribute on the control.
+  > Give it a name. name = "username"
+  > eg. 
+  	<form #f = "ngForm" (ngSubmit) = "doSubmit(f)">	<!-- Dont forget the "" -->
+  		<input ... ngModel name="username">
+		<button ... type="submit"> <!-- imp: bcoz it triggers the default submission behavior -->
+	</form>
+	where f : HTMLFormElement in typescript
+
+
 ---
 
 ngIf, ngFor, ngStyle, ngClass, ngSwitch, ngModel, (ngSubmit) = doSubmit() [for both template n reactive form], ngForm
