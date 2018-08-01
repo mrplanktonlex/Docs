@@ -748,7 +748,7 @@ Template-Driven forms:-
 	  </label> {{ gender }}
 	</div>
 	
-  > setting and patching form values:
+  > setValue() and patchValue() helpers (setting and patching form values):
   	Q. what if u wanted to initialize the whole form with initial set of value?
 	A.1. this.signupForm.setValue({})
 		setValue() takes and object which should represent the exact form-structure.
@@ -759,7 +759,13 @@ Template-Driven forms:-
 	A.2. this.signupForm.form.patchValue({ })	
 		To solve the problem in A.1., use this.signupForm.form.patchValue({ })
 			its input object DOES NOT require all form-controls, but only the names of the ones u want to overwrite.
-			
+	
+	IMP GOTCHA: this.signupForm.form.setValue({ }) is also available.
+	IMP Q. So, whats the difference between this.signupForm.form.setValue({ }) and this.signupForm.setValue({})
+	    A. Dunno Yet.
+
+  > Using Form Data:-
+	    
   > Handling checkbox 
   
 ---
