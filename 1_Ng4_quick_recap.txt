@@ -749,7 +749,17 @@ Template-Driven forms:-
 	</div>
 	
   > setting and patching form values:
-  	
+  	Q. what if u wanted to initialize the whole form with initial set of value?
+	A.1. this.signupForm.setValue({})
+		setValue() takes and object which should represent the exact form-structure.
+		use it <button type="button" ...>
+		
+		Problem:- this may overwrite all the already entered value, since its input object requires ALL values
+		
+	A.2. this.signupForm.form.patchValue({ })	
+		To solve the problem in A.1., use this.signupForm.form.patchValue({ })
+			its input object DOES NOT require all form-controls, but only the names of the ones u want to overwrite.
+			
   > Handling checkbox 
   
 ---
