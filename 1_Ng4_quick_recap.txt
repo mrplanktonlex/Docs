@@ -794,7 +794,9 @@ Just some code for extra knowlege :-
     
 ---
 
-Reactive-driven:- L193:  @angular/forms
+Reactive-driven:- L193:  @angular/forms : 
+You are not creating the form in template, u r creating it in the class; but u r syncing with the template.
+  Steps in short:-
   >> FormGroup(), FormControl() in TS
   >> [formGroup] = classvarForSignupForm, formControlName="username" where username was a key defined in FormGroup()
 
@@ -821,22 +823,24 @@ Reactive-driven:- L193:  @angular/forms
 				<input ... id="email" formControlName ="email" ... >
 				<input ... id="gender" formControlName ="gender" ... >
 				
-		- submit the form using ngSubmit
+		- submit the form using ngSubmit (no 
 				<form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
 					<input ... id="username" formControlName ="username" ... >
 					<input ... id="email" formControlName ="email" ... >
 					<input ... id="gender" formControlName ="gender" ... >		
 					
-				onSubmit(){ ... }	
+				onSubmit(){ ... }  // this.signupForm, this.signupForm.controls, this.signupForm.value (user-typed)
 	- Validators
 		this.signupForm = new FormGroup({
-			'username' : new FormControl (null, Validators.required), // DO NOT execute it like Validators.required(); angular will do that.
+			'username' : new FormControl (null, Validators.required), 
+	// VIMP:-DO NOT execute it like Validators.required(); angular will execute it; it just needs to know the reference.
 			'email': new FormControl (null, [Validators.required, Validators.email]),
 			'gender': new FormControl('male'),
 		});
 		
 	- Getting access to controls:-
-		<span *ngIf="signupForm.get('username').valid && signupForm.get('username').touched">  // Note:- .get(name) or path-to-the-name, if its nested.
+<span *ngIf="signupForm.get('username').valid && signupForm.get('username').touched">  
+              // Note:- .get(name) or path-to-the-name, if its nested.
 			...
 		</span>
 	- 		
