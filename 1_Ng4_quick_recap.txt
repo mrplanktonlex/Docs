@@ -740,9 +740,18 @@ Template-Driven forms:-
 	<div id= ... ngModelGroup="userData" #userData="ngModelGroup"> (to access the userData as a JS object)
 		and add custom-error msgs.
 	
-  > Handling radio buttons 
+  > Handling radio buttons : they are not a special case. 
+  	<div *ngFor="let gender of genders">
+	  <label>
+	  	<input type="radio" 
+			     ngModel name="gender" [value] = "gender">
+	  </label> {{ gender }}
+	</div>
+	
+  > setting and patching form values:
   	
   > Handling checkbox 
+  
 ---
 
   <!-- Email error block -->
