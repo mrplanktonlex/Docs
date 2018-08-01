@@ -800,6 +800,10 @@ You are not creating the form in template, u r creating it in the class; but u r
   >> FormGroup(), FormControl() in TS
   >> [formGroup] = classvarForSignupForm, formControlName="username" where username was a key defined in FormGroup()
   >> formGroupName="userData" + userData.username in ngif custom errors ( both r in HTML)
+  >> formControlName := assigned to a property in signupForm: FormGroup. used for singular elements. used to sync with HTML.
+     formArrayName := assigned to a property in signupForm: FormGroup. used for grouping singular elements 
+     formGroupName := assigned to a property in signupForm: FormGroup. used for nested FormGroup-s
+          
 	- ReactiveFormsModule
 	- Class Variable
 		import { FormGroup } from '@angular/forms';
@@ -817,7 +821,9 @@ You are not creating the form in template, u r creating it in the class; but u r
 			new FormControl (null, SingleValidator -OR- ArrayOfValidators),
 			new FormControl (null, SingleValidator -OR- ArrayOfValidators, Asynchronous Validators),
 		
-		- sync HTML template with FormGroup, using formControlName
+		- sync HTML template with FormGroup, using formControlName.
+VIMP: note : formControlName is a string here and hence NO property binding is reqd. but if you want to do property binding, then formControlName ="username" is same as writing [formControlName] ="'username'"
+VIMP note:- if an index is used, then PROPERTY binding will be REQUIRED. (like in formArrayName)
 			<form [formGroup]="signupForm">
 				<input ... id="username" formControlName ="username" ... >
 				<input ... id="email" formControlName ="email" ... >
@@ -871,6 +877,40 @@ You are not creating the form in template, u r creating it in the class; but u r
 	        	// Note:- .get(name) or path-to-the-name, if its nested.
 		  Please enter a valid username.
 		</span>
+		
+	- FormArray (Array of Form Controls)
+		-- previously we saw Array of Validators, 
+		
+		'hobbies': new FormArray([]); -OR-
+		'hobbies': new FormArray([ new FormControl() ... ]);
+		
+		<div formArrayName='hobbies'>
+			<button type="button" (click) = "OnAddHobby()"
+		</div>
+		
+		onAddHobby() {
+		  const control = new FormControl(null, Validators.required);	
+		  (<FormArray>this.signupForm.get('hobbies')) // typecasting + we r telling angular everything in here is a FormArray
+		  			     .push(control);  // control wont be visible in view without formArrayName directive.
+		}	
+		
+	       -- extend the html more:- formControlName is required to sync it with HTML.
+	VIMP note:- if an index is used, then PROPERTY binding will be REQUIRED. (like in formArrayName)
+	       	<div formArrayName='hobbies'>
+			<button type="button" (click) = "OnAddHobby()"
+		</div>
+		<div class="form-group" <!-- form-group, form-control these are bootstrap classes -->
+			*ngFor = "let hobbyControl of signupForm.get('hobbies').controls; let i = index">
+			<input type = "text" class="form-control" [formControlName]="i">
+		</div>
+		
+	- Creating custom validators:- (say custom validator for forbidden usernames)
+		class variable:-
+			forbiddenUsernames = ['Chris', 'Anna'];
+			
+		forbiddenNames (control: FormControl) {
+		}
+	
 		
 ---
 
