@@ -819,7 +819,7 @@ You are not creating the form in template, u r creating it in the class; but u r
 		// method signature for FormControl().
 			new FormControl (null),
 			new FormControl (null, SingleValidator -OR- ArrayOfValidators),
-			new FormControl (null, SingleValidator -OR- ArrayOfValidators, Asynchronous Validators),
+			new FormControl (null, SingleValidator -OR- ArrayOfValidators, Single -OR- Array of Asynchronous Validators),
 		
 		- sync HTML template with FormGroup, using formControlName.
 VIMP: note : formControlName is a string here and hence NO property binding is reqd. but if you want to do property binding, then formControlName ="username" is same as writing [formControlName] ="'username'"
@@ -933,11 +933,36 @@ VIMP note:- if an index is used, then PROPERTY binding will be REQUIRED. (like i
 		// this will give error
 		'username' : new FormControl (null, [ Validators.required, this.forbiddenUserNames.bind(this)]), 
 
-	- Using Error Codes :- (custom-error for our custom-validator)
+	- Using Error Codes :- (custom-errors for our custom-validator)
 		<span *ngIf = "signupForm.get('userData.username').errors['nameIsForbidden']" > ... </span>
 		
 
-
+        - create async validator (querying a web-server for validations)
+		forbiddenEmails(control: FormControl): Promise<any> | Observable<any> // note the return type has changed
+		
+		forbiddenEmails(control: FormControl): Promise<any> | Observable<any> {
+			const promise = new Promise<any>((resolve, reject) => {
+				setTimeout(() => {
+					if (control.value === 'some@someemail.com') {
+						// Validation failed. Since its a promise, we dont return(), we resolve()
+						resolve({'emailIsForbidden': true});
+					} else {
+						resolve(null);
+					}
+				}, 1500);
+			});
+			return promise; // NOTE THIS
+		} // forbiddenEmails ends
+		
+		+
+		// Note: DONOT execute i.e. this.forbiddenEmails(), use this.forbiddenEmails.
+		
+		'email': new FormControl (null, [Validators.required, Validators.email], this.forbiddenEmails ),
+		
+		// if u observe the DOM now, u will see ng-invalid -> ng-pending -> ng-valid or vice-versa. 
+			// ng-pending is the directive angular inserts while it is still evaluating.
+		
+		
 ---
 
 Life-cycle hooks:- https://codecraft.tv/courses/angular/components/lifecycle-hooks/ 
