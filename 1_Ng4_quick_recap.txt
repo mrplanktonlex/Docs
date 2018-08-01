@@ -962,7 +962,25 @@ VIMP note:- if an index is used, then PROPERTY binding will be REQUIRED. (like i
 		// if u observe the DOM now, u will see ng-invalid -> ng-pending -> ng-valid or vice-versa. 
 			// ng-pending is the directive angular inserts while it is still evaluating.
 		
-		
+        - reacting to valueChanges(), statusChanges(), setValue({}), patchValue({}) 
+	There is a form state, which u can track in general 
+	on the signupform i.e. this.signupform -OR- on any control i.e. this.signupform.get('username'), u have 2 observables which u can listen to 
+		*.valueChanges() -OR- *.statusChanges()
+	1.
+// this.signupform.valueChanges() can be used whenever we change something on the form. It return an object notation of the form.		this.signupform.valueChanges().subscribe( 
+			(value) => { console.log(value); }
+		);	
+	2.
+// STATUS means INVALID, PENDING, VALID, etc.
+		this.signupform.statusChanges().subscribe( 
+			(status) => { console.log(status); }
+		);	
+	3. this.signupform.setValue({ complete obj })       // same as TD
+	4. this.signupform.patchValue({ specific keys in an obj }) // same as TD
+	5. this.signupform.reset() -OR- this.signupform.reset({})
+		eg. of this.signupform.reset({}) can be to reset radio buttons
+
+	  
 ---
 
 Life-cycle hooks:- https://codecraft.tv/courses/angular/components/lifecycle-hooks/ 
