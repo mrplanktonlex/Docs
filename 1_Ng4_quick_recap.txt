@@ -704,7 +704,23 @@ Template-Driven forms:-
   	required
 	minlength = 8
 	email
-
+	[disabled]="!f.valid" + CSS rules like:- input.ng-invalid.ng-touched select.ng-invalid.ng-touched { border: 1px solid red }
+  
+  > Adding custom-error msgs.
+    <input ... ngModel name="email" #email="ngModel"> <!-- Note: how ngModel is mentioned twice -->
+    <span class="help-block" *ngIf="!email.valid && email.touched"> Email format is incorrect </span-block>
+    	<!-- help-block is a bootstrap class -->
+	
+  > Defining default values:-
+    Before:-
+	    <select ... ngModel name="secret"> 
+		<option value = 'pet'>What is ur fav.pet</option>
+		<option value = 'teacher'>What is ur fav.teacher</option>
+	    </select>
+    After:-
+	    <select ... [ngModel] = "defaultQuestion" name="secret"> </select>
+	    where defaultQuestion is a class var i.e. defaultQuestion = 'pet';
+    	
 ---
 
 Reactive-driven:- L193:  @angular/forms
