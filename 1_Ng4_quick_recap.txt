@@ -720,7 +720,23 @@ Template-Driven forms:-
     After:-
 	    <select ... [ngModel] = "defaultQuestion" name="secret"> </select>
 	    where defaultQuestion is a class var i.e. defaultQuestion = 'pet';
-    	
+  
+---
+
+  <!-- Email error block -->
+    <div *ngIf="email.invalid && email.touched"
+        class="col-sm-3 text-danger">
+ 
+        <div *ngIf = "email.errors?.required">
+            Email field can't be blank
+        </div>
+ 
+        <div *ngIf = "email.errors?.pattern">
+            The email id doesn't seem right
+        </div>
+ 
+     </div>
+    
 ---
 
 Reactive-driven:- L193:  @angular/forms
