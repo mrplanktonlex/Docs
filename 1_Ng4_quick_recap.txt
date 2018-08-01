@@ -749,6 +749,8 @@ Template-Driven forms:-
 	</div>
 	
   > setValue() and patchValue() helpers (setting and patching form values):
+  	NOTE:- the @ViewChild('f')signupForm: NgForm  is still in use:-
+	
   	Q. what if u wanted to initialize the whole form with initial set of value?
 	A.1. this.signupForm.setValue({})
 		setValue() takes and object which should represent the exact form-structure.
@@ -765,11 +767,18 @@ Template-Driven forms:-
 	    A. Dunno Yet.
 
   > Using Form Data:-
-	    
-  > Handling checkbox 
-  
+	this.signupForm.get('username')
+	this.signupForm.value.username
+	
+  > resetting the form:-
+  	this.signupForm.reset() for reset all form values -OR- this.signupForm.reset({}) for specific form values.
+	
+	Q. Whats the difference between this.signupForm.reset() and this.signupForm.setValue() ?
+	A. this.signupForm.reset() will also reset the angular classes on the shadow-DOM like valid, touched, etc.
+	
 ---
-
+Xtra1:=
+Just some code for extra knowlege :- 
   <!-- Email error block -->
     <div *ngIf="email.invalid && email.touched"
         class="col-sm-3 text-danger">
@@ -781,12 +790,15 @@ Template-Driven forms:-
         <div *ngIf = "email.errors?.pattern">
             The email id doesn't seem right
         </div>
- 
-     </div>
+    </div>
     
 ---
 
 Reactive-driven:- L193:  @angular/forms
+	- ReactiveFormsModule
+	- Class Variable
+	signupForm: FormGroup where 
+		import { FormGroup } from '@angular/forms';
 	- form
 		this.signupForm = new FormGroup({
 			'username' : new FormControl (null),
