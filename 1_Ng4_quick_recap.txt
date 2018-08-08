@@ -58,7 +58,7 @@ Angular provides foll. DOM Queries to access the above abstractions:-
     - 2nd param is optional, as angular can infer the type; but there are exceptions, where the 2nd param needs to be mentioned explicitly.
     - ElementRef: html elements like span, angular infers & returns ElementRef
     	ElementRef -> NativeElement eg. console.log(this.tref.nativeElement.textContent);
-	> Such usage is discouraged as it causes tight coupling.
+	> NOTE:- Such usage is discouraged as it causes tight coupling. See ex.1.1 below
     - TemplateRef: if its a template, angular infers & returns TemplateRef
     	<ng-template #someTmplref> .. </ng-template> 
 	+ 
@@ -98,6 +98,108 @@ Angular provides foll. DOM Queries to access the above abstractions:-
 		ngAfterViewInit(): void {
      			console.log(this.vc.element.nativeElement.textContent);
     		}
+		
+		----
+		
+		  @ViewChild("vc", {read: ViewContainerRef}) vc: ViewContainerRef;
+    		  @ViewChild("tpl") tpl: TemplateRef<any>;
+
+		    ngAfterViewInit() {
+			let view = this.tpl.createEmbeddedView(null);
+			this.vc.insert(view);
+		    }
+
+==============================
+Ex. 1.1. ElementRef + ViewChild
+	<app-views></app-views>
+	+ 
+	<span #spanEleRef>I am content inside a span ElementRef</span>
+	+ 
+	@ViewChild('spanEleRef')spanElementRef; // Note: outside the () is the name u give, in this case spanElementRef.
+	-OR-
+	// @ViewChild('spanEleRef')spanElementRef: ElementRef; // same as above
+	+ 
+	ngOnInit() {
+   	 console.log ('1. ', this.spanElementRef); // will give the JS obj
+	 		  // this.spanElementRef.nativeElement // will give <span> ... </spa>
+			  // this.spanElementRef.nativeElement.textContent // will give the content within the <span> element.
+  	}
+	
+Ex. 1.2. TemplateRef + ViewChild
+	<app-views></app-views> 
+	+ 
+	<ng-template #ngTmplRef>
+  		<p>I am a para in an ng-template </p>
+	</ng-template>
+	+
+	@ViewChild('ngTmplRef') ngCustomTmplRef: TemplateRef<any>;
+	+ 
+	// this.ngCustomTmplRef['_def'].element.template.lastRenderRootNode.text.prefix // only text1
+    	// this.ngCustomTmplRef['_def'].element.template.nodes[1].text.prefix // text1commented + text2withpara
+    	// this.ngCustomTmplRef['_def'].element.template.nodes[2].text.prefix // if both text1withoutpara + text2withpara
+	
+NOTE: As you can see, this is very cumbersome and not guaranteed. 
+      As a matter of principle, use TemplateRefs ONLY with ViewContainerRef. 
+      	ViewContainer ---> can have many views --> Each view has a template.
+	ViewContainer exposes ViewContainRef for us to attach one or more views to it using 
+			      ViewContainerRef::createEmbeddedView(), ViewContainerRef::createComponent(), ViewContainerRef::clear().
+			      
+	So, in 1.2, add these 
+	<ng-container #vc></ng-container>
+	+
+	@ViewChild("vc", {read: ViewContainerRef}) customVC: ViewContainerRef;	// Viewchild should have read-options obj for a ViewContainerRef
+	+ 
+	ngOnInit() {
+	   // 1.
+	   let view = this.ngCustomTmplRef.createEmbeddedView(null); // A view has a template
+           this.customVC.insert(view); // A container can have one or more views.
+	   // 2. -OR- 
+	   this.customVC.createEmbeddedView(this.ngCustomTmplRef); // preferred way.
+	   // 3. - OR-
+	   this.customVS.createComponent(); // incomplete. See 3.1
+	   	- uses ComponentFactoryResolver, 
+  	}
+	
+	// 3.1
+	In another comp, constructor() {}
+	   private compFactoryResolver: ComponentFactoryResolver,
+	   
+	   ngOnInit() {
+	   	// 2. The resolveComponentFactory() method takes a component and returns a ComponentFactory.
+	   	// const compfactory: ComponentFactory<any> = this.compFactoryResolver.resolveComponentFactory(ButtonComponent);
+		// this.compRef = this.customVC.createComponent(compfactory);  // where compRef: ComponentRef<any>; 
+    		// console.log(this.compRef.instance); // works, because of singlecomp (ButtonComp)
+	   }
+	 
+	 // 3.2 -- extending 3.1 to have multiple components
+	 create another wrapper component
+	 export class SomeComp {
+    		constructor(){
+        		return [ 
+            			new ButtonComponent('button1'), new ButtonComponent('button2'), new ButtonComponent('button3')
+        		]
+    		} // constructor ends
+	  }
+	 In prev. comp. 
+	 compRef: ComponentRef<any>;
+		+
+	 ngOnInit() {
+		 const compfactory: ComponentFactory<any> = this.compFactoryResolver.resolveComponentFactory(SomeComp);   
+    		 this.compRef = this.customVC.createComponent(compfactory);
+		 this.compRef.instance.forEach(element => {	// now we have all 3 components.
+      			console.log(element);
+      		 });
+	 }
+	 
+	 // 3.3 To view multiple components on html (this is not the optimal solution)
+	 this.compRefInstance = <HTMLButtonElement>this.compRef.instance;
+	 +
+	 <div *ngFor="let button of compRefInstance">
+    		<!-- {{ button | json }} -->
+    	    <button type="button">{{button.label}}</button> 
+	 </div>
+		
+	
 ==============================
 
 String Interpolation:-
