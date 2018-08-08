@@ -1,3 +1,33 @@
+Building elements with @angular/elements
+	https://medium.com/@tomsu/building-web-components-with-angular-elements-746cd2a38d5b 
+
+ng add @angular/elements	(adds to package.json) . interesting, we dont have to use "npm install --save"
+ng g component button --inline-style --inline-template -v Native
+ng g c button --inline-style --inline-template -v Native
+	-v Native means:- 
+	   We use ViewEncapsulation.Native so that the styles are bundled with the template and the component’s class into one file.
+	   
+Note:- The compiler takes the @NgModule.bootstrap:[] and const appRoutes: Routes and populates the @NgModule.entryComponents:[] automatically, so by default entryComponents: [] is not required explicitly, but when using @angular/elements, we will require to use it. So, by default, whatever is declared in bootstrap:[] will be added to entryComponents:[]
+
+app.module.ts 
+	import { NgModule, Injector } from '@angular/core';
+	import { createCustomElement } from '@angular/elements';
+
+	bootstrap: [AppComponent],
+  	entryComponents: [ButtonComponent]
+
+	export class AppModule { 
+	   constructor( private injector: Injector){   // Injector is an abstract Class
+    		// const customButton = createCustomElement( ButtonComponent, { injector: injector } );
+    		   const customButton = createCustomElement( ButtonComponent, { injector } ); 		// same as above.
+    			 customElements.define('custom-button', customButton);
+  	   }
+
+  	   ngDoBootstrap(){} // u can write custom code here to manually bootstrap. Note, there is NO "implements DoBootstrap"
+  		// https://blog.angularindepth.com/how-to-manually-bootstrap-an-angular-application-9a36ccf86429
+	}
+===================================
+
 String Interpolation:-
 {{ classvar }} // will be a class variable.
 {{ classmethod() }} // Works, but Dont do this as it will call it multiple times
