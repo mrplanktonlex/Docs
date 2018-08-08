@@ -86,9 +86,18 @@ Angular provides foll. DOM Queries to access the above abstractions:-
 		  - Every component is bound to a particular instance (global/local) of an injector(RootInjector is for appComp).
 		     so we’re passing the current injector instance when creating the component below:-
 		     	let componentRef = factory.create(injector);
+		  - Also, don’t forget that components that are instantiated dynamically must be added to 
+		  	EntryComponents of a module or hosting component.	
+	So, we’ve seen how both embedded and host views can be created. Once a view is created it can be inserted into the DOM using ViewContainerRef		
     - ComponentRef: 
     - ViewContainerRef: ViewContainerRef cannot be inferred and have to be asked for specifically in read parameter. 
-    
+    	- Represents a container where one or more views can be attached.
+	- any DOM element can be used as a view container; IMP!!! What’s interesting is that Angular doesn’t insert views inside the element, but appends them after the element bound to ViewContainer
+		<ng-container #vc></ng-container>
+		@ViewChild("vc", {read: ViewContainerRef}) vc: ViewContainerRef;
+		ngAfterViewInit(): void {
+     			console.log(this.vc.element.nativeElement.textContent);
+    		}
 ==============================
 
 String Interpolation:-
