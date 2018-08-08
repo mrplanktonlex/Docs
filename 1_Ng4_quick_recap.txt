@@ -11,9 +11,8 @@ Note:- The compiler takes the @NgModule.bootstrap:[] and const appRoutes: Routes
 
 - createCustomElement() from @angular/elements.
 - customElements.define() is from customElements, which is a TypeScript Object defined in lib.dom.d.ts
-
 app.module.ts 
-	import { NgModule, Injector } from '@angular/core';
+	import { NgModule, Injector } from '@angular/core';	// NOTE: Injector is an abstract class.
 	import { createCustomElement } from '@angular/elements';
 
 	bootstrap: [AppComponent],
@@ -22,13 +21,18 @@ app.module.ts
 	export class AppModule { 
 	   constructor( private injector: Injector){   // Injector is an abstract Class
     		// const customButton = createCustomElement( ButtonComponent, { injector: injector } );
-    		   const customButton = createCustomElement( ButtonComponent, { injector } ); 		// same as above.
+		// const customButton = createCustomElement( ButtonComponent, { 'injector': injector } ); // same as above.
+    		   const customButton = createCustomElement( ButtonComponent, { injector } ); 		  // same as above.
     			 customElements.define('custom-button', customButton);
   	   }
 
   	   ngDoBootstrap(){} // u can write custom code here to manually bootstrap. Note, there is NO "implements DoBootstrap"
   		// https://blog.angularindepth.com/how-to-manually-bootstrap-an-angular-application-9a36ccf86429
 	}
+
+app.component.html
+	<app-button btnLabel="ClickHere"></app-button>
+
 ===================================
 
 String Interpolation:-
