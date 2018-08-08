@@ -57,8 +57,35 @@ Angular provides foll. DOM Queries to access the above abstractions:-
   @ViewChild([reference from template], {read: [reference type]});
     - 2nd param is optional, as angular can infer the type; but there are exceptions, where the 2nd param needs to be mentioned explicitly.
     - ElementRef: html elements like span, angular infers & returns ElementRef
+    	ElementRef -> NativeElement eg. console.log(this.tref.nativeElement.textContent);
+	> Such usage is discouraged as it causes tight coupling.
     - TemplateRef: if its a template, angular infers & returns TemplateRef
+    	<ng-template #someTmplref> .. </ng-template> 
+	+ 
+	@ViewChild("tpl") tpl: TemplateRef<any>;
     - ViewRef: cannot be returned from the DOM and have to be constructed manually.
+    	> This type of abstraction represents an angular View. Views contain elements which are created and destroyed together.
+	Angular supports two types of views:
+	1. Embedded Views which are linked to a Template
+		Any View --> A template (template is blueprint of a view)
+			ngAfterViewInit() {
+ 			   let view = this.tpl.createEmbeddedView(null);
+			}
+	2. Host Views which are linked to a Component
+		Host View --> Component created dynamically.
+		> Host views are created when a component is dynamically created/instantiated
+		> A component can be created dynamically using ComponentFactoryResolver. See ultimate ng for more.
+		constructor(private injector: Injector,
+            		    private r: ComponentFactoryResolver) {
+    				let factory = this.r.resolveComponentFactory(ColorComponent);
+    				let componentRef = factory.create(injector);
+    				let view = componentRef.hostView;
+				}
+			    );
+		VIMP:-
+		  - Every component is bound to a particular instance (global/local) of an injector(RootInjector is for appComp).
+		     so we’re passing the current injector instance when creating the component below:-
+		     	let componentRef = factory.create(injector);
     - ComponentRef: 
     - ViewContainerRef: ViewContainerRef cannot be inferred and have to be asked for specifically in read parameter. 
     
