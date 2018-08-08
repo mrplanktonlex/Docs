@@ -9,6 +9,9 @@ ng g c button --inline-style --inline-template -v Native
 	   
 Note:- The compiler takes the @NgModule.bootstrap:[] and const appRoutes: Routes and populates the @NgModule.entryComponents:[] automatically, so by default entryComponents: [] is not required explicitly, but when using @angular/elements, we will require to use it. So, by default, whatever is declared in bootstrap:[] will be added to entryComponents:[]
 
+- createCustomElement() from @angular/elements.
+- customElements.define() is from customElements, which is a TypeScript Object defined in lib.dom.d.ts
+
 app.module.ts 
 	import { NgModule, Injector } from '@angular/core';
 	import { createCustomElement } from '@angular/elements';
