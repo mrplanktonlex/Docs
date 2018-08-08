@@ -45,6 +45,24 @@ import { filter, map, retry, retryWhen, catchError,
 ==============================
 
 ==============================
+@Inject, @Injectable, Injector
+@ViewTemplate, 
+ElementRef, TemplateRef, ViewRef, ComponentRef, ViewContainerRef, (Abstractions provided by angular)
+	https://blog.angularindepth.com/exploring-angular-dom-abstractions-80b3ebcfc02 
+	The new Angular version runs on different platforms — in a browser, on a mobile platform or inside a web worker. So a level of abstraction is required to stand between platform specific API and the framework interfaces. In angular these abstractions come in a form of the following reference types: ElementRef, TemplateRef, ViewRef, ComponentRef and ViewContainerRef
+	
+Angular provides foll. DOM Queries to access the above abstractions:- 
+	@ViewChild, @ViewChildren (We can use these to get the above abstractions in a component/directive).
+	
+  @ViewChild([reference from template], {read: [reference type]});
+    - 2nd param is optional, as angular can infer the type; but there are exceptions, where the 2nd param needs to be mentioned explicitly.
+    - ElementRef: html elements like span, angular infers & returns ElementRef
+    - TemplateRef: if its a template, angular infers & returns TemplateRef
+    - ViewRef: cannot be returned from the DOM and have to be constructed manually.
+    - ComponentRef: 
+    - ViewContainerRef: ViewContainerRef cannot be inferred and have to be asked for specifically in read parameter. 
+    
+==============================
 
 String Interpolation:-
 {{ classvar }} // will be a class variable.
