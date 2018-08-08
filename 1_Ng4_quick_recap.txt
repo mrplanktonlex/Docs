@@ -1,3 +1,14 @@
+Observables vs Promises:- https://angular.io/guide/comparing-observables
+> Promises start immediately on creation. Observables are declarative; computation does not start until subscription.
+> Promises provide one value; Observables provide many values (over time).
+> Promises execute only once; Observables can be executed/subscribed repeatedly.
+> Promises are not cancellable; Observables are cancellable.
+> Promises cannot differentiate between chaining, it only uses .then() clauses.
+  Observables differentiate between chaining and subscription. Obsvs, thus help to create complex centralized pre-processing, 
+  without executing the actual work (until subscription).
+> Promises push errors to child promises, observables have subscribe(), which has inbuilt error-handling for centralized error handling.  
+
+==============================
 
 String Interpolation:-
 {{ classvar }} // will be a class variable.
