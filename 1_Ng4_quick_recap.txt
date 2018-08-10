@@ -46,7 +46,7 @@ import { filter, map, retry, retryWhen, catchError,
 
 ==============================
 Constructor decorator params:-
-	@SkipSelf, @Self, @Optional, @Host, @Inject, @Attribute
+	@SkipSelf, @Self, @Optional, @Host + viewProviders:[], @Inject, @Attribute
 	1. @SkipSelf:-
 	   > use it if, Comp wants to have its own (local) instance of Service + at same time have (global) instance of the service
 	   	https://stackoverflow.com/questions/34983611/injecting-service-providers-in-angular-2-0
@@ -71,6 +71,7 @@ Constructor decorator params:-
 		@Host() @Optional() srvc:Service  // works.
 		
 	4. @Host:- Looks like it stops the injector bubbling on the host-element (directive/component) where it is declared (???)
+	See ex. 4.1
 	5. @Inject:- 	
 		
 	Examples:-
@@ -107,6 +108,61 @@ Constructor decorator params:-
 		  correct syntax:- @SkipSelf() private globalSrvcInstance: ServiceOneService, // decorator 1st + then "private"
 		  wrong syntax:- private @SkipSelf() globalSrvcInstance: ServiceOneService,
 
+	----
+	
+	4.1	
+	>> Service1Service, Service2Service (with default), 
+	>> Directive1Directive (overwites default msgs with @Host , 
+	>> (parent) comp1, (parent) comp2 - call <app-directive1></app-directive1> + viewProviders:[]
+	>> Output is in ngOninit{} of (parent) comp1, comp2 and ngOnInit of directive1.
+	
+// viewProviders is of type Providers:[], so using Providers & viewProviders in the same comp, will give u same local instance of the service	// DO NOT use providers: [] with viewProviders:[], because it just does not make sense.
+
+		Service1Service : has default "msg1" property: I am service1
+		Service2Service : has default "msg2" property: I am service2
+
+		directive: app-directive
+			> implements ngOnInit(){}
+			> overwrites default msgs, msg1 and msg2 to : I am #1 and I am#2
+				>> uses constructor @Host() serv1: Service1Service, serv2: Service2Service
+			> Every component that uses via viewProviders, will an independent copy (deep copy) of the service objects (VIMP: in ngOnInit() of comp + directive !!!). 
+			> So, comp1 and comp2, will get 2 diff. objects of services.
+
+		comp1 -> 
+			<app-directive></app-directive> + viewProviders:[ Service1Service, Service2Service]	 // viewProviders is of type Providers:[]
+				>> I am #1, I am #2
+		comp2 -> 
+			<app-directive></app-directive> + viewProviders:[ Service1Service, Service2Service]
+				>> I am #1, I am #2
+
+		NOTE:- Comp1 & Comp2:-
+				> both comp1 and comp2 do NOT create instances in their constructors.
+				> instead, they are just calling the directive using <app-directive></app-directive> + viewProviders:[] 
+
+		Q. but what if comp1 and comp2 do create instances in their constructors ??
+		A. 
+		comp1:-
+			constructor() { private srv1: Service1Service } // will give u the exact same instance as was used in the directive.
+				>> get its own local instance of Service1Service
+				>> any changes made using srv1 (in ngOnInit()), will also be reflected in the directive's serv1 (in ngOnInit)
+					change, msg1 to: Modified I am #1, 
+						>>> Modified I am #1 (in srv1 & in directive obj too is auto updated, as its pass by reference), I am #2
+
+
+		comp2:-
+			constructor() { private srv2: Service2Service } // will give u the exact same instance as was used in the directive.	   
+				>> get its own local instance of Service2Service
+				>> any changes made using srv2(in ngOnInit), will also be reflected in the directive's serv2(in ngOnInit)
+					change, msg2 to: Modified I am #2, 
+						>>> I am #1, Modified I am #2 (in srv2 & in directive obj too is auto updated, as its pass by reference)
+		NOTE: comp1.srv2 and comp2.srv2 are totally independent of each other.
+
+		Q. But what is comp1 and comp2 want to have the default values i.e. I am service1 , I am service2
+		In comp1 / comp2
+		A.1. // @SkipSelf() private srv2: Service2Service // IMP: gives u the default instance of the service.
+		A.2. // srv2 = new Service2Service(); // IMP: gives u the default instance of the service. Providers:[] is not required. 
+		If you get errors of StaticInjectorError, then add viewProviders:[] to app.component.ts 
+		
 ======================
 Injector bubbling (https://angular.io/guide/hierarchical-dependency-injection)
 tree-shakable providers, InjectionToken (https://angular.io/guide/dependency-injection)
