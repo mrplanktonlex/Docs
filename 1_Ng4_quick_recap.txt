@@ -166,7 +166,10 @@ Constructor decorator params:-
 ======================
 Injector bubbling (https://angular.io/guide/hierarchical-dependency-injection)
 tree-shakable providers, InjectionToken (https://angular.io/guide/dependency-injection)
-providers -vs- viewProviders ( https://codecraft.tv/courses/angular/dependency-injection-and-providers/ngmodule-providers-vs-component-providers-vs-component-viewproviders/ )
+
+** providers -vs- viewProviders **
+( https://codecraft.tv/courses/angular/dependency-injection-and-providers/ngmodule-providers-vs-component-providers-vs-component-viewproviders/ )
+	>> viewProviders are used in parent comps, which call directives (using services). they r used in parent comps, to prevent reloading services everywhere. The ngOninit() of the parent comps (using service) & ngOninit of the directive (using service) both have same instance of the service (when using viewProviders).
 
 @Injectable, Injector
 @ViewTemplate, 
