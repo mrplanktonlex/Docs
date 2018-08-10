@@ -45,7 +45,72 @@ import { filter, map, retry, retryWhen, catchError,
 ==============================
 
 ==============================
-@Inject, @Injectable, Injector
+Constructor decorator params:-
+	@SkipSelf, @Self, @Optional, @Inject, @Host, @Attribute
+	1. @SkipSelf:-
+	   > use it if, Comp wants to have its own (local) instance of Service + at same time have (global) instance of the service
+	   	https://stackoverflow.com/questions/34983611/injecting-service-providers-in-angular-2-0
+	2. @Self:- (default behavior ONLY!!! Else error)
+		background: 
+		  Angular checks if currentcomp defines a DInjector (for a service) in its @Component decorator.
+		  If not found, it will try to find a parent injector in a parent component.
+	  	(Q. How to create a parent component?? Unlike angular1, we use @Input() and @Output() to communicate with child)
+		  If not found, it will go up the chain and try to find a parent injector (i.e.DI in constructor()) n so on
+		  If not found, it will check the root injector (in @NgModule of SM/FM/CoreM, app.module.ts)
+		  If not found, it will give "No provider error"
+		  
+		@Self:- find the service only in current comp. else error
+		 in any comp, (both seem to do the same thing ??? i.e. default behavior)
+		 	private srvcInstance: ServiceOneService,
+			@Self() private srvcInstance: ServiceOneService,
+			
+	3. @Optional:- u can mark any instance as optional in the constructor. u can put it before or afte @Self()/@Host()
+		@Optional() @Self() srvc:Service  // works.
+		@Self() @Optional() srvc:Service  // works.
+		@Optional() @Host() srvc:Service  // works.
+		@Host() @Optional() srvc:Service  // works.
+		
+	4. @Inject:- 	
+		
+	Examples:-
+	1.1
+		services/ng g s serviceOne
+	   	export class ServiceOneService {
+  			someproperty: string = 'I am a default value'
+			...
+		+
+		child1/ng g c child1
+		+ 
+		app.module.ts (In @NgModule)
+			providers: [ServiceOneService],	// for creating singleton / global instance in components
+		+
+		app.component.ts
+		  constructor( private appSrvc: ServiceOneService ) {	// get the singleton global instance
+    				this.appSrvc.someproperty = 'I am having parents value'; // change the default value.
+				console.log( 'this.appSrvc.someproperty', this.appSrvc.someproperty);
+  			      }
+		+
+		child1.component.ts (In @Component)
+		     providers: [ServiceOneService]
+		     ...
+		     constructor(
+   			 @SkipSelf() private globalSrvcInstance: ServiceOneService, // will get the global instance
+    				     private localSrvcInstance: ServiceOneService   // will create a new local instance for child1 comp
+                     ) { }
+			
+		ngOnInit() {
+    			console.log(this.localSrvcInstance, this.globalSrvcInstance);
+  		}
+		
+		IMP NOTE:= 
+		  correct syntax:- @SkipSelf() private globalSrvcInstance: ServiceOneService, // decorator 1st + then "private"
+		  wrong syntax:- private @SkipSelf() globalSrvcInstance: ServiceOneService,
+
+======================
+Injector bubbling (https://angular.io/guide/hierarchical-dependency-injection)
+tree-shakable providers, InjectionToken (https://angular.io/guide/dependency-injection)
+
+@Injectable, Injector
 @ViewTemplate, 
 ElementRef, TemplateRef, ViewRef, ComponentRef, ViewContainerRef, (Abstractions provided by angular)
 	https://blog.angularindepth.com/exploring-angular-dom-abstractions-80b3ebcfc02 
