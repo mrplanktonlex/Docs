@@ -165,7 +165,15 @@ Constructor decorator params:-
 		
 ======================
 Injector bubbling (https://angular.io/guide/hierarchical-dependency-injection)
-tree-shakable providers, InjectionToken (https://angular.io/guide/dependency-injection)
+tree-shakable providers, InjectionToken (https://angular.io/guide/dependency-injection), OpaqueToken (+ @Inject)
+
+	InjectionToken (https://angular.io/guide/dependency-injection), OpaqueToken (+ @Inject)
+	  -- InjectionToken seems to a stricter type checking than OpaqueToken which got deprecated in Angular4
+	  > https://stackoverflow.com/questions/43419050/angular-2-opaquetoken-vs-angular-4-injectiontoken		
+		> https://toddmotto.com/angular-dependency-injection 
+			>> Note: in providers: [{ provide: SomeClass, useClass: SomeClass }], 
+				The provide property in the object is the "token" for the provider that we’re registering, angular registers the class to this token, using "useClass: ...". Hence we can use the same token and override it with another class.
+		
 
 ** providers -vs- viewProviders **
 ( https://codecraft.tv/courses/angular/dependency-injection-and-providers/ngmodule-providers-vs-component-providers-vs-component-viewproviders/ )
