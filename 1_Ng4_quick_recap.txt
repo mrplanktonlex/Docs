@@ -73,6 +73,10 @@ Constructor decorator params:-
 	4. @Host:- Looks like it stops the injector bubbling on the host-element (directive/component) where it is declared (???)
 	See ex. 4.1
 	5. @Inject:- 	
+	6. @Attribute:- 
+	 - used in constructor(){} and used typically with @Input() string constants; thereby preventing angular to check it repeatedly
+	 - gives a performance boost when used with @Input string constants.
+	 - explore more.
 		
 	Examples:-
 	1.1
