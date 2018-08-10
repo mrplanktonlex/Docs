@@ -46,7 +46,7 @@ import { filter, map, retry, retryWhen, catchError,
 
 ==============================
 Constructor decorator params:-
-	@SkipSelf, @Self, @Optional, @Inject, @Host, @Attribute
+	@SkipSelf, @Self, @Optional, @Host, @Inject, @Attribute
 	1. @SkipSelf:-
 	   > use it if, Comp wants to have its own (local) instance of Service + at same time have (global) instance of the service
 	   	https://stackoverflow.com/questions/34983611/injecting-service-providers-in-angular-2-0
@@ -70,7 +70,8 @@ Constructor decorator params:-
 		@Optional() @Host() srvc:Service  // works.
 		@Host() @Optional() srvc:Service  // works.
 		
-	4. @Inject:- 	
+	4. @Host:- Looks like it stops the injector bubbling on the host-element (directive/component) where it is declared (???)
+	5. @Inject:- 	
 		
 	Examples:-
 	1.1
@@ -109,6 +110,7 @@ Constructor decorator params:-
 ======================
 Injector bubbling (https://angular.io/guide/hierarchical-dependency-injection)
 tree-shakable providers, InjectionToken (https://angular.io/guide/dependency-injection)
+providers -vs- viewProviders ( https://codecraft.tv/courses/angular/dependency-injection-and-providers/ngmodule-providers-vs-component-providers-vs-component-viewproviders/ )
 
 @Injectable, Injector
 @ViewTemplate, 
