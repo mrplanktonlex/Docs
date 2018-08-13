@@ -995,7 +995,37 @@ parent.component.ts
 	console.log (this.c1, this.c1.length, this.c1.last.d1.nativeElement.parentElement.childNodes[3].innerText);
 
 ===================================
+Q. What is difference between preventDefault() and stopPropagation()?
+A. document.getElementById("myAnchor").addEventListener("click", function(event){
+    event.preventDefault()
+});
 
+The preventDefault() method cancels the event if it is cancelable, meaning that the default action that belongs to the event will not occur.
+
+For example, this can be useful when:
+	Clicking on a "Submit" button, prevent it from submitting a form
+	Clicking on a link, prevent the link from following the URL
+Note: Not all events are cancelable. Use the cancelable property to find out if an event is cancelable.
+Note: The preventDefault() method does not prevent further propagation of an event through the DOM. Use the stopPropagation() method to handle this.
+
+eg. (stop propagation)
+$("span").click(function(event){
+    event.stopPropagation();
+    alert("The span element was clicked.");
+});
+$("p").click(function(event){
+    alert("The p element was clicked.");
+});
+$("div").click(function(){
+    alert("The div element was clicked.");
+});
+
+The event.stopPropagation() method stops the bubbling of an event to parent elements, preventing any parent event handlers from being executed. Tip: Use the event.isPropagationStopped() method to check whether this method was called for the event.
+
+event.stopPropagation()
+event.isPropagationStopped()
+
+===================================
 Module:
 	- @NgModule (declarations, imports, providers, bootstrap, entryComponents) Note :- import is a TS-keyword, where imports:[] is an angular feature.
 				(exports, etc.) 
