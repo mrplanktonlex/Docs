@@ -1087,6 +1087,28 @@ Style#3: (using ngTemplateOutletContext) [ Note: ngTemplateOutlet would still be
 <!-- <ng-container [ngTemplateOutlet]="ngTempl" context="contextObj"></ng-container> -->
 <ng-container [ngTemplateOutlet]="ngTempl" [ngTemplateOutletContext]="contextObj"></ng-container>
 
+style#4:
+The directive is not really mandatory for us; the ViewContainerRef can be instantiated from within the same component and the directive canbe altogether gotten rid of as well.
+	
+	<!-- add a ref to ng-container eg. #ngContain -->
+		<ng-container [ngTemplateOutlet]="ngTempl" [ngTemplateOutletContext]="contextObj" #ngContain></ng-container>
+	<!-- we will pickup ngContain using a ViewChild. Not the options-obj with the read param. READ param is MANDATORY -->
+		@ViewChild('ngContain', {read: ViewContainerRef} ) ngContain: ViewContainerRef;
+	// rewrite loadComponent() to use the viewChild obj.
+	 	loadComponent() {
+    			this.ngContain.clear(); // changed.
+    			const compFactory = this.compFactoryResolver.resolveComponentFactory(Comp1Component);	// same
+    			const compRef: ComponentRef<any> = this.ngContain.createComponent(compFactory);		// same
+
+    			// same as before.
+    			const someInitData: Person = {
+				...
+			};
+			// also populate contextobj.
+		 } // new loadComponent ends.	
+
+Now, it works same as before, onclick, it loads a new component.
+
 ===================================
 
 Module:
