@@ -837,6 +837,25 @@ app.component.html
 	<app-button btnLabel="ClickHere"></app-button>
 
 ===================================
+UA:-
+
+Shadow DOM & View Encapsulation:- (All these are features of WebComponents, which came out in Polymer)
+	Shadow DOM allows u to create a DOM tree within a DOM tree. Browsers support shadow DOM.
+	View encapsulation:- ViewEncapsulation.Emulated, ViewEncapsulation.Native, ViewEncapsulation.None
+
+	@Component({ 
+		encapsulation: ViewEncapsulation.Emulated // default. u can see some styles like _ng-host
+	})	
+
+	ViewEncapsulation.Native
+	- will give u a shadow-dom which will be wrapped in a <shadow-root>
+
+	ViewEncapsulation.None
+	- writing global styles into the DOM.
+
+
+
+===================================
 
 Module:
 	- @NgModule (declarations, imports, providers, bootstrap, entryComponents) Note :- import is a TS-keyword, where imports:[] is an angular feature.
