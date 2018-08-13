@@ -1045,27 +1045,47 @@ Dynamic component loading
 	> Component templates are not always fixed. An application may need to load new components at runtime.
 	> you need a way to load a new component without a fixed reference to the component in the template.
 
-Before you can add components you have to define an anchor point to tell Angular where to insert components
-eg. a directive with 
-		constructor(public viewContainerRef: ViewContainerRef) { }	
+eg. my practical example:-
 
-	In the wrapper component's template, put below code, this is where you apply the directive you just made	
-		<ng-template ad-host></ng-template>		
-		+
-		@ViewChild(AdDirective) adHost: AdDirective;
-		...
-		constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
-		...
-		let viewContainerRef = this.adHost.viewContainerRef;
-		viewContainerRef.clear(); // clear the anchor-point 
+Style#1:- 
+	Before you can add components you have to define an anchor point to tell Angular where to insert components
+	- using directive with ViewContainerRef 
+	  ( has to be PUBLIC instance in constructor; if its private, comp wont be able to access it )
+	- using component with <ng-template directiveAbove></ng-template> 
+		+ ComponentFactoryResolver +  compFactoryResolver.resolveComponentFactory(SomeComp) // returns comp-factory function
+		  @ViewChild(DirectiveAbove) x : DirectiveAbove
+		+ custom function loadComponent() [ on button click ]
+		+ this.directiveAbove.viewContainerRef.clear()
+		  const compFactory = this.compFactoryResolver.resolveComponentFactory(Comp1Component);
+		  const compRef: ComponentRef = this.directiveAbove.viewContainerRef.createComponent( compFactory )
+	- using entryComponents :[] + CommonModule
+	
+	  loadComponent() {
+		this.dynamic1.viewContainerRef.clear();
+		const compFactory = this.compFactoryResolver.resolveComponentFactory(Comp1Component);
+		const compRef = this.dynamic1.viewContainerRef.createComponent(compFactory);
+		const someInitData: Person = {
+				name: 'Jack Bauer',
+				age: 40
+		};
 
-		let componentFactory = this.componentFactoryResolver.resolveComponentFactory(adItem.component);	// i/p is comp, out is factory function
-		let componentRef = viewContainerRef.createComponent(componentFactory);	// get the componentRef from the viewContainerRef.createComponent(compFactory)
-		(<AdComponent>componentRef.instance).data = adItem.data; // optional may not be necessary.
-  
-		+ 
-		entryComponents: [ HeroJobAdComponent, HeroProfileComponent ], 
-		// because there are no selector references in the templates for dynamically loaded components since they load at runtime.
+		compRef.instance['data'] = someInitData;
+		console.log (compRef.instance);
+	}
+}
+
+Style#2: In above, nothing is being output to the view. So, in comp, do these changes. contextObj = someInitData;
+(Uses ngTemplateOutlet)
+
+	<ng-template appDynamic #ngTempl>
+	  <p *ngIf="contextObj?.name"> Name is {{ contextObj.name }} </p>
+	</ng-template> 
+	<ng-container [ngTemplateOutlet]="ngTempl" context="contextObj"></ng-container>
+	
+	
+Style#3: (using ngTemplateOutletContext) [ Note: ngTemplateOutlet would still be required ]
+<!-- <ng-container [ngTemplateOutlet]="ngTempl" context="contextObj"></ng-container> -->
+<ng-container [ngTemplateOutlet]="ngTempl" [ngTemplateOutletContext]="contextObj"></ng-container>
 
 ===================================
 
