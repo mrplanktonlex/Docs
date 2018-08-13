@@ -837,23 +837,53 @@ app.component.html
 	<app-button btnLabel="ClickHere"></app-button>
 
 ===================================
-UA:-
+ShadowDOM & ViewEncapsulation
 
-Shadow DOM & View Encapsulation:- (All these are features of WebComponents, which came out in Polymer)
-	Shadow DOM allows u to create a DOM tree within a DOM tree. Browsers support shadow DOM.
-	View encapsulation:- ViewEncapsulation.Emulated, ViewEncapsulation.Native, ViewEncapsulation.None
+   /*
+    Shadow DOM is the concept of using a DOM tree within a DOM tree. Its an inbuilt browser feature.
+    The concept also exists in HTML (webcomponents in polymer JS), where an element is placed in <slot></slot> as a placeholder (?)
+    However, some browsers, may not have shadow dom, in which angular can be instructed to still implement its own shadow DOM.
+      Angular does this by using its inbuilt feature i.e. ViewEncapsulation. (Note, ViewEncapsulation is an Enum)
+        https://blog.thoughtram.io/angular/2015/06/29/shadow-dom-strategies-in-angular2.html
+      Angular implements shadow DOM by assigning all elements to #shadow-root. A shadow root has 2 modes: open + closed.
+      ViewEncapsulation mostly deals with style encapsulation (?)
 
+        ViewEncapsulation.None - No Shadow DOM at all. Therefore, also no style encapsulation.
+        ViewEncapsulation.Emulated - No Shadow DOM but style encapsulation emulation.
+        ViewEncapsulation.Native - Native Shadow DOM with all it’s goodness. (will be deprecated)
+	ViewEncapsulation.ShadowDom - replaces ViewEncapsulation.Native
+
+        A) Problems with:-
+          ViewEncapsulation.None:- This is called an "unscoped strategy".
+              1. problem here is styles with same names could get overwritten. So, if comp1 has .test{} css class,
+                  and app-comp doesnt have .test{} css class (u forgot to define it), but an html element in app-comp. is using .test{},
+                  then the .test{} class frm comp1 will be applied to the html-element in app-comp (which is what we DONT want)
+              2. problem:- If there is any <ng-content></ng-content> tag in the comps template, those will get replaced with script-tags
+                  <script type="ng/contentStart"></script>
+                    ...
+                  <script type="ng/contentEnd"></script>
+
+        B) ViewEncapsulation.Emulated
+          - is default
+          - even if browser does not support shadow dom, angular will create/emulate it.
+          - give a unique _ng-host_uniqueid class too.
+          - NOTE: #shadow-root is NOT Created
+          - Problem A1. is solved, html-element (in app-comp) will NOT get the style of comp1
+
+        C) ViewEncapsulation.Native //. Deprecated from v6.1.0. Use ViewEncapsulation.ShadowDom instead.
+          - will put it inside #shadow-root reference. Q. can this reference be picked up using viewchild() ??
+          - inside #shadow-root, angular will provide the .test{} in the comp & also the global .test{} style.
+              (so that the global can be used if required)
+          - it will have the comps html element too within #shadow-root
+          - Problem A1. is solved, html-element (in app-comp) will NOT get the style of comp1
+
+        D) ViewEncapsulation.ShadowDom: replaces ViewEncapsulation.Native
+    */
+
+eg.
 	@Component({ 
-		encapsulation: ViewEncapsulation.Emulated // default. u can see some styles like _ng-host
+		encapsulation: ViewEncapsulation.Emulated // default. u can see some styles like _ng-host_NSOMEUNIQUEKEY
 	})	
-
-	ViewEncapsulation.Native
-	- will give u a shadow-dom which will be wrapped in a <shadow-root>
-
-	ViewEncapsulation.None
-	- writing global styles into the DOM.
-
-
 
 ===================================
 
