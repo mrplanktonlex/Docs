@@ -956,7 +956,7 @@ Viewchid & ViewChildren+QueryList<samecomp>:-
 			this.x is now available as a JS-obj of that child comp. 
 
 2. ViewChildren + QueryList<samecomp>:-
-   Usage:- used in a parent which has multiple childs
+   Usage:- used in a parent which has multiple childs (1-level only)
    eg. in app.component.html
    	<app-compone><app-compone>
 	<app-compone><app-compone>
@@ -967,6 +967,33 @@ Viewchid & ViewChildren+QueryList<samecomp>:-
 Now this.xx will give us access to both the component-instances.
 this.xx, this.xx.length (2 in this case), this.xx._results (is an array and u can loop over it).
 	
+3. ng-content (Content projection)
+app.component.html
+	<app-compone>	<h3>ddddd</h3>	</app-compone>
+	Note:- The content in h3 tag is being projected. It is WITHIN the <app-compone> tags (and NOT as an attribute)
+compone.component.html
+	<ng-content select="h3"></ng-content> (used to specify diff. projection slots) -OR- 
+	<ng-content></ng-content> (for singular projection)
+	
+	Note:- the select-param is responsible for placeholding diff. projection slots; 
+	       projection slots can be selected based on css classes, ids, etc.  too. Similat to a document.querySelector()
+
+4. ContentChild & ContentChildren+QueryList<childcomp>
+- signature same as viewchild. question is where to write it.
+- require 2 levels inside app.component.html
+- used in a parent had 2-levels of children. (i.e. child+grandchild)
+
+app.component.html
+	<app-parent>	// <<<<<<<=======================================  @ContentChild should be written here. 
+  		<app-compone id="1">  <h3>ddddd</h3>  </app-compone>	// <ng-content select="h3"></ng-content>
+  		<app-compone id="2">  <h3>ddddd222</h3>  </app-compone>	// <ng-content select="h3"></ng-content>
+	</app-parent>
+
+parent.component.ts
+	// @ContentChild(ComponeComponent) c1: ComponeComponent;	     // works. used when singular <app-compone>	
+  	@ContentChildren(ComponeComponent) c1: QueryList<ComponeComponent>;  // works. used when multiple <app-compone>
+	console.log (this.c1, this.c1.length, this.c1.last.d1.nativeElement.parentElement.childNodes[3].innerText);
+
 ===================================
 
 Module:
