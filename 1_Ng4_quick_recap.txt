@@ -885,7 +885,13 @@ eg.
 	@Component({ 
 		encapsulation: ViewEncapsulation.Emulated // default. u can see some styles like _ng-host_NSOMEUNIQUEKEY
 	})	
-	
+
+eg.2.
+u can have application wide encapsulation set in main.ts like this:-
+      platformBrowserDynamic().bootstrapModule(AppModule, {defaultEncapsulation: ViewEncapsulation.Native})
+Note:- here the key is "defaultEncapsulation" and not "encapsulation" (which is used in @Component({})      
+      
+
 More:- 
 https://gist.github.com/praveenpuglia/0832da687ed5a5d7a0907046c9ef1813
 
@@ -932,6 +938,35 @@ A.	<div class="dom"></div>
 Note:- Shadow DOM, cannot be removed once created. It can only be replaced with a new one.
 Read https://gist.github.com/praveenpuglia/0832da687ed5a5d7a0907046c9ef1813 for more gyan	
 
+
+===================================
+Viewchid & ViewChildren+QueryList<samecomp>:-
+
+1. ViewChild:-
+	- access html elements using #localref.
+	eg. @ViewChild('localref') lref: ElementRef;
+	this can now be access as this.lref in ngOnInit, etc.
+	
+   Usage:-
+   	- simple use is in child component with html elements (with local refs)
+	- advanced use:= other than local refs, it can also be used to get a JS-obj of the component itself
+		eg. In app.comp.ts
+			import { ComponeComponent } from './compone/compone.component';
+			@ViewChild(ComponeComponent) x: ComponeComponent;
+			this.x is now available as a JS-obj of that child comp. 
+
+2. ViewChildren + QueryList<samecomp>:-
+   Usage:- used in a parent which has multiple childs
+   eg. in app.component.html
+   	<app-compone><app-compone>
+	<app-compone><app-compone>
+		+
+	import { ComponeComponent } from './compone/compone.component';
+	@ViewChildren(ComponeComponent) xx: QueryList<ComponeComponent>;
+
+Now this.xx will give us access to both the component-instances.
+this.xx, this.xx.length (2 in this case), this.xx._results (is an array and u can loop over it).
+	
 ===================================
 
 Module:
