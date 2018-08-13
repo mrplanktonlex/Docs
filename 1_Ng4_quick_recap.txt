@@ -862,6 +862,7 @@ ShadowDOM & ViewEncapsulation
                   <script type="ng/contentStart"></script>
                     ...
                   <script type="ng/contentEnd"></script>
+		  (Unable to replicate it now in v6)
 
         B) ViewEncapsulation.Emulated
           - is default
@@ -884,6 +885,52 @@ eg.
 	@Component({ 
 		encapsulation: ViewEncapsulation.Emulated // default. u can see some styles like _ng-host_NSOMEUNIQUEKEY
 	})	
+	
+More:- 
+https://gist.github.com/praveenpuglia/0832da687ed5a5d7a0907046c9ef1813
+
+Terminologies:-
+	1. Shadow Root: 
+	    > It's what gets attached to an element to give that element it's shadow DOM. 
+	      Technically it's a non-element node, a special kind of "Document Fragment".
+	2. Shadow Host: The element to which the shadow root gets attached. 
+	      A host can access it's shadow root via a property on itself. .shadowRoot.
+	      VIMP NOTE: The elements in a shadow tree are NOT descendants of the shadow host in general (including for the purposes of Selectors like the descendant combinator) - Spec
+	3.  Light DOM: - 
+		- The DOM that lives outside shadow DOM
+		- The set of DOM elements we can sandwich between the opening and closing tags.       
+		eg. 
+		<custom-picture>
+    				^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    				#shadow-root
+    				___________________________
+
+    			<!--Light DOM-->
+    			<img src="https://path.to/a-kitten.png">
+    			<cite>A Nice Kitten!</cite>
+    			<!--Light DOM ends-->
+		</custom-picture>
+	4. DocumentFragment: The DocumentFragment interface represents a minimal document object that has no parent. It is used as a light-weight version of Document to store a segment of a document structure comprised of nodes just like a standard document. The key difference is that because the document fragment isn't part of the actual DOM's structure, changes made to the fragment don't affect the document, cause reflow, or incur any performance impact that can occur when changes are made. - MDN
+	
+Extra gyan:-	
+Q. IN Vanilla JS, How to create Shadow DOM?
+A.	<div class="dom"></div>
+	let el = document.querySelector(".dom");
+	el.attachShadow({mode: "open"});
+	// Just like prototype & constructor bi-directional references, we have...
+	el.shadowRoot // the shadow root.
+	el.shadowRoot.host // the element itself.
+
+	// put something in shadow DOM
+	el.shadowRoot.innerHTML = "Hi I am shadowed!";
+
+	// Like any other normal DOM operation.
+	let hello = document.createElement("span");
+	hello.textContent = "Hi I am shadowed but wrapped in span";
+	el.shadowRoot.appendChild(hello);
+
+Note:- Shadow DOM, cannot be removed once created. It can only be replaced with a new one.
+Read https://gist.github.com/praveenpuglia/0832da687ed5a5d7a0907046c9ef1813 for more gyan	
 
 ===================================
 
