@@ -1303,9 +1303,47 @@ my-for.directive.ts
 
 ===================================
 
+ReflectiveInjector:- is deprecated from v5 onwards. Its replaced by StaticInjector
+	https://blog.angularindepth.com/angular-introduces-staticinjector-should-you-care-4e059eca030c
+It was used to create child injectors using ReflectiveInjector.resolveAndCreate(). The reason it was deprecated was because it was doing lookup and resolving implicit (implied) dependencies on its own, which had a performance hit.
+       - It was based on the Reflect library.
+
+StaticInjector
+	- Developer has to specify all dependencies himself; but very rarely ReflectiveInjector is used by a normal developer.
+
+Types of Injectors:-
+	1. Injectors for components : ReflectiveInjector is not used there. so no change in code.
+	2. Other Injectors Angular uses internally: Platform, Compiler and NgZone. (and they used ReflectiveInjector).
+	2.1 NgZoneInjector: doesn’t take any providers so it’s unaffected by change.
+	2.2 platformBrowserDynamic().bootstrapModule(AppModule); is where the platform and compiler used to use ReflectiveInjector; it now uses StaticInjector.
+
 ===================================
+
+ngDoBootstrap():- How to manually bootstrap ??
+		- Requires ApplicationRef.
+https://blog.angularindepth.com/how-to-manually-bootstrap-an-angular-application-9a36ccf86429
+
+AComp, BComp
++
+entryComponents: [AComponent, BComponent]
++
+remove the bootstrap:[]
++
+export class AppModule {
+  ngDoBootstrap(app) {  }  // Angular passes the reference to the running application in the form of "ApplicationRef" to this method.
+}
+	>> Later, when we will be ready to bootstrap the application we will use bootstrap() method of the "ApplicationRef" to initialize the root component.
+	>> See example on how to create a wrapper method.
+	
+===================================
+Implementing custom component decorator in Angular
+	https://blog.angularindepth.com/implementing-custom-component-decorator-in-angular-4d037d5a3f0d
+	
+===================================
+
 Pending:-
-	ReflectiveInjector, Change Detection + ChangeDetectorRef
+	Change Detection + ChangeDetectorRef
+	Implementing custom component decorator in Angular 
 	ngProjectAs(){} (for content-projection).
 	Unit testing
 	ngrx
