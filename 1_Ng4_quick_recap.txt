@@ -1081,7 +1081,8 @@ Style#2: In above, nothing is being output to the view. So, in comp, do these ch
 	  <p *ngIf="contextObj?.name"> Name is {{ contextObj.name }} </p>
 	</ng-template> 
 	<ng-container [ngTemplateOutlet]="ngTempl" context="contextObj"></ng-container>
-	
+
+NOTE:- <ng-container> is used for grouping DOM nodes. Its not displayed on the browser.
 	
 Style#3: (using ngTemplateOutletContext) [ Note: ngTemplateOutlet would still be required ]
 <!-- <ng-container [ngTemplateOutlet]="ngTempl" context="contextObj"></ng-container> -->
@@ -1164,7 +1165,7 @@ Looks like, u can still put the @Input() there if you would like to, but DONT EX
 	2.7) Using a TemplateRef with ViewContainerRef (for rendering)
 	Goal:- instantiate the html in <template> tags and insert it BELOW the entrypoint #entry. (or #ngContain in my ex. above).
 		<div #ngContain></div>
-		<template #tmpl> Todd Mot to</template>
+		<template #tmpl> Todd Mot to</template> // anything in <template> tags is NOT VISIBLE on the browser(?)
 		+
 		@ViewChild('ngContain', {read: ViewContainerRed}) ngContain: ViewContainerRef; // gives access to <div>.
 		@ViewChild('tmpl') tmpl: TemplateRef: <any>;  // gives access to <template>			
@@ -1174,9 +1175,19 @@ Looks like, u can still put the @Input() there if you would like to, but DONT EX
 			// createComponent is for components, createEmbeddedView() is for templates.
 		}
 		   
+	IMP NOTE: <template> can take let-variables, just like <ng-template>	   
 ===================================
-ReflectiveInjector, Change Detection + ChangeDetectorRef, ngProjectAs(){} (for content-projection).
-Difference between HostView and EmbeddedView
+Pending:-
+	Difference between HostView and EmbeddedView + any other views ??
+	ReflectiveInjector, Change Detection + ChangeDetectorRef, ngProjectAs(){} (for content-projection).
+	Unit testing
+	ngrx
+	Unit testing ngrx shit
+	Angular Universal
+	Providers: ValueProvider (useValue), 
+	Zones: 
+===================================
+
 ===================================
 
 Module:
