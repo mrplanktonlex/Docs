@@ -1108,9 +1108,11 @@ The directive is not really mandatory for us; the ViewContainerRef can be instan
 		 } // new loadComponent ends.	
 
 Now, it works same as before, onclick, it loads a new component.
+Note:- it does not have to <ng-container></ng-container> which defines the entry-point. It can be a simple <div #ngContain></div>
+	It how the ViewChild reads it with {read: ViewContainerRef} is whats important.
 
 Q. How to destroy a dynamic component on click?? 
-A. 
+A.1. 
    make compRef as public (remove const), so that it becomes this.compRef.
    	this.compRef become // ComponentRef_*.ChangeDetectorRef.destroyed = false && ComponentRef_*.hostView.destroyed = false
    Add a button with click = destroyComp() {
@@ -1121,8 +1123,22 @@ A.
 More on destroying dynamic components ( using ReflectiveInjector )
 	https://rahulrsingh09.github.io/AngularConcepts/dynamic
 
+A.2. UA:
+	Few Imp Extra Knowledge:-
+	2.1) Dynamic Components do not have an @Input(), so we cannot write @Input() title = 'default title';
+		Instead, it accesses the "public" properties, so if we had just title = 'default title';
+		Such public properties, can be overwritten like this: this.compRef.instance.title = 'new title';
+Looks like, u can still put the @Input() there if you would like to, but DONT EXPECT the ngOnChanges(){} to trrigger for dynamic components
+		
+	2.2) Dynamic Components can use @Output()
+		if @Output() submitted = new EventEmitter<any>;
+		this.compRef.instance.submitted.subscribe( () => {} );
+
+	2.3) Destroying Dynamic Components
+		this.compRef.destroy();
+		where compRef: ComponentRef<AuthFormComponent> -OR- compRef: ComponentRef<any> ;
 ===================================
-ReflectiveInjector
+ReflectiveInjector, Change Detection, ngProjectAs(){} (for content-projection).
 ===================================
 
 Module:
