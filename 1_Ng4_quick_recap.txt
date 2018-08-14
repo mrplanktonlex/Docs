@@ -1159,7 +1159,7 @@ Looks like, u can still put the @Input() there if you would like to, but DONT EX
 			- use it to change the sequence of the components, after the compilation is done
 		
 		   moveComponent(){
-			this.ngContain.move(this.compRef.hostView, 1); // See diff between hostview n embeddedview.
+			this.ngContain.move(this.compRef.hostView, 1); // See diff between hostview-n-embeddedview.
 		   }
 	
 	2.7) Using a TemplateRef with ViewContainerRef (for rendering)
@@ -1176,9 +1176,33 @@ Looks like, u can still put the @Input() there if you would like to, but DONT EX
 		}
 		   
 	IMP NOTE: <template> can take let-variables, just like <ng-template>	   
+
+----
+
+HostView + EmbeddedView
+	https://angular.io/guide/architecture-components#templates-and-views
+	
+In 2.6) and 2.7) of dynamic views, we were introduced to :-
+1. HostView
+2. EmbeddedView
+
+HostView:-
+	View which is attached to the component.
+EmbeddedView:-
+	When a hostview has multiple child-views or grand-child views, they form a heirarchy.
+	Views that are child/grandchild are called embeddedviews.
+		- Embedded views typically make use of templates (so that they are hidden) 
+		- A template is a blueprint of an embedded view. (its implemented using <template> , <ng-template> or <ng-container>)
+			<ng-container> is used to group multiple templates/ dom nodes.
+
+In 2.6) this.ngContain.move(this.compRef.hostView, 1); 
+	Here hostview was used, because we are talking about the wrapper view.
+In 2.7) we are dealing with child-views using templates.
+	Hence, createEmbeddedView() was used.
+	
+Aint magic, now that u know the difference.	
 ===================================
 Pending:-
-	Difference between HostView and EmbeddedView + any other views ??
 	ReflectiveInjector, Change Detection + ChangeDetectorRef, ngProjectAs(){} (for content-projection).
 	Unit testing
 	ngrx
