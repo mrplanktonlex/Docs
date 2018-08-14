@@ -1040,7 +1040,7 @@ ngOnChanges
 
 ---
 
-https://angular.io/guide/dynamic-component-loader (cookbook)
+https://angular.io/guide/dynamic-component-loader (cookbook). DynamicComponentLoaded is deprecated. Use ComponentFactoryResolver.
 Dynamic component loading
 	> Component templates are not always fixed. An application may need to load new components at runtime.
 	> you need a way to load a new component without a fixed reference to the component in the template.
@@ -1201,9 +1201,111 @@ In 2.7) we are dealing with child-views using templates.
 	Hence, createEmbeddedView() was used.
 	
 Aint magic, now that u know the difference.	
+
+===================================
+UA:-
+Directives:-
+	- custom attribute directive 
+		> using HostListener + HostBinding
+		> @Input() set
+		> Adding and removing styles + AppendChild() to an existing element 
+		> exportAs which exports methods which can be used in the html-templates.
+	- custom structural directive 
+		> @Input() set 
+		> since we cannot write html, we have to use ViewContainerRef.createEmbeddedView() + templateRef
+		> <div myFor [myForOf]="items" let-item let i="index"> </div>
+
+1. custom attribute directive 		
+>> custom-directive + tie a hostlistener into a custom directive
+	
+	@Directive({
+		selector: '[credit-card]',	// the square braces is plain JS to indicate its an attribute.
+	})
+	export class CreditCardDirective {	
+		@HostListener('input', ['$event']); // NOTE:- 2nd param is an array of STRINGS that we want to listen to, hence the ''
+		constructor(
+			private el: ElementRef	// this.el.nativeElement.input.value if used on an <input>
+		){}
+		
+		onKeyDown( event: KeyboardEvent ) { // event, event.target
+			const input = event.target as HTMLInputElement; // this casts it into type HTMLInputElement, so that we can use input.value, input.value.replace()
+		}
+	}
+	
+key things to note:-	
+// HostListener: is an event listener of the Host.	
+// @HostListener('input', ['$event']); // NOTE:- 2nd param is an array of STRINGS that we want to listen to, hence the ''
+// const input = event.target as HTMLInputElement;
+
+>> HostBinding
+	@HostBinding('style.border')border: string;
+	@HostBinding('class')classes = 'a b c'; // gets these css classes.
+
+>> @Input()						  // using a property in TS
+   @Input() set tooltip(value) {  // using a setter in TS, gives us a value, which will be.
+   }
+
+>> Adding and removing styles
+	element = document.createElement('div');
+    ...
+	hide() {
+		this.element.classList.remove('tooltip-active'); // maybe it has display:none or some like that.
+	}
+	show() {
+		this.element.classList.add('tooltip-active'); 
+	}
+	
+>> Adding another element to an existing element
+	this.element.nativeElement.appendChild(this.tooltipElement);
+	
+>> Using exportAs property (of directives) with template-refs.
+	in the @Directive:
+		exportAs: 'tooltip' 
+			- it will allow us to use it along with a TemplateRef (#myToolTip)
+			- exports all directives methods so that they can be called in the template.
+		
+		< label tooltip="some text"
+			#myToolTip="tooltip" // this is the exportAs property.
+		>
+			<span 
+				(mouseover) = "myToolTip.show()"
+				(mouseout) = "myToolTip.hide()"
+			>
+			</span>
+		</label>
+		
+----
+2. custom structural directive 
+creating a custom structural directive. (NOTE: we cannot use html-templates in directives, so we have to use ViewContainerRef.createEmbeddedView() + TemplateRef)
+ // createEmbeddedView because it a child view with template.
+ 
+my-for.directive.ts
+	
+	@Directive({
+		selector:'[myFor][myForOf]' // myFor is the name of the directive.
+	})
+	export class MyForDirective {
+		@Input set myForOf(collection){ // anytime it changes, we will collection updated.
+			collection.forEach((item,index) => {
+				this.view.clear();
+				this.view.createEmbeddedView(this.template, {$implicit: item, index } // shorthand for index:index
+				);
+			})
+		}
+		
+		constructor(
+			private viewContainerRef: ViewContainerRef,
+			private tRef: TemplateRef<any>
+		) {}
+		
+	} // class ends
+
+===================================
+
 ===================================
 Pending:-
-	ReflectiveInjector, Change Detection + ChangeDetectorRef, ngProjectAs(){} (for content-projection).
+	ReflectiveInjector, Change Detection + ChangeDetectorRef
+	ngProjectAs(){} (for content-projection).
 	Unit testing
 	ngrx
 	Unit testing ngrx shit
