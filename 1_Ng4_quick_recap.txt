@@ -1097,8 +1097,8 @@ The directive is not really mandatory for us; the ViewContainerRef can be instan
 	// rewrite loadComponent() to use the viewChild obj.
 	 	loadComponent() {
     			this.ngContain.clear(); // changed.
-    			const compFactory = this.compFactoryResolver.resolveComponentFactory(Comp1Component);	// same
-    			const compRef: ComponentRef<any> = this.ngContain.createComponent(compFactory);		// same
+    			const compFactory = this.compFactoryResolver.resolveComponentFactory(Comp1Component);	// same as before
+    			const compRef: ComponentRef<any> = this.ngContain.createComponent(compFactory);		// same as before
 
     			// same as before.
     			const someInitData: Person = {
@@ -1137,8 +1137,46 @@ Looks like, u can still put the @Input() there if you would like to, but DONT EX
 	2.3) Destroying Dynamic Components
 		this.compRef.destroy();
 		where compRef: ComponentRef<AuthFormComponent> -OR- compRef: ComponentRef<any> ;
+		
+	2.4) ChangeDetectorRef:- (will cover it when we do change detection though)
+		this.compRef.changedetectorref.make...()
+		(needs to be explored more)
+		
+	2.5) Ordering Dynamic Components:-
+		Indexing is similar to JS array. The *.viewchildAsViewContainerRef.createComponent() takes index as a 2nd param.
+		VIMP NOTE:- if index is NOT mentioned, then it will have an index of -1.
+		
+		const compRef1: ComponentRef<any> = this.ngContain.createComponent(compFactory, 0);
+		const compRef2: ComponentRef<any> = this.ngContain.createComponent(compFactory, 1);
+		
+		Note:- Such ordering is freezed (for the time being) during compilation.
+		
+ 	2.6) Re-ordering Dynamic Components:-
+		Q. How to re-order dynamic components, after they have been injected ?
+		A. this.ngContain.move() 
+			- will allow us to move the component inside a particular view.
+			- use it to change the sequence of the components, after the compilation is done
+		
+		   moveComponent(){
+			this.ngContain.move(this.compRef.hostView, 1); // See diff between hostview n embeddedview.
+		   }
+	
+	2.7) Using a TemplateRef with ViewContainerRef (for rendering)
+	Goal:- instantiate the html in <template> tags and insert it BELOW the entrypoint #entry. (or #ngContain in my ex. above).
+		<div #ngContain></div>
+		<template #tmpl> Todd Mot to</template>
+		+
+		@ViewChild('ngContain', {read: ViewContainerRed}) ngContain: ViewContainerRef; // gives access to <div>.
+		@ViewChild('tmpl') tmpl: TemplateRef: <any>;  // gives access to <template>			
+		+
+		ngAfterContentInit(){
+			this.ngContain.createEmbeddedView(this.tmpl);
+			// createComponent is for components, createEmbeddedView() is for templates.
+		}
+		   
 ===================================
-ReflectiveInjector, Change Detection, ngProjectAs(){} (for content-projection).
+ReflectiveInjector, Change Detection + ChangeDetectorRef, ngProjectAs(){} (for content-projection).
+Difference between HostView and EmbeddedView
 ===================================
 
 Module:
