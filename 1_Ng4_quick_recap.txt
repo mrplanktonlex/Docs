@@ -1121,8 +1121,9 @@ A.1.
 	this.compRef.destroy(); // ComponentRef_*.ChangeDetectorRef.destroyed = true && ComponentRef_*.hostView.destroyed = true.
    }
 
-More on destroying dynamic components ( using ReflectiveInjector )
+More on destroying dynamic components ( using ReflectiveInjector ). 
 	https://rahulrsingh09.github.io/AngularConcepts/dynamic
+	https://angular.io/api/core/ReflectiveInjector is deprecated. from v5, use Injector.create()
 
 A.2. UA:
 	Few Imp Extra Knowledge:-
