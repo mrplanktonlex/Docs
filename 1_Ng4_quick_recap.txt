@@ -1423,7 +1423,7 @@ Types of Injectors:-
 ===================================
 
 ngDoBootstrap():- How to manually bootstrap ??
-		- Requires ApplicationRef.
+		- Requires "ApplicationRef".
 https://blog.angularindepth.com/how-to-manually-bootstrap-an-angular-application-9a36ccf86429
 
 AComp, BComp
@@ -1464,6 +1464,46 @@ Types of providers:
 
 ===================================
 
+ControlValueAccessor & NG_VALUE_ACCESSOR
+	import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+	
+1. ControlValueAccessor 
+https://angular.io/api/forms/ControlValueAccessor
+https://blog.angularindepth.com/never-again-be-confused-when-implementing-controlvalueaccessor-in-angular-forms-93b9eee9ee83
+
+   - its an interface.
+   - A ControlValueAccessor acts as a bridge between the Angular forms API and a native element in the DOM.
+   - The number of native form controls is limited but the variety of custom form controls can be potentially infinite 
+   so Angular needs a generic mechanism to stand between the Angular’s formControl and a native/custom form control. 
+   - And this is where ControlValueAccessor comes into play. This is the object that stands between the Angular formControl and a native form control and SYNCHRONIZES values between the two.
+
+1.1
+Any component or directive can be turned into ControlValueAccessor
+	- by implementing ControlValueAccessor interface and 
+	- registering itself as NG_VALUE_ACCESSOR provider. 
+
+	From UA:-
+		import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+
+		const PIZZA_TOPPINGS_ACCESSOR = {
+		  provide: NG_VALUE_ACCESSOR,
+		  useExisting: forwardRef(() => PizzaToppingsComponent),
+		  multi: true,
+		};
+
+		@Component({
+		  selector: 'pizza-toppings',
+		  providers: [PIZZA_TOPPINGS_ACCESSOR],
+		  changeDetection: ChangeDetectionStrategy.OnPush,
+		  styleUrls: ['pizza-toppings.component.scss'],
+
+2. NG_VALUE_ACCESSOR
+https://angular.io/api/forms/NG_VALUE_ACCESSOR 
+Used to provide a ControlValueAccessor for form controls.
+	- const NG_VALUE_ACCESSOR: InjectionToken<ControlValueAccessor>;
+
+===================================
+
 Pending:-
 	Change Detection + ChangeDetectorRef
 	ngProjectAs(){} (for content-projection).
@@ -1472,6 +1512,7 @@ Pending:-
 	Unit testing ngrx shit
 	Angular Universal
 	Zones: 
+	ControlValueAccessor, NG_VALUE_ACCESSOR
 ===================================
 
 ===================================
