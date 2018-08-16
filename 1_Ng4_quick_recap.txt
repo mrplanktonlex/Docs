@@ -13,6 +13,109 @@ Observables vs Promises:- https://angular.io/guide/comparing-observables
 
 ==============================
 
+>> Tracing:
+	before:- RouterModule.forRoot( appRoutes );
+	after:-  RouterModule.forRoot( appRoutes, {enableTracing: true} );
+	
+	{enableTracing: true} shows us which routing events got fired. Use it ONLY FOR DEBUGGING
+		events can be like: NavigationStart, RoutesRecognized, NavigationEnd
+
+>> RoutesRecognized has "urlAfterRedirects" and state: RouterStateSnapshot.
+   NavigationEnd has "urlAfterRedirects"
+		
+>> events can be accessed like this 
+		this.router.events.subscribe( (event) => { if(event instanceOf NavigationEnd) { // do something } 
+		});
+		-OR-
+		import 'rxjs/add/operators/filter';
+		this.router.events.filter( (event) => event instanceOf NavigationEnd ).subscribe( () => {}) 
+			// Now in subscribe we will get ONLY 1 event i.e. NavigationEnd
+			// This is MORE efficient, because subscribe will fire ONLY when it has NavigationEnd.
+		
+
+>> Router Outlet Events
+	<router-outlet></router-outlet>
+	-OR-
+	<router-outlet
+		(activate) = "OnActivate($event)"		// $event will be some component.
+		(deactivate) = "OnDeactivate($event)"	// Called On destruction.
+	></router-outlet>
+
+>> Dynamic route "resolves" with snapshots.
+	- "resolves" will preload the data BEFORE you have navigated to a routed component.
+	- Note:- resolve() is a router guard. Use it to preload any data before the routed-component is navigated to.
+	
+	Q. How to configure a resolve? 
+	A. 
+		In appRoutes:Routes = [
+		 {
+			path:'/folder/name', component: HomeComponent, resolve: {
+				messages: HomeResolve // where messages is something the api returns ?	
+			}
+		 }
+		]
+		
+		messages will be defined in the component.
+			data: Observable<{ messages: Mail[] }> = this.route.data;
+		
+	home.resolve.ts 
+		- its a class with @Injectable()
+		
+			import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+				// ActivatedRouteSnapshot knows our current route, params, fragments, etc. 
+				// RouterStateSnapshot represents the state of the route at a particular time.
+				
+			export class HomeResolve implements Resolve {
+				constructor(
+					private serv: someservice
+				){}
+				resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+					// we will call the someservice here.
+					return this.serv.getFolders(route.params.name); // "route.params.name" implies somefoldername in "/folder/somefoldername" in path:''
+				}
+			} // class ends 
+
+	VIMP: Add HomeResolve to the providers:[] in app.module.ts 	
+	// someservice.service.ts :: getFolders() which makes an api call.		
+
+(skipped remaining)
+	
+---
+
+Auxiliary / Named router outlet 
+	<router-outlet></router-outlet>					// primary outlet 
+	<router-outlet name="another"></router-outlet>  // sibling outlet
+	
+	{
+		path: 'message/:id', component: HomeComponent, outlet: 'another'
+	}
+
+	// 1. navigating (to named outlet) using routerLink 
+	
+	<a [routerLink]="['', 
+					   {outlets: {pane: ['message', message.id] } }  //  eg. /message/1
+					  ]"
+		routerLinkActive = "active"	// there is a.active{} css style		  
+					  > </a> /// because the url is /inbox(pane:message/1); 1st param is empty cause it is relative.
+
+	-OR-
+	
+	// 2. navigating using API				  
+	this.router.navigate(
+		['', {outlets: {pane: ['message', message.id] } } ]
+	)
+	
+	// 3. Destroying auxiliary outlets
+	<a [routerLink]="[ { outlets: { primary: 'folder/inbox', pane : null } } ]" > ...
+	<a [routerLink]="[ { outlets: { primary: 'folder/trash', pane : null } } ]" > ...
+	
+	"pane: null" can also be used in navigation API i.e. this.router.navigate();
+	
+	resolve() can be used too with auxiliary routes (skipped)
+---
+
+==============================
+
 https://angular.io/guide/rx-library
 Note that, for Angular apps, we prefer combining operators with pipes, rather than chaining. Chaining is used in many RxJS examples.
 
