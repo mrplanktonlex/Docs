@@ -13,6 +13,85 @@ Observables vs Promises:- https://angular.io/guide/comparing-observables
 
 ==============================
 
+https://angular.io/api/forms/NG_VALUE_ACCESSOR
+https://angular.io/api/core/InjectionToken
+InjectionToken (Class)
+	Creates a token that can be used in a DI Provider.
+interface MyInterface {...}
+var myInterface = injector.get(new InjectionToken<MyInterface>('SomeToken'));						
+
+		Pre-requisite:- The Taxonomy of reactive programming.
+		https://vsavkin.com/the-taxonomy-of-reactive-programming-d40e2e23dee4
+			
+			Reified & Transparent:-
+				Transparent - because the developer only interacts with the most recent value. The framework hides all the other values (changing over time).
+				Reified - means having access to the concrete objects (representing the act of observation, like Subjects) 
+						  having these concrete objects is powerful because we can manipulate them, pass them around, and compose them.
+							eg. If name is a subject, then name.value is the current value, but name represents the value changing over time.
+					
+
+Any component or directive can be turned into ControlValueAccessor 
+	- by implementing ControlValueAccessor interface and 
+	- registering itself as NG_VALUE_ACCESSOR provider.
+	
+----
+						A.										B.
+Native/Custom		<=========   Control Value Accessor    <=========>   Angular Form Control
+ Form Control
+ 
+ A. Communication Interface specific to a control. 
+ B. writeValue(v), registerOnChange(fn), registerOnTouched(){}, fn(change), etc.
+ writeValue(v) : update the value from the outside world ( Coming into the component eg. via @Input).
+ registerOnChange(fn): Needs us to store a callback 
+ 
+	private onChange: (value: string) => void ;
+	registerOnChange(onChange: (value: string) => void) {
+		this.onChange = onChange;
+	}
+	
+	// If there is any @Output, then remove those LOCs and propagate the changes using this.onChange(color);
+
+ C: providers:[
+		{ provide: NG_VALUE_ACCESSOR, useExisting:<CurrentCompName>, multi:true }
+		{ provide: NG_VALIDATORS, useExisting:<CurrentCompName>, multi:true }  // multi:true, means the token expects an array of accessors.
+	]
+ 	
+	
+For Native Form Control, Angular has following default-value-accessors. For input + textarea, the default-value-accessor is (ironically) DefaultValueAccessor.
+The rest are shown below.
+
+     Accessor              |     Form Element     |
++------------------------------------+----------------------+
+| DefaultValueAccessor               | input, textarea      |
+| CheckboxControlValueAccessor       | input[type=checkbox] |
+| NumberValueAccessor                | input[type=number]   |
+| RadioControlValueAccessor          | input[type=radio]    |
+| RangeValueAccessor                 | input[type=range]    |
+| SelectControlValueAccessor         | select               |
+| SelectMultipleControlValueAccessor | select[multiple]     |
+
+Continue here:=
+https://blog.angularindepth.com/never-again-be-confused-when-implementing-controlvalueaccessor-in-angular-forms-93b9eee9ee83
+
+import { Validator, NG_VALIDATORS } from @angular/forms;
+providers:[
+	{ provide: NG_VALIDATORS, useExisting:<CurrentCompName>, multi:true } // multi:true, means the token expects an array of accessors.
+]
+validate(){} method needs to be implemented in the class. Validator is an interface for Template Driven Forms.
+validate(c: FormControl){}
+
+NOTE: u can also move these code into a directive.
+
+==============================
+others:-
+
+	Notice: the style.* and class.* bindings can be used in property binding
+
+	[style.background-color]="..."			  // has .color{}	
+	[class.selected]="color===selectedColor"  // represents .color.selected{}  ??
+
+==============================
+
 >> Tracing:
 	before:- RouterModule.forRoot( appRoutes );
 	after:-  RouterModule.forRoot( appRoutes, {enableTracing: true} );
