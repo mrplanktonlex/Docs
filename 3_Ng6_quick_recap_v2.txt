@@ -795,6 +795,119 @@ import { filter, map, retry, retryWhen, catchError,
 
 ==============================
 
+rxjs
+rxjs/Rx =========> doesnt exist anymore in v6; import * as Rx from 'rxjs/Rx' ===>> wont work in v6
+rxjs/Observable == doesnt exist anymore in v6;  
+rxjs/Subject ===== doesnt exist anymore in v6;
+rxjs/add/operator/map === doesnt exist anymore in v6;
+rxjs/add/operator/debounce === doesnt exist anymore in v6;
+
+------
+
+    "rxjs": "^6.0.0",
+    "rxjs-compat": "^6.2.2",
+    "rxjs-tslint": "^0.1.5",
+
+From v6 onwards, the following will NOT work:-
+1.
+	import * as Rx from 'rxjs/Rx'; (was earlier used for Rx.Observable.create(), etc )
+    import { Observable } from 'rxjs/Observable'; 
+    import { Subject } from 'rxjs/Subject';
+    
+instead, use :-
+	import { Observable, Subject, of, from, fromEvent, interval } from 'rxjs';
+    			
+NOTE:= below was working for sometime, but doesn't anymore:-
+	import { from, of } from 'rxjs/create';
+
+2. 
+   	import 'rxjs/add/operator/map';
+   	import 'rxjs/add/operator/debounce';
+    	
+    v6 & above: 
+   	import { map, debounce } from 'rxjs/operators';	
+	
+IMP NOTE:-	
+	1. Some operators have a name change due to name collisions with JavaScript reserved words! 
+		These include: 
+			Observable.throw -> throwError()
+			do -> tap, 
+			catch -> catchError, 
+			switch -> switchAll, 
+			finally -> finalize
+		
+	2. 
+		rxjs/operators: Contains all pipeable operators	
+		rxjs: contains other methods/types/utilities/schedulers/
+		
+	3. rxjs-compat can be used for gradual migration
+	   rxjs-tslint is also good.
+
+----
+
+rxjs-compat will prevent compilation errors from 
+   	import 'rxjs/add/operator/map';
+   	import 'rxjs/add/operator/debounce';
+
+----
+Observable is a data producer. See promise vs observable section. 
+Subject is a data producer + consumer. 
+
+In Rxjs v6:-
+1. Creating a custom observable:- 
+	import { Observable } from 'rxjs';
+	+
+	Observable.create() -or- new Observable() // both are same. Observable.create() internally called new Observable().
+	+ 
+	.next(), .error(), .complete()  [ NOTE: it is NOT onNext()/onError()/onCompleted() as the docs say. ]
+	observer.next() -or- observer.next('msg1')
+
+---
+
+eg 1. Service + component using the service
+	export class Rxservice1Service {
+		constructor() { }
+		// 1.
+		   public getSomeStream1() {
+				const somestream$ = new Observable ( (observer) => {
+					observer.next('a1');
+					observer.next('msg1');
+					observer.complete();
+				});
+				return somestream$;
+			} // getSomeStream1 ends
+
+		 // 2.
+		   public getSomeStream2() {
+				const somestream2$ = Observable.create((observer) => {
+					observer.next('a2');
+					observer.next('msg2');
+					observer.complete();
+				});
+				return somestream2$;
+		   }
+	} // class ends
+
+	In component,
+	 ngOnInit() {
+        // do something here with the rxSrv1.
+        // 1.
+        this.rxSrv1.getSomeStream1().subscribe(
+                (val) => console.log(val), err => console.log(err),
+                () => { console.log('completed'); }
+        );
+
+        // 2.
+        this.rxSrv1.getSomeStream2().subscribe(
+            (val) => console.log(val), () => {}, () => console.log('completed')
+        );
+    } // ngOnInit ends
+	
+----	
+
+
+==============================
+
 String Interpolation:-
 {{ classvar }} // will be a class variable.
 {{ classmethod() }} // Works, but Dont do this as it will call it multiple times
