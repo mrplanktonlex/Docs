@@ -867,22 +867,18 @@ In Rxjs v6:-
 eg 1. Service + component using the service
 	export class Rxservice1Service {
 		constructor() { }
-		// 1.
+		// 1. Observables. 1.1
 		   public getSomeStream1() {
 				const somestream$ = new Observable ( (observer) => {
-					observer.next('a1');
-					observer.next('msg1');
-					observer.complete();
+					observer.next('a1'); observer.next('msg1'); observer.complete();
 				});
 				return somestream$;
 			} // getSomeStream1 ends
 
-		 // 2.
+	    // 1.2. // Observable.create() internally calls its constructor i.e. "new Observable()". The new-keyword always calls the constructor
 		   public getSomeStream2() {
 				const somestream2$ = Observable.create((observer) => {
-					observer.next('a2');
-					observer.next('msg2');
-					observer.complete();
+					observer.next('a2'); observer.next('msg2'); observer.complete();
 				});
 				return somestream2$;
 		   }
@@ -905,6 +901,88 @@ eg 1. Service + component using the service
 	
 ----	
 
+import { fromPromise } from 'rxjs'; // used to work earlier, but will now fail in v6.
+
+// NOTE: fromPromise is not part of the public API anymore and its wrapped in the from method. Instead use below:
+    // For rxjs 6.0.0 use:
+    // import { from } from 'rxjs';
+    // var observableFromPromise =  from(promiseSrc);
+    // if using rxjs-compat, then import 'rxjs/add/observable/fromPromise'; can also be used.
+
+----
+
+Boring observables:- empty, never, throw (Andre Stalz) (Note: Observable.throw() becomes throwError() in v6)
+https://egghead.io/lessons/rxjs-creation-operators-empty-never-throw?course=rxjs-beyond-the-basics-creating-observables-from-scratch	
+
+Rx.Observable.empty  // is an observable that just returns 'done' on subscription. i.e. imagine an observable with only .complete()
+Rx.Observable.never  // is an observable that does nothing on subscription.		   i.e. imagine an observable which does nothing and it infinitely waits for a value
+Rx.Observable.throw  // is an observable that emits a custom error.                i.e. imagine an observable with ONLY .error()
+	Rx.Observable.throw (new Error('blah blah error') );
+	observer.error(new Error('blah blah error'))
+	
+----
+
+Rx.Observable.of( 10, 100, 200) // .of() is used for generating a stream of synchronous values.
+	// same as writing  
+		new Observable((observer) => {
+			observer.next(10); observer.next(100); observer.next(200);
+		})
+
+// LHS is a stream which can be subscribed to.
+		
+----		
+from-family: fromArray, fromPromise, from(arg)
+
+1.
+Rx.Observable.fromArray([100, 200, 300]); // same as .of(). Difference is:= JS values are usually in a list (i.e. Array). 
+												// fromArray() uses list, whereas .of() uses singular values
+// LHS is a stream which can be subscribed to.
+
+2.
+Rx.Observable.fromPromise(promisesrc). //obsolete in v6. use from() instead
+	
+3. VIMP!!
+from (arg)
+		> arg, can be an array/promise
+		> arg can be an iterator/generator(es6) too. i.e. from(somegeneratorFuncExpression)
+
+----
+Some examples:-
+
+1.
+	import { interval } from 'rxjs'; 
+	import { take } from 'rxjs/operators';
+	
+		v6        		 			-OR-     < v6
+	interval(1000) 		 			-OR- Rx.observable.interval(1000) // interval of 1 sec, starting with 0, eg. 0,1,2,3,4...
+	interval(1000).pipe(take(4));	-OR- interval(1000).take(4)	// TAKE Only 4 numeric values and then stop.
+
+NOTE: .pipe() can be used in the service's public method(before subscription) -OR- .pipe() can be used in the component (after subscription)
+		eg. before subscription:- 
+			public somefuncinservice() { return interval(1000).pipe(take(4)) }  + this.srv.somefuncinservice().subscribe( x => console.log (x));
+		eg. after subscription:- 
+			public somefuncinservice() { return interval(1000) } + this.srv.somefuncinservice().pipe(take(4)).subscribe( x => console.log (x));
+			
+		// For both styles, .pipe(take(4)) works fine	
+		// For both styles, everytime a new subscription is made, same numbers are repeated 0,1,2,3. 
+		// For both styles, for subscriptions in ngOnInit()
+			For 2 subscriptions, O/P: 00112233
+			For 3 subscriptions, O/P: 000111222333
+		
+2. this.rxSrv1.getnumbers().pipe(take(4)).pipe(map(x => 'hello#' + x))  // see maps usage. this is a different stream which we created from .pipe(take(4))
+
+==============================
+Andre Stalz:-
+Higher Order Observables:- observables emitting observables.
+
+1. this.rxSrv1.getnumbers().pipe(take(4)).pipe(map(x => of (x) )) // import { of } from 'rxjs'; // not very useful until u subscribe the x.
+To consume a higher order observable, we have to subscribe within a subscribe, which is not elegant.
+>> we are not storing the inner subscription anywhere, to unsubscribe later; thereby potentially causing leaks.
+>> more complicated.
+
+Sol1. Flattening operators:- takes a higher order observable.
+	  eg. switch():- 
+				// 
 
 ==============================
 
@@ -2832,5 +2910,3 @@ create store/
 	- Storemodule
 	- action creators, reducer
 	- Unit test for reducer
-
-	
