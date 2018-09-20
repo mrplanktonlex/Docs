@@ -1,0 +1,221 @@
+action-constants, action-creators, action-types?
+
+----
+
+Action creators:
+this.store.dispatch({ type: GET_TODO }, payload); // payload here means payload: payload 
+However, we may not be sending the payload every single time. So, for that we use an action-creator.
+
+*.action.ts
+export class GetTodo implements Action{  // implements Action will help u with any errors, eg. typos like "types" instead of "type", etc.
+										 // Action is an interface in ngrx/store.
+	readonly type = GET_TODO; // set the type to an action-constant. Since its readonly, typo error will be reduced for "type".
+	constructor( private payload: any){} // any here can be replaced with an interface or something, if required.
+										 // It can be made "public" so that u can pass any errors as payload.
+}
+
+
+
+This can be checked like this:-
+console.log(new GetTodo({})) // when neither type nor payload are there, use {}
+
+Using the action creator:=
+this.store.dispatch({ type: GET_TODO }, payload);   now becomes
+this.store.dispatch( new someImport*StoreVarInIndexTs.GetTodo (payload) );  // aint this cleaner??
+
+----
+
+Project Setup and Walkthrough:-
+
+StoreModule, MetaReducer // MetaReducer is used, when we want to apply a function to all reducers.
+EffectsModule
+
+// both these NOT to be used in production.
+StoreDevtoolsModule '@ngrx/store-devtools';	// will help us see states when we change the state. (redux-devtools)
+import { storeFreeze} from 'ngrx-store-freeze'; // in a reducer, if u try to mutate and obj, this package will not allow that.
+
+// eg. of Metareducer 
+export const metaReducers: MetaReducer<any>[] = !prodenv ? [storeFreeze] : [];
+StoreModule.forRoot({}, {metaReducers} ),	
+	EffectsModule.forRoot([]), environment.development? StoreDevtoolsModule.instrument(): []
+
+	
+	The reason the 1st param is empty in StoreModule.forRoot({}, {metaReducers} ), 
+	    because we will build the ProductsModule first and then start adding reducers to the 1st param (like ActionReducerMap ??)
+		
+	products/
+		products.module.ts 
+			>> is currently using pure angular concepts. We will be changing it into ngrx stuff.
+		
+	
+	products/components
+	products/containers/
+		products/containers/product-item/	(for routes with /:id or /new )
+		products/containers/products/
+		products/containers/products/products.component.ts + sass file. // gets data from a service and populates a class variable to render to html
+		products/containers/index.ts
+	products/containers/models/
+	products/containers/services/
+	
+	Problem here is :- we are using a services driven approach (using traditional angular) and not a state-driven approach.
+	
+	Q. What all WIRING needs to be changed, to make it a state-driven angular application?
+	A. 
+	
+	products/store/	i.e. FM/store/		This will result in action constants with 'FM] Get Todo'
+	products/store/actions/
+	products/store/reducers/
+	products/store/effects/ 
+	
+	
+----
+
+State Composition with Selectors:
+
+	
+
+	Pre-requisites:-
+		Interface Pizza in pizza.model.ts 
+		Interface PizzaState in reducer.
+			PizzaState {
+				data: Pizza[], // from pizza.model
+				loaded: boolean, loading: boolean
+			}
+			
+			InitialState : PizzaState {
+				data: [],
+				loaded: false,
+				loading: false
+			}
+			
+		NOTE: reducers/ does not have a index.ts in it.
+			
+		Reducer should have:-
+		> an interface showing the slice of state it represents. This can be in models/reducers/ folder too.
+		> InitialState 
+		> reducer function
+
+	We will have to write a selector. Why? 
+	Because it is going to help us retrieve the slice of state (represented in reducer).
+
+	
+	Q. How do we get data from the store?
+	A. we use .select() . e.g. this.store.select()
+		> It can take a string -OR- a function. If you send a function as param, then it will return u a slice of state.
+		> egs. this.store.select('products') . If errors, then use
+			   this.store.select<any>('products')
+			   
+			   this.store.select<any>('products').subscribe(), where:-
+				> 'products' is not yet created.??
+				> its a top level key, which will help us to get further child slices of state.
+				> 
+Q. WTF is 'products' ??
+A. 
+	step 1: 
+		create an interface above the PizzaState i.e. in index.ts, say ProductsState
+			ProductsState will have slices of state. eg. pizzas: PizzaState 
+			
+			export interface ProductsState {
+				pizzas: fromPizzas.PizzaState
+			}
+			
+			export const reducers: ActionReducerMap<ProductsState> = {
+				pizzas: PizzaReducer
+			}
+	step 2:
+			Remember we had ProductsModule as a FM in plain angular world.
+			We need to tell it that a store exists.
+			
+			products.module.ts
+			import { StoreModule } from '@ngrx/store';
+			@NgModule({ 
+				imports: [
+					...
+					StoreModule.forFeature('products', {})	
+						// if forFeature() is used, its for LL, so keep forRoot()'s 1st param empty {}
+						// The second param should NOT be {}, its explained below in products/store/index.ts
+				]
+			})
+			
+		products/store/
+		products/store/actions/		
+		products/store/reducers/Pizza.reducer.ts <<<=== This has PizzaState
+		products/store/reducers/index.ts <<<=== This has ProductsState
+		
+		Now, create 
+		products/store/index.ts <<<===  exports all reducers for things outside of products/store/
+										!!!IMP!!! it will also be useful in smart components like :-
+											constructor(store: Store<fromStore.ProductsState>) {}
+		
+			import { reducers } from '../products/store';	// products/store/index.ts allows us to do that.
+															// this "reducers" is the ActionReducerMap one we created above.
+			StoreModule.forFeature('products', reducers )
+			
+		!!!! VIMP!!!	THIS 'products' is going to be very important.
+		
+----
+
+contd ... 
+
+	Coming back to:-
+		this.store.select<any>('products').subscribe()
+		
+	In services-driven approach, its difficult to get slices of state.
+	In state-driven approach, we can get slices of state using .select().
+		But todo that, the REDUCERS HAVE TO EXPORT such STATES!!!
+		
+		reducers/pizza.reducer.ts (after the reducer function)
+			export const getPizzasLoading = (state: PizzaState) => state.loading ;
+			export const getPizzasLoaded = (state: PizzaState) => state.loaded ;
+			export const getPizzas = (state: PizzaState) => state.data ;
+			
+		We also need to export ProductsState which is in reducers/index.ts 
+		reducers/index.ts 
+			import { createFeatureSelector } from '@ngrx/store';
+			export const getProductsState = createFeatureSelector('products'); // from .forFeature('products')
+										 // here we are creating a base reference to that property.
+										 
+			-OR-
+			export const getProductsState = createFeatureSelector<ProductsState>('products');
+			
+			NOTE:- 
+				createFeatureSelector is to get the feature 'products'
+				createSelector is to get the pizza state-functions like getPizzas, getPizzasLoaded, getPizzasLoading
+				
+				import { createSelector } from '@ngrx/store'
+				
+				export const getPizzaState = createSelector( getProductsState, ); // still incomplete
+					1st param is starting pt.
+					2nd param can be another selector or an anon function. 
+				export const getPizzaState = createSelector( getProductsState, 
+					(state: ProductsState ) => state.pizzas	// here we have whats in pizza.reducer.ts
+				);
+
+				export const getAllPizzas = createSelector(getPizzaState, fromPizzas.getPizzas);
+				export const getPizzasLoaded = createSelector(getPizzaState, fromPizzas.getPizzasLoaded);
+				export const getPizzasLoading = createSelector(getPizzaState, fromPizzas.getPizzasLoading);
+				
+				So our state tree looks like this:=
+				{
+					'products' => {    // LHS: getProductsState, 'pizzas' cause thats what is in the interface ProductsState
+						'pizzas' => {  // LHS: getPizzaState, RHS is the InitialState-types.	
+							data: [], 		// getPizzas
+							loaded: false,	// getPizzasLoaded
+							loading: false	// getPizzasLoading
+						}
+					}
+				}
+
+---				
+				
+this.store.select()
+createFeatureSelector, createSelector				
+----				
+
+this.store.select<any>('products').subscribe()  can be written like :-
+this.store.select<any>(fromStore.getAllPizzas).subscribe()	//??? whatever gives you 'products'.
+
+No need to subscribe, u can assign it to a stream and then take care of it using async.
+
+----
+
