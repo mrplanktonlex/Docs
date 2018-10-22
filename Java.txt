@@ -1,0 +1,227 @@
+jar vs war vs ear 
+
+jar : java archive
+- group of .class files 
+- it contains a group
+
+war : web archive
+- will have jsps, servlets, html, css, etc.
+- will have ONLY one web application 
+
+ear : enterprise archive
+- we will use anything from j2ee but NOT things from war-file
+- jsps, servlets, ejbs, jms, etc. we can use 
+
+---
+
+web app -vs- enterprise app
+
+web-app:
+
+enterprise-app: 
+
+---
+
+web server -vs- app-server 
+
+---
+
+classpath vs path
+
+---
+
+JDK vs JRE vs JVM 
+
+---
+
+java vs javaw vs javaws : All the 3 can be used to run the java application, but whats the difference?
+
+java:   java cmd is to run java class file.
+javaw:  java cmd without console outputs
+javaws: java web start utility:
+(not web services!!!)
+	- jnlp (url) ??? whats that ???
+	javaws jnlp_url
+		-- the application will be downloaded into client system
+		-- this is helpful to get updates 
+
+---
+
+how to create executable jar (double click jar file and it should run)
+- should be able to run like "java durga.jar" 
+- we know jar contains several class files 
+But which one is the main class ?
+For that we write a manifest file. Manifest.MF 
+	-- main-class: JarDemo(\n char is imp!!!)
+	-- jar -cvfm demo.jar Manifest.MF JarDemo.class JarDemo$1.class 
+		this will create demo.jar 
+		-m is for Manifest.MF
+		
+	java -jar demo.jar	(note the -jar option)
+
+NOTE:- the demo.jar can now be copy pasted anywhere and can be executed by simply double clicking.
+	
+extras:
+jar -xvf demo.jar (-x is for extracting/unzipping the jar )	
+---
+
+how many ways to execute a java program ?
+
+---
+================================================================
+
+Serialization n Deserialization 
+https://www.youtube.com/watch?v=Y5KXGLbCzbc&index=5&list=PLd3UqWTnYXOkE3etrqOSPgkUdcxrEc0Y1  
+
+transient keyword
+	static vs transient 
+	final vs transient 
+
+Object Graphs in Serialization
+Customized Serialization (using transient)
+
+Serialization w.r.t. inheritance.
+Externalization
+serialVersionUID
+
+---
+
+obj to file : Serialization
+file to obj : Deserialization
+
+Serialization:
+- the process of writing the "state" of an obj. from a 
+	Java supported form --->>to---->> File / Network Supported Form
+	is called serialization
+
+	Java Obj obj1
+	  --> ObjectOutputStream.writeObject(obj1) -- converts obj to binary data
+		--> FileOutputStream (writes to the file) -- write binary data to file 	
+
+
+Deserialization:
+- the process of conversion of 
+	File/Network supported form to Java supported form is called deserialization.
+
+	From file:
+	--> FileInputStream (to read binary data from file)
+		--> ObjectInputStream.readObject();
+			--> Java Object (Obj2)
+
+Note:-
+in case of multiple objects
+	- serialization is same 
+	- deserialization will be in the same order as it was serialized.
+		so, make sure order is same as was in serialization
+
+Problem:- 
+		I am the serializer and the deserializer, so np because I know the order.
+		Q. But what if someone else was deserializing; such people wont know the order. 
+
+Object Graph:-
+	If Dog class has Cat class ref and Cat class has rat class reference,
+	then when serialization happens, all of Dog, Cat, Rat will be created.
+
+	Runtime Exception: NotSerializableException: Dog 
+	Soln:- class Dog implements Serializable
+	Runtime Exception: NotSerializableException: Cat		
+	Soln:- class Cat implements Serializable	
+	Runtime Exception: NotSerializableException: Rat		
+	Soln:- class Rat implements Serializable	
+	
+	So, in object graphs, every object should be Serializable.
+	
+	eg.
+	Obj. to be serialized: d1 -> c -> r -> j = 20 (c for cat, r for rat)
+		Obj. on file = c -> r -> j = 20 (??)
+	Obj. got by deserialized: d2 -> c -> r -> j = 20 (c for cat, r for rat)	
+	
+Customized Serialization
+	
+"transient"	keyword:
+- we use it before sensitive class members eg. 
+	transient String password = 'test';
+	
+	Problem1:  Data loss problem during "default" serialization
+		During "default" serialization, JVM will ignore original values of members
+		with "transient", instead it will store null. So, deserialization u get null.
+	
+	Expected:- 
+		During serialization, file stores password as null
+		During deserialization, password is automatically recovered.
+	
+	Soln:-
+		encrypt password 
+							---> write encrypted password to file 
+		decrypt password.	<---
+		
+Customized serialization can be implemented using 2 methods:
+1st method:- (complete signatures are important)
+	private void writeObject(ObjectOutputStream os) throws Exception {
+		// whatever extra work being done, like encryption goes here.
+	}
+2nd method:- 
+	private void readObject(ObjectInputStream is) throws Exception {
+		// whatever extra work being done, like decryption goes here.
+	}
+
+	// Note: the signature of both methods cannot change.
+		These 2 methods r callback methods (because jvm will call these automatically).
+	// these methods will have to be placed in the corresponding class.
+		i.e. Account class.
+		In previous example, if the dog obj was getting serialized, then these methods would be placed in the dog class.
+		
+	// eg. 
+	class Account implements Serializable {
+		String username = 'test';
+		transient String password = 'anushka';
+		
+		// step2. jvm is happy. it found custom-implentation.
+		// control is given to this method. jvm will just run it.
+		private void writeObject(ObjectOutputStream os) throws Exception {
+			os.defaultWriteObject(); 
+			// step 3. we r requesting, jvm can u plz run the default serialization ?? ---> writes to file "pwd: null"
+			
+			// step4. whatever extra step like mangoes on top of money.
+			String epwd = '123' + pwd;
+			os.writeObject(epwd); ---> write to file "epwd"
+		}
+		
+		private void readObject(ObjectInputStream is) throws Exception {
+			is.defaultReadObject(); // pwd: null
+			String epwd = (String)is.readObject(); //pwd: 123Anushka
+			// decrypt password logic....
+		}
+		
+	} // class account ends 
+		
+	// 	
+	class mypublicclass {
+		public static void main (String[] args) {
+		
+		// Serialization
+			Account a1 = new Account();
+			FileOutputStream fos = new FileOutputStream('1.ser');
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(a1); // step1. JVM checks if Account class has custom-implentation of writeObject. 
+		
+		// Deserialization
+			FileInputStream fis = new FileInputStream('1.ser');
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			Account a2 = (Account)ois.readObject(); 
+			// JVM will check if readObject() is in Account class or not.  
+		}
+	}	
+
+---
+
+Serialization w.r.t. inheritance	
+		
+		
+		
+--- 
+
+
+---
+
+		
