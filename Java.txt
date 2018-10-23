@@ -216,12 +216,442 @@ Customized serialization can be implemented using 2 methods:
 ---
 
 Serialization w.r.t. inheritance	
+https://www.youtube.com/watch?v=Y5KXGLbCzbc&index=5&list=PLd3UqWTnYXOkE3etrqOSPgkUdcxrEc0Y1 
+
+Case 1:
+class Parent implements Serializable{}
+class Child extends Parent {} // n does not implement Serializable. 
+child c1 = new Child() n this obj goes into 1.ser 
 		
-		
-		
+	- in this case, everything 	is serializeable and deserializeable.
+	- bcoz if parent is serializeable, then everything else is serializeable
+
+NOTE: Object class does NOT implement Serializeable interface
+	
+Case 2:
+class Parent{ int i = 20; }
+class Child implements Serializable{
+  int j = 20;
+}
+
+	- Child c1 = new Child();
+		c1.i = 888; 
+		c1.j = 999;
+	- in this case,
+		--> in 1.ser, i= 0; j = 999.
+			i takes default value of int, which is 0.
+			the reason it takes default value is because Parent is non-Serializeable.
+
+NOTE:-
+at the time of deserialization, JVM triggers "instance control flow", in every non-Serializeable parent 
+instance control flow contains :-
+2.1 identification of instance members 
+2.2 execution of instance assignments on blocks (??)
+2.3 execution of constructor
+
+	So, we get c1.i = 10; c1.j = 999; // during deserialization
+	JVM calls the no-argument constructor --> instance control flow.
+		- so no-argument constructor should be there in every non-Serializeable parent. 
+		NOTE: non-Serializeable parent should have COMPULSORY no-argument constructor.
+			- Default constructor can assigned by the compiler. Or, programmer can provide customized constructor for "no-argument constructor".
+			- Otherwise,
+				Runtime Exception: InvalidClassException 
+			
+Q. but i's value of 888 was never retrieved ???			
+Lot of questions in mind.
+	
 --- 
 
+Externalization:- 
+
+Serialization -vs- Deserialization : 
+- jvm is in control
+- jvm saves entire obj (with all properties) to the file.
+we cannot cherry pick properties.
+- Control is not with programmer.
+
+Like Serializable interface, in externalization, we have Externalize interface.
+Externalize interface has 2 methods:-
+- writeExternal()
+- readExternal()
+
+Externalize is child interface of Serializable
+During serialization, when oos.writeObject(d1) is called, jvm checks
+- if there the class associated with the object, is Serializable.
+	if yes, it copies the whole object.
+	if not, it checks if that class is externalizeable.
+		-- if yes, it knows programmer wants to send only few properties.
+			--> jvm searches for writeExternal() implementation
+			// Account class implements Externalizeable	
+				
+				public void writeExternal (ObjectOutputStream oos) throws IOException {
+					oos.writeObject(s); // s = String
+					oos.writeInt(i); // i = int
+				}
+
+	// here jvm is storing data
+	
+	Deserialization: // here programmer is going to recreate the object.
+Note:- Unlike Serializable, transient keyword has NO affect in Externalization
+because, programmer is in control.
+	
+	step 1:	
+		- jvm comes and sees that corresponding class is Externalizeable.
+		- it knows only certain part of the properties can be retrieved.
+		- so to create the complete object, it calls that class's PUBLIC no-argument constructor i.e. public Account().
+			-- if Account() no-argument constructor is NOT Found, we will get 
+				Runtime Exception of InvalidClassException
+					- in Account(), default values will be assigned i.e.
+						s = null, i = 0, j = 0; (s is String, i and j is int)
+		
+	
+	step 2: On the NEW object (s=null, i=0, j=0), which jvm created, jvm will call readExternal()	
+	// During deserialization,  
+	public void readExternal(ObjectInputStream is) throws
+		IOException, ClassNotFoundException
+	{
+		s = (String)ois.readObject()
+		i = is.readInt();
+	}
+	
+---
+
+Serializeable						
+- is marker interface, does not have any methods 
+- entire obj will be saved, no option to save part of the obj properties.
+- jvm is in control at all times, hence for sensitive data, transient keyword should be used. 
+- default serialization is there.
+- not necessary to contain public no-argument constructor
+
+Externalizeable
+- is an interface with 2 methods: writeExternal + readExternal
+- only part of the obj will be saved, so it is more performant.
+- programmer is in control, so no use of transient keyword.
+- customized serialization is there. 
+- corr. class should COMPULSORY contain public no-argument constructor
+		
+---
+
+SerialVersionUID 
+
+person, machine and location is same in egs. so far.
+but that need not be same, all these 3 params can change.
+- NOTE:- .class file does not travel from sender to receiver, only the state of the object is travelling.
+
+- jvm generates a unique ID for every .class file, with every serialization.
+- during deserialization, jvm will ask, oye object, which class u belong to ?
+	- u have some UID 
+	- UID will be same eg. 101 in senders class, in 1.ser and in receivers class.
+	- if all 3 dont match, run time exception will happen.
+	- this ID is serialVersionUID. 
+	
+VIMP NOTE:- 
+- same JVM version and same vendor, platform (OS) is necessary for the default serialVersionUID to be generated exactly the same. Else, deserialization may fail.
+
+- both sender and receiver should maintain same version of .class file.
+Else, serialVersionUID may differ.
+
+(skipped)
+
+================
+CORE JAVA
+================
+Tokens
+Data Types
+Type Casting
+Java Statements
+Arrays
+
+Tokens:
+	Lexemes - logical units like +, *, int, ; etc.
+	Tokens -- are groupings of lexemes 
+	
+	Identifiers, Literals, Keywords/Reserved Words, Operators.
+	Identifiers : name provided to prog. elmenets.
+	
+---
+
+2 types of Class variables:- Static vars n non-static vars (or instance vars)
+3 types of variables are there in java:
+local vars., static vars., non-static vars.
+
+5 types of memory: of which
+   we require 3 types of memory:
+	1. method area -- static vars.
+	2. stack memory	-- local vars. 
+	3. heap memory -- non-static/instance vars.
+
+class A {
+	int i = 10;	//non-static var. === heap memory
+	void m1(){
+		float f = 22.22f; // local var. === stack memory
+	}
+}	
+	
+---
+
+class A {
+	int i = 10; // heap memory
+	
+	somemethod(){
+		int i = 20; // stack memory
+		console.log(i, this.i); // i is local var., this.i is instance var.
+								// if i is not found amongst local vars, it will check in class vars, 
+								// if still not found, it will check in super class vars.
+	}
+}	
 
 ---
+
+package: is collection of classes and interfaces.
+java.io classes:
+	BufferedReader
+	InputStreamReader
+	FileInputStream
+	FileOutputStream
+java.lang classes
+	System
+	Object
+	Exception
+	Thread
+	
+class names with package names is the fully qualified name.
+	eg. java.io.BufferedReader 
+
+---
+
+Note:- we can use all predefined classes and names as identifiers.
+
+eg. int i = 10;
+	sopln (i)
+can be written as :-
+	int Exception = 10;
+	sopln(Exception)	
+	
+eg.2. 
+	String String = "String"; // this will also work 
+	
+eg.3. 
+	int System = 10;
+	Sopln (System); // error. 
+	
+Rule is: 
+	> once u have used it as an integer, u have to use it integer only from now on; u cannot use it again as its original class.	
+	
+---
+
+https://www.youtube.com/watch?v=BTVZieEazV8 
+
+java oops in 10 minutes (on youtube)
+
+Inheritance: if we want to use DataMembers and MemberFunctions of Parent Class
+to Child Class.
+		- single inheritance: Father & Child: without interfaces 
+		- multilevel inheritance: without interfaces
+		- multiple inheritance: with interfaces
+		- hybrid inheritance
+		
+	PS: An interface is a reference type in Java. 
+		It is a collection of abstract methods.
+
+Single inheritance:
+	public class Parent {
+		protected int ID;
+		protected String className;	
+	} // parent ends
+
+	public class Teacher extends Child {
+		private void 
+	}	
+
+---
+	
+Anonymous interface: 
+	- Explicit implementation of interfaces in java is not possible like c#.
+	- it is done using anonymous interface.
+		
+interface Foo { 
+		void f();
+}
+
+interface Bar {
+		void f();
+}
+
+public class Test {
+	Foo getFoo() {
+		return new Foo() {
+			@Override
+			public void f(){
+			} // f ends
+		} // return ends 
+	} // getFoo ends
+
+	Bar getBar(){ // step1. write a named function.
+		// step 2: return new Bar()
+		return new Bar() {
+			@Override	// step 3. use override and write an definiton
+			public void f(){
+			} // f ends
+		} // return ends
+		
+	} // getBar ends
+
+	p.s.v.main(String...args){
+		Test test = new Test();
+		test.getFoo().f();
+		test.getBar().f();
+	}
+} // class ends 
+	
+---	
+	
+Final-keyword: is a sealed keyword ("sealed" is in c#) and its used to restrict inheritance.
+- if applied to classes, they cannot be inherited.
+- if appliced to methods, they cannot be overridden.
+- if applied to fields and variables, they can be initialized once.	
+	
+---
+
+Polymorphism: is ability of object to behave in multiple ways @ runtime.
+Best rule: Make Base class as Abstract class.	
+	
+- Abstract class: is a class from which we cannot create an object. 
+	- it can have abstract methods -or- simple methods (?)
+	- it can participate in inheritance
+	- if such class has "abstract" method, then child has to implement it.
+	NOTE: child class can have its own abstract method, but it is not necessary to make the child itself abstract.
+	
+---
+
+Composition:
+		- a feature in which an object can hold many objects 
+		
+	
+public class OS {
+	public void bootUp(){ ... }
+	public void shutDown() { ... }
+} // class ends 
+
+public class PowerSupply {
+	public void turnOn(){ ... }
+	public void turnOff() { ... }
+} // class ends 	
+	
+public class Computer() {
+	private OS os = new OS();
+	private PowerSupply ps = new PowerSupply();
+	
+	// composition eg.1 ?
+	Computer(){
+		ps.turnOn();
+		os.bootUp();
+	} // computer ends 
+	
+	// composition eg.2 ?
+	void allDone(){
+		os.shutDown();
+		ps.turnOff();
+	}
+	
+	p.s.v.main (String[] args) {
+		Computer comp = new Computer();
+		comp.allDone();
+	}
+} // class ends 	
+	
+	
+==============================
+
+Java JDBC 
+4 diff. types to connect :
+- native driver: odbc bridge -- used for ms access 
+- native api: 
+- pure java drivers.	
+	
+7 steps of connectivity:-
+1. import package - java.sql.*
+2. Load and register the driver.
+3. Connect
+4. Create the statement (sql)
+5. Execute the query.
+6. Process results 
+7. Close the connection.	
+	
+2. Load and Register the driver.
+-- diff dbs have diff. drivers. eg. for mysql, com.mysql.jdbc.driver 
+	Load:	
+		-- download mysql-connector jar from internet. (netbeans has it loaded)
+		-- for eclipse, download the jar file explicitly.
+		-- how to load we will see later 
+	Register: 
+		-- <someclass??>.forName("com.mysql.jdbc.driver)
+		
+3. Connect
+	there is an interface called "Connection"
+		-- u have to instantiate this interface.
+		-- getConnection() is a method which someone implemented on this interface n we should use this method.
+		-- DriverManager.getConnection("url", "username", "pwd"). its a static method.
+		
+4. Create the statement (sql)
+3 types of statement:
+	statement, preparedStatement, CallableStatement (for PL/SQL)
+		- CallableStatement is for stored procedures.
+
+import java.sql.*;
+p.s.v.main(){
+	Class.forName("com.mysql.jdbc.driver");
+	Connection con = DriverManager.getConnection("url", "username", "pwd");
+	Statement st = con.createStatement();
+	Resultset rs = st.executeQuery("select * from student");
+	while(rs.next()) {
+		sysout(rs.getInt(1) + " " + rs.getString(2)); // for row like 1|plankton
+	}
+	st.close();
+	conn.close();
+} // main ends		
+	
+// DQL: use sth.executeQuery() for querying the db
+// DML: use sth.executeUpdate() for manipulation	
+// DDL: 	
+	
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 		
