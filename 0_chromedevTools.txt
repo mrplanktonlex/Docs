@@ -1,0 +1,30 @@
+Render blocking: both css and JS can cause it.
+- download, parse and then execute the css/js before proceeding.
+
+Get rid of any render blocking that isn't truly needed.
+First, we need to find it:
+
+- Audits -> run Audits (using lighthouse)
+	-- Opportunities-section
+		> Eliminate Render Blocking Resources
+		Press ctrl+shift+P(p?) on windows/linux 
+		1.	-- it opens the "command menu"
+			-- type "coverage" + click "show coverage" ===> A new "Coverage" tab will be opened.
+				Click reload (In the "Coverage" Tab) 
+				
+				Then it will show "how much code, from each file is unused"
+					-- click on jquery.js file.
+					-- the red bar means those lines were not executed 
+					
+		2. Press Ctrl+Shift+P and type "block" and select "Show Request Blocking" 
+			(Some of the libraries may not be used at all)
+			> Click "Add Pattern"
+			> /libs/* 
+			> go back to the network pannel and reload the page.
+				-- it will show which js-scripts were "render blocking" and are highlighted in red.
+								
+	-- Diagnostics-section		
+		Performance-tab + capture settings 
+			Network: Fast 3G
+			CPU: 4x slowdown
+			Click "Start profiling and reload page"
