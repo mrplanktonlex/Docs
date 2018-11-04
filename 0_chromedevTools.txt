@@ -28,3 +28,37 @@ First, we need to find it:
 			Network: Fast 3G
 			CPU: 4x slowdown
 			Click "Start profiling and reload page"
+
+---
+
+
+Debugging:
+
+Sources Tab:
+	select the js.
+		- Event Listener Breakpoints.
+			- Mouse 
+				- click 
+
+Sources Tab + Page 
+Sources Tab + Snippets 
+			- here you can write small unrelated code and press Ctl+Enter or hit play to execute it.
+			
+
+Sources Tab + Watch:
+	typeof <varname>
+
+----
+Reference: https://moderndevtools.com/lessons/11
+Performance tab:
+	Select the peak in question.
+	Click any purple block 
+		Click the line of code Chrome shows. 
+		Click {} (pretty printing)
+		Add debugger and see if that line is triggered.
+		
+		eg. For Recalculate style, it shows "Elements Affected"
+		Anything taking more than 50ms needs to be looked at.
+
+----
+
