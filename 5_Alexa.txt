@@ -100,7 +100,15 @@ AWS Lambda function (using Node.js):-
 				- u can get quotes
 
 Local environment Setup (for AWS)
-	- 
+	- npm install -g lambda_local 
+	- local testing command:
+		lambda_local -l index.js -h handler -e event.json 
+
+AWS cli 
+	- pip install awscli
+	- Create a user and give permissions at IAM Management Console.
+	- aws configure. 
+	
 
 =========
 
