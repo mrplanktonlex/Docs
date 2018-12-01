@@ -23,4 +23,8 @@ S6
 S1 
 
 www.echosim.io 
-
+alexa.amazon.com 
+	- goto settings 
+	
+Alexa Skill Kit 
+	1. Greetings Skill Objective and setup
