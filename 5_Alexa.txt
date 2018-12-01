@@ -95,7 +95,12 @@ AWS Lambda function (using Node.js):-
 				   IntentRequest Ex. "Say hello to John"
 				   SessionEndedRequest Ex. "exit" or error or timeout 
 				*/   
+			(skipped node.js stuff)
+			-- forismatic.com/en/api 
+				- u can get quotes
 
+Local environment Setup (for AWS)
+	- 
 
 =========
 
