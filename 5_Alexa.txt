@@ -64,4 +64,26 @@ Alexa Skill Kit
 				    --> AWS Lambda Function / Any Web Services
 		
 	
-			
+=========
+
+AWS Lambda Service:-
+	- is a serverless compute service that will create the response 
+	- No need to validate incoming requests 
+	- No need to maintain ssl certificates, etc. 
+	- supports Java, Node.js, C#, Python code.
+AWS Free Tier
+	- 1million requests per month + 3.2m secs of compute time per month.
+	
+eg. 
+AWS Lambda function (using Node.js):-
+	- http://aws.amazon.com 
+	- country matters, so select country properly else you wont get enough trigger points. 
+	- search for lambda + click on lambda + click "create function"
+		- template to select is "SimpleMicroServices" 
+		
+	
+
+
+=========
+
+Web Service
