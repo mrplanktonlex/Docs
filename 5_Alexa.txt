@@ -90,7 +90,11 @@ AWS Lambda function (using Node.js):-
 				- it will show coding section.
 					-- index.handler : means index.js::handler() . It can be something else.
 			-- 		
-	
+				var request = event.request;
+				/* LaunchRequest Ex. "Open Greeter" 
+				   IntentRequest Ex. "Say hello to John"
+				   SessionEndedRequest Ex. "exit" or error or timeout 
+				*/   
 
 
 =========
