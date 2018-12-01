@@ -109,7 +109,11 @@ AWS cli
 	- Create a user and give permissions at IAM Management Console.
 	- aws configure. 
 	
-
+SSML 
+	- Speech Synthesis Markup Language 
+	- upload automation
+	
+		-- SSML tags give Alexa additional information on pronunciation of words, acronyms, numbers, etc. 
 =========
 
 Web Service
