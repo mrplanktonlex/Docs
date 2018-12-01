@@ -44,5 +44,24 @@ Alexa Skill Kit
 		1.4 Response 
 			Hello <guest>, Good Morning / afternoon / evening 
 			
-			
+========
+
+	slots : { FirstName } , slot-type reference. 
+	Slots Types + Slot Values 
+	Save Model + Build Model
+	
+	Goto Endpoint: 
+		Service Endpoint Types: 
+		     AWS Lambda ARN 
+		     -OR-
+		     https:// (Web service)
+	
+	Deveice -> Amazon Alexa Service 
+		           |
+		           V
+		-> Developer Portal --> Looks at the intent schema ("intent" obj which has slot types + values) 
+				    --> Forms the Request.
+				    --> AWS Lambda Function / Any Web Services
+		
+	
 			
