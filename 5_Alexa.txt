@@ -79,8 +79,17 @@ AWS Lambda function (using Node.js):-
 	- http://aws.amazon.com 
 	- country matters, so select country properly else you wont get enough trigger points. 
 	- search for lambda + click on lambda + click "create function"
-		- template to select is "SimpleMicroServices" 
-		
+		- role to select: "create role from template"
+		- template to select: "SimpleMicroServices" 
+	- on Triggers, select 
+		- alexa skill kit (ASK) click on it
+			-- ||-ly Goto developer.amazon.com and try to get the "Skill ID"
+				- Goto Alexa -> Alexa Skill Kit -> Greetings 
+				- there will be a big name under "Greeting" (or what u named it ), this is ur "Skill ID"
+			-- Go one level back i.e. to Lambda -> functions -> greeting skill
+				- it will show coding section.
+					-- index.handler : means index.js::handler() . It can be something else.
+			-- 		
 	
 
 
