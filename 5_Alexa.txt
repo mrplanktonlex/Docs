@@ -28,6 +28,21 @@ alexa.amazon.com
 	
 Alexa Skill Kit 
 	1. Greetings Skill Objective and setup
-		- Goal : wish the guest eg. Hello greeter
-			-- Open/launch/talk  to/begin   greeter 
-			-- tell/ask  greeter  to/for/about    <some request>
+		1.1 Goal : wish the guest eg. Hello greeter
+		
+		1.2 Invocation
+			-- Open/launch/talk  to/begin   "greeter"	(ignore double quotes, i put those in) 
+			-- tell/ask  "greeter"  to/for/about    <some request>
+
+		1.3 Request
+			Alexa, ask "greeter" to say hello to <guest eg. John>"
+			Alexa, ask "greeter" to wish our <guest eg. John>"
+			Alexa, ask "greeter" to wish John
+			
+			So, there are multiple wash to put this request.
+			
+		1.4 Response 
+			Hello <guest>, Good Morning / afternoon / evening 
+			
+			
+			
