@@ -28,3 +28,6 @@ alexa.amazon.com
 	
 Alexa Skill Kit 
 	1. Greetings Skill Objective and setup
+		- Goal : wish the guest eg. Hello greeter
+			-- Open/launch/talk  to/begin   greeter 
+			-- tell/ask  greeter  to/for/about    <some request>
