@@ -1,0 +1,66 @@
+tabbed pane in BS3:-
+
+<div class = "col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+  <br />
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a href="#home" class="nav-link active" role="tab" data-toggle="tab">Home</a>
+    </li>
+    <li class="nav-item">
+        <a href="#profile" class="nav-link" role="tab" data-toggle="tab">Profile</a>
+    </li>
+    <li class="nav-item">
+        <a href="#about" class="nav-link" role="tab" data-toggle="tab">About</a>
+    </li>
+  </ul>
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane fade in active" id="home"> 1 </div>
+    <div role="tabpanel" class="tab-pane fade" id="profile"> 2 </div>
+    <div role="tabpanel" class="tab-pane fade" id="about"> 3 </div>
+  </div>
+</div>
+
+----
+
+import { Component, Input } from '@angular/core';
+
+@Component({
+   selector: 'xxx',
+   template: `
+   <div class = "col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+      <br />
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a href="#home" class="nav-link active" role="tab" data-toggle="tab">Home</a>
+        </li>
+        <li class="nav-item">
+            <a href="#profile" class="nav-link" role="tab" data-toggle="tab">Profile</a>
+        </li>
+        <li class="nav-item">
+            <a href="#about" class="nav-link" role="tab" data-toggle="tab">About</a>
+        </li>
+      </ul>
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade in active" id="home"> 1 </div>
+        <div role="tabpanel" class="tab-pane fade" id="profile"> 2 </div>
+        <div role="tabpanel" class="tab-pane fade" id="about"> 3 </div>
+      </div>
+    </div>
+
+   `
+})
+export class XXX {
+// nav-item
+  @Input() navItemHref: string;
+  @Input() navItemActive: boolean;
+  @Input() navItemTitle: string;
+
+//tabpanel stuff: "fade in", "active", "fade", "id"
+  @Input() tabpanelFadeIn: boolean;
+  @Input() tabpanelActive: boolean;
+  @Input() tabpanelId: string;
+  @Input() tabpanelTitle: string;
+} // class ends
+
+In html:-
+
