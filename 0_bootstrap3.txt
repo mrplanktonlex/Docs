@@ -62,5 +62,5 @@ export class XXX {
   @Input() tabpanelTitle: string;
 } // class ends
 
-In html:-
+When + is clicked, add a line-item in "nav-item" using <li> + add one entry in tabpanel
 
