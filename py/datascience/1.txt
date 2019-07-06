@@ -1,0 +1,23 @@
+
+const faker = require('faker')
+let i = 0;
+
+// 1.
+// faker.address.countryCode()
+// console.log(faker.image.imageUrl())
+// console.log(faker.internet.url())
+
+
+faker.ssn = function(){
+ return  Math.floor(Math.random() * 1000000000);
+}
+
+// 2. 
+for (i=0; i<100; i++){
+  // console.log(faker);
+  console.log(faker.name.firstName(),       faker.name.lastName());
+  console.log(faker.ssn());
+
+//, faker.name.title());
+  console.log(faker.address.streetAddress(), faker.address.city(), faker.address.stateAbbr(), faker.address.zipCode());
+} // for ends
