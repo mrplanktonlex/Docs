@@ -1,3 +1,9 @@
+step1:- create dataset.
+step2:- read dataset (in csv) into python
+step3:- process dataset (in python) to match input for tensorflow:-
+
+// step1: create dataset. For PII, could not find anything on kaggle.
+So, used faker.js for custom developement data. Code is available in faker repl here: https://repl.it/repls/MiserlyGainsboroTechnician 
 
 const faker = require('faker')
 let i = 0;
@@ -7,12 +13,12 @@ let i = 0;
 // console.log(faker.image.imageUrl())
 // console.log(faker.internet.url())
 
-
+// js code
 faker.ssn = function(){
  return  Math.floor(Math.random() * 1000000000);
 }
 
-// 2. 
+// 2. js code
 for (i=0; i<100; i++){
   // console.log(faker);
   console.log(faker.name.firstName(),       faker.name.lastName());
@@ -21,3 +27,4 @@ for (i=0; i<100; i++){
 //, faker.name.title());
   console.log(faker.address.streetAddress(), faker.address.city(), faker.address.stateAbbr(), faker.address.zipCode());
 } // for ends
+
