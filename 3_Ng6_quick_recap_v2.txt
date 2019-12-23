@@ -1,3 +1,36 @@
+No Preloading, PreloadingAllModules, Custom Preloading Strategy
+
+Pre-requisite:-
+
+	NOTE:- to pass "data" to a LL module use, data:{} property.
+	It takes an object.
+
+	eg. 
+	const appRoutes: Routes = [
+		{},
+		{},
+		{ path:'', 
+			data: { someproperty: true }, 
+			loadChildren: './employee/employee.module#EmployeeModule' 
+		}
+	];
+
+CustomPreloadingStrategy:-
+	export class someClass implements PreloadingStartegy{
+		preload(route: Route, fn : () => Observable<any>) : Observable<any> {
+			if(route.data && route.data['someproperty']){
+				return fn();
+			} else {
+				return of(null); // observable of null. return this, if someproperty is not set to true for that LL module.
+			}
+		}
+	}
+
+---
+
+
+=================================
+
 Observables vs Promises:- https://angular.io/guide/comparing-observables
 
 > Promises start immediately on creation. Observables are declarative; computation does not start until subscription.
