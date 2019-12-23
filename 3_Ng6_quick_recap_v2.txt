@@ -16,7 +16,7 @@ Pre-requisite:-
 	];
 
 CustomPreloadingStrategy:-
-	export class someClass implements PreloadingStartegy{
+	export class someCustomPreloadingClass implements PreloadingStartegy{
 		preload(route: Route, fn : () => Observable<any>) : Observable<any> {
 			if(route.data && route.data['someproperty']){
 				return fn();
@@ -27,6 +27,8 @@ CustomPreloadingStrategy:-
 	}
 
 ---
+
+RouterModule.forRoot(appRoutes, { preloadingStrategy: someCustomPreloadingClass } 
 
 
 =================================
