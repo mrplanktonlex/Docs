@@ -25,4 +25,30 @@
                             <p>TUX re-inventing the wheel, and move the needle. Feature creep dogpile that but diversify kpis but market-facing.</p>
                         </div><!-- .card-content -->
                     </a>
-                </article><!-- .card -->
+                </article><!-- .card --}
+
+.card-content {
+	padding: 1.4em;
+}
+
+.card-content h2 {
+	margin-top: 0;
+	margin-bottom: .5em;
+	font-weight: bold;
+}
+
+.card-content p {
+	font-size: 80%;
+}
+
+/* Flexbox stuff */
+
+.cards {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: space-between;
+}
+
+.card {
+	flex: 0 1 24%;
+}
