@@ -720,8 +720,8 @@ xxx
 	<router-outlet></router-outlet>
 	-OR-
 	<router-outlet
-		(activate) = "OnActivate($event)"		// $event will be some component.
-		(deactivate) = "OnDeactivate($event)"	// Called On destruction.
+		(activate) = "someMethodOnActivate($event)"		// $event will be some component.
+		(deactivate) = "someMethodOnDeactivate($event)"	// Called On destruction.
 	></router-outlet>
 
 >> Dynamic route "resolves" with snapshots.
