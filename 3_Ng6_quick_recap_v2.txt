@@ -1,4 +1,23 @@
 
+---
+
+Need to refresh and do examples on below:-
+
+Multicast: One Stream, multiple consumers. (on a Subject).
+Multicast Operators:   A multicast operator shares the single subscription created with other subscribers	
+						multicast().
+						https://www.tutorialspoint.com/rxjs/rxjs_multicasting_operator.htm
+Unicast: Each consumer/subscriber gets his own stream. If subscriber2 is late in subscribing (to an Observable), he may get ONLY those values, after he has subscribed !!!
+
+multicast operators: connect(), publish(), ConnectableObservable()
+share(), multicast eg. with BSubject, RSubject, AsyncSubject.
+switchMap()
+mergeMap()
+forkJoin()
+distinctUntil(), etc.
+
+----
+
 @Inject, @Injectable(), Injector, "Root Injector", "Injection Token"
 	" Root Injector " : (Injector for App.Component.ts ).
 						- The Injector looks for the DI in the Angular Providers using the Injection token. 
