@@ -1,3 +1,28 @@
+
+@Inject, @Injectable(), Injector, "Root Injector", "Injection Token"
+	" Root Injector " : (Injector for App.Component.ts ).
+						- The Injector looks for the DI in the Angular Providers using the Injection token. 
+						- The Injector creates the instance and injects it into the Component or service.
+	@Inject: param decorator to manually DI a service.
+
+@inject (if services are written in the same file as the component, and if both/all services use the same interface ISomeInterface, then how to get the 
+			DI done for these services (using the ISomeInterface) i.e. we should NOT use the standard DI.
+			
+		https://stackblitz.com/edit/angular-injection-token-example-nnflpp1 
+				export const QUILL_CONFIG = new InjectionToken<IQuillConfig>('quillConfig');
+				+
+				constructor(  
+					@Inject(QUILL_CONFIG) quillConfig: IQuillConfig
+				  ) {
+
+PS: Note how interfaces can be used to @Inject (manually) many services using it.
+
+---
+
+
+
+----
+
 No Preloading, PreloadingAllModules, Custom Preloading Strategy
 
 Pre-requisite:-
