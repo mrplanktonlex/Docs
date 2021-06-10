@@ -1,0 +1,31 @@
+table using table, with typescript, faker	https://codepen.io/mr_jnsn/pen/MWpvpMB	(static data, no faker)
+											https://stackblitz.com/edit/angular-ivy-bhtgk3  (faker)
+table using div, with typescript, faker 
+											
+table using bootstrap
+table using bootstrap with pagination
+table using ag-grid (with angular)
+table using ag-grid (with react)
+table using ag-grid (with vue)
+table using faker-data
+
+
+modal using html+css ==> reusable plz.
+
+overlay: icici
+	https://codepen.io/mr_jnsn/pen/QWdJBqg
+	
+login using JWT
+login using Google SSO
+	
+---
+
+>> destructuring: https://codepen.io/mr_jnsn/pen/dyvVPZr 
+	- arrays, objs, sets
+>> Sets : https://codepen.io/mr_jnsn/pen/wvgGBKx
+>> Job, Tech Job, protype inheritance: https://codepen.io/mr_jnsn/pen/vYgdGBZ
+>> call, apply, bind: https://codepen.io/mr_jnsn/pen/zYNRrWQ
+>> method chaining: https://codepen.io/mr_jnsn/pen/KKaZjGq
+>> currying: https://codepen.io/mr_jnsn/pen/QWdaXBp
+>> Event Bubbling -vs (useCapture)
+	https://codepen.io/mr_jnsn/pen/qBRPwJm
