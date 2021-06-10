@@ -5,8 +5,11 @@ Need to refresh and do examples on below:-
 
 Multicast: One Stream, multiple consumers. (on a Subject).
 Multicast Operators:   A multicast operator shares the single subscription created with other subscribers	
-						multicast().
-						https://www.tutorialspoint.com/rxjs/rxjs_multicasting_operator.htm
+						multicast(). https://www.tutorialspoint.com/rxjs/rxjs_multicasting_operator.htm
+							user .connect() with multi-casted stream. 
+						publish() is short for .multicast(new Rx.Subject())
+							https://stackoverflow.com/questions/38025123/whats-the-difference-between-publish-and-multicast-operator-in-rxjs-5 
+I had the same question when reading http://reactivex.io/rxjs/manual/overview.html. So to make it clear, .publish() is just shorthand for .multicast(new Rx.Subject()) (and publishBehavior, publishLast, and publishReplay are similar but instantiate BehaviorSubject, AsyncSubject and ReplaySubject respectively).
 Unicast: Each consumer/subscriber gets his own stream. If subscriber2 is late in subscribing (to an Observable), he may get ONLY those values, after he has subscribed !!!
 
 multicast operators: connect(), publish(), ConnectableObservable()
